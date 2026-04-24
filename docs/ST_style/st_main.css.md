@@ -175,43 +175,146 @@
 
 ---
 
-## Атрибут `p` — position элемента
+## Атрибут `ps` — position элемента
 
-Применяется к **любому** элементу. Устанавливает `position` с `!important`.
+Применяется к **любому** элементу. Устанавливает `position` с `!important`. Значение `centered` делает: `left: 50%; top: 50%; transform: translate(-50%, -50%)`.
 
 ```html
-<h3 p="relative">Лёгкий заголовок</h3>
-<span p="absolute">Жирный текст</span>
-<p p="fixed">Обычный текст</p>
+<h3 ps="relative">Лёгкий заголовок</h3>
+<span ps="absolute centered">Жирный текст</span>
+<p ps="fixed">Обычный текст</p>
 ```
 
 | Значение          | position    |
 |-------------------|-------------|
-| `p="relative"`    | relative    |
-| `p="absolute"`    | absolute    |
-| `p="fixed"`       | fixed       |
-| `p="sticky"`      | sticky      |
+| `ps~="relative"`  | relative    |
+| `ps~="absolute"`  | absolute    |
+| `ps~="fixed"`     | fixed       |
+| `ps~="sticky"`    | sticky      |
+
+Центрирование
+
+```
+ps="center"
+```
+
+- размещает элемент по центру контейнера
+- центрирование происходит по X и Y одновременно
 
 ---
 
-## Атрибут `o` — overflow элемента
+Частичное центрирование
+
+```
+ps="center-x"
+```
+
+- центрирует элемент по горизонтали
+
+```
+ps="center-y"
+```
+
+- центрирует элемент по вертикали
+
+---
+
+Комбинированное использование
+
+```
+ps="absolute center"
+ps="fixed center-x center-y"
+```
+
+- применяется позиционирование + центрирование
+
+---
+
+Правила интерпретации
+
+1. `ps` всегда определяет поведение position-логики элемента
+2. `center` имеет приоритет над частичными модификаторами
+3. `center-x` и `center-y` могут использоваться независимо или совместно
+4. Центрирование применяется только к позиционируемым элементам (absolute / fixed / sticky)
+
+---
+
+Примеры использования
+
+```
+<h3 ps="relative">Title</h3>
+
+<div ps="absolute center">
+    Centered modal
+</div>
+
+<span ps="fixed center-x">
+    Horizontally centered bar
+</span>
+
+<p ps="sticky center-y">
+    Vertically aligned block
+</p>
+```
+
+---
+
+## Атрибут `ov` — overflow элемента
 
 Применяется к **любому** элементу. Устанавливает `overflow` с `!important`.
 
 ```html
-<h3 o="">Лёгкий заголовок</h3>
-<span o="x">Жирный текст</span>
-<p o="hidden">Обычный текст</p>
+<h3 ov="">Лёгкий заголовок</h3>
+<span ov="x">Жирный текст</span>
+<p ov="hidden">Обычный текст</p>
+<p ov="scroll-x">Обычный текст</p>
 ```
 
-| Значение          | overflow                               |
-|-------------------|----------------------------------------|
-| `o=""`            | overflow-x: auto; overflow-y: auto     |
-| `o="x"`           | overflow-x: auto; overflow-y: hidden   |
-| `o="y"`           | overflow-x: hidden; overflow-y: auto   |
-| `o="hidden"`      | overflow-x: hidden; overflow-y: hidden |
+| Значение          | overflow                                  |
+|-------------------|-------------------------------------------|
+| `ov=""`            | overflow-x: visible; overflow-y: visible |
+| `ov="x"`           | overflow-x: visible; overflow-y: hidden  |
+| `ov="y"`           | overflow-x: hidden; overflow-y: visible  |
+| `ov="scroll x"`    | overflow-x: auto; overflow-y: hidden     |
+| `ov="scroll y"`    | overflow-x: hidden; overflow-y: auto     |
+| `ov="hidden"`      | overflow-x: hidden; overflow-y: hidden   |
 
 ---
+
+## Система ограничения количества строк в элементе — `lc`
+
+> **Важно**: фреймворк управляет ограничением количества через свойства `-webkit-line-clamp: var(--line-clamp) !important;` `display: -webkit-box !important;` `-webkit-box-orient: vertical !important;` `overflow: hidden !important`, где `--line-clamp` изначально `0`, при значение `0` устанавливается `-webkit-line-clamp: none` и может быть числом **0-10**;
+
+### Синтаксис
+
+```html
+<!-- Одно значение (применяется на всех размерах экрана) -->
+<p lc="0">       <!-- не применяется -->
+<p lc="1">          <!-- 1 строка -->
+<p lc="5">        <!-- 5 строк -->
+
+<!-- Responsive: несколько значений через пробел -->
+<!-- Значения применяются в порядке брейкпоинтов, ПОСЛЕДНЕЕ выигрывает -->
+<p lc="3 lg-6">  <!-- 3 строки на xs/sm/md/lp, 6 строк на lg+ -->
+<p lc="4 md-0 lg-10"> <!-- 4 строки → не применяется → 10 строк -->
+```
+
+### Доступные значения
+
+Числа **1–10** для каждого брейкпоинта:
+
+```
+lc="0"  lc="1"  lc="2"  ...  lc="10"       -- базовые (xs, ≥0px)
+lc="sm-0" ... lc="sm-10"                    -- ≥360px
+lc="md-0" ... lc="md-10"                    -- ≥768px
+lc="lp-0" ... lc="lp-10"                    -- ≥1024px
+lc="lg-0" ... lc="lg-10"                    -- ≥1280px
+lc="dt-0" ... lc="dt-10"                    -- ≥1536px
+lc="xl-0" ... lc="xl-10"                    -- ≥1920px
+```
+
+---
+
 
 ## Система отступов — `m`, `mt`, `mb`, `p`, `pt`, `pb`
 
@@ -352,6 +455,14 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 **Доступные значения start**: `start-1` ... `start-12` для каждого брейкпоинта.
 
+Для управления отступами можно использовать атрибут gap (подробнее в блоке про ds (display)):
+
+```html
+<div grid="gap-1">
+<div grid="12 gap-x-5">
+<div grid="10 gap-y-3">
+```
+
 ### Полный пример паттерна карточек
 
 ```html
@@ -372,7 +483,7 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ---
 
-## Атрибут `d` — управление отображением
+## Атрибут `ds` — управление отображением
 
 Управляет CSS-свойством `display` с `!important`. Позволяет показывать/скрывать элементы на разных брейкпоинтах.
 
@@ -389,11 +500,11 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 ### Min-width (mobile-first)
 
 ```html
-<div d="none">                 <!-- скрыт на всех экранах -->
-<div d="flex">                 <!-- flex на всех экранах -->
-<div d="none lg-block">        <!-- скрыт до lg, block на lg+ -->
-<div d="block lg-none">        <!-- block до lg, скрыт на lg+ -->
-<div d="none md-flex lg-none"> <!-- flex только на md–lp -->
+<div ds="none">                 <!-- скрыт на всех экранах -->
+<div ds="flex">                 <!-- flex на всех экранах -->
+<div ds="none lg-block">        <!-- скрыт до lg, block на lg+ -->
+<div ds="block lg-none">        <!-- block до lg, скрыт на lg+ -->
+<div ds="none md-flex lg-none"> <!-- flex только на md–lp -->
 ```
 
 Префиксы: `xs-`, `sm-`, `md-`, `lp-`, `lg-`, `dt-`, `xl-`
@@ -403,28 +514,38 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 Работают только в конкретном диапазоне ширины:
 
 ```html
-<div d="xs-only-none">   <!-- скрыт только на xs (0–359.98px) -->
-<div d="sm-only-block">  <!-- block только на sm (360–767.98px) -->
-<div d="md-only-none">   <!-- скрыт только на md (768–1023.98px) -->
-<div d="lp-only-flex">   <!-- flex только на lp (1024–1279.98px) -->
-<div d="lg-only-none">   <!-- скрыт только на lg (1280–1535.98px) -->
-<div d="dt-only-block">  <!-- block только на dt (1536–1919.98px) -->
-<div d="xl-only-flex">   <!-- flex только на xl (1920px+) -->
+<div ds="xs-only-none">   <!-- скрыт только на xs (0–359.98px) -->
+<div ds="sm-only-block">  <!-- block только на sm (360–767.98px) -->
+<div ds="md-only-none">   <!-- скрыт только на md (768–1023.98px) -->
+<div ds="lp-only-flex">   <!-- flex только на lp (1024–1279.98px) -->
+<div ds="lg-only-none">   <!-- скрыт только на lg (1280–1535.98px) -->
+<div ds="dt-only-block">  <!-- block только на dt (1536–1919.98px) -->
+<div ds="xl-only-flex">   <!-- flex только на xl (1920px+) -->
 ```
+
+### Gap. Также `gap` используется для управления расстоянием между дочерними элементами контейнера, работает для `grid` и `flex` контейнеров.
+
+Префиксы: `gap-`, `gap-x-`, `gap-y`.
+
+1. `gap-*` задаёт базовый общий промежуток.
+2. `gap-x-*` переопределяет только горизонтальную ось.
+3. `gap-y-*` переопределяет только вертикальную ось.
+
+Возможные значения от 0 до 15.
 
 ### Паттерн из реального проекта
 
 ```html
 <!-- Кнопка только на мобилке -->
-<div class="container" mt="6" d="block lg-none">
+<div class="container" mt="6" ds="block lg-none">
     <button class="button button--wide button--orange" p="5">Забронировать</button>
 </div>
 
 <!-- Блок с блокцитатой только на десктопе -->
-<div d="none lg-block" class="gallery__blockquote_container">...</div>
+<div ds="none lg-flex gap-4" class="gallery__blockquote_container">...</div>
 
 <!-- Кнопки навигации слайдера только на десктопе -->
-<div class="swiper-button-prev" d="none lg-block">...</div>
+<div class="swiper-button-prev" ds="none lg-grid gap-x-2 gap-y-9">...</div>
 ```
 
 ---
