@@ -17,8 +17,8 @@
 /* raise */
 *[raise] {
     --transition-duration: var(--td-medium);
-    --raise-hover: 0.5rem;
-    --raise-active: 1rem;
+    --raise-hover: 0.5em;
+    --raise-active: 1em;
 
     will-change: transform;
     animation: blink var(--blink-duration) step-end var(--blink-iteration-count)
@@ -605,6 +605,8 @@
 *[td="2s"] { --transition-duration: 2s }
 *[td="3s"] { --transition-duration: 3s }
 *[td="5s"] { --transition-duration: 5s }
+*[td="10s"] { --transition-duration: 10s }
+*[td="15s"] { --transition-duration: 15s }
 *[td="none"] { --transition-duration: none }
 
 *[infinite] { --iteration-count: infinite; }
