@@ -1655,7 +1655,7 @@ label > input, label > textarea {
     resize: vertical;
 }
 
-label:has(> *[checkbox], *[radio]):has(> input[type="checkbox"], input[type="radio"]) {
+:where(label:has(> *[checkbox], *[radio]):has(> input[type="checkbox"], input[type="radio"])) {
     position: relative;
     input[type="checkbox"], input[type="radio"] {
         position: absolute;
