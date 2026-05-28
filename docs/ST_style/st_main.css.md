@@ -32,19 +32,9 @@
 | `dt`    | 1536px    | 1919.98px   | Десктопы                 |
 | `xl`    | 1920px    | —           | Широкоформатные          |
 
-Для `-only` вариантов (только атрибут `d`) используются диапазоны `min + max`.
+Для `-only` вариантов (только атрибут `ds`) используются диапазоны `min + max`.
 
-**CSS-переменные брейкпоинтов** доступны в `:root`:
-```css
---xs-min: 0px
---sm-min: 360px
---md-min: 768px
---lp-min: 1024px
---lg-min: 1280px
---dt-min: 1536px
---xl-min: 1920px
-/* max = следующий min − 0.02px */
-```
+> **Note:** базовый брейкпоинт `xs` (≥0px) не требует префикса. `m="3 lg-6"` — это «3 на xs+, 6 на lg+». Префикс `xs-` больше не поддерживается (был удалён как избыточный).
 
 ---
 
@@ -87,17 +77,15 @@
 ### Шкала отступов
 
 ```css
---space-step: 4px
-
---space-0:  0px   -- space-5:  20px  -- space-10: 40px  -- space-15: 60px  -- space-20: 80px
---space-1:  4px   -- space-6:  24px  -- space-11: 44px  -- space-16: 64px  -- space-21: 84px
---space-2:  8px   -- space-7:  28px  -- space-12: 48px  -- space-17: 68px  -- space-22: 88px
---space-3:  12px  -- space-8:  32px  -- space-13: 52px  -- space-18: 72px  -- space-23: 92px
---space-4:  16px  -- space-9:  36px  -- space-14: 56px  -- space-19: 76px  -- space-24: 96px
-                                                          -- space-25: 100px
+--space-step: 4px;
+--sz-step:    calc(var(--space-step) / 4);   /* = 1px */
 ```
 
-**Формула**: `N × 4px`. `mt="5"` → `margin-top: 20px`.
+**Формула**: `mt="N"` → `margin-top: calc(N * var(--space-step))` = `N × 4px`.
+
+Утилиты `m/mt/mb`, `p/pt/pb`, `gap` хранят **число-множитель** в custom-property (`--mt`, `--mb`, `--pt`, `--pb`, `--gap`, `--gap-x`, `--gap-y`), а applier умножает на `--space-step` через `calc()`. Это позволяет внутри `[container]` подменить `--space-step` на `cqw` — и **все** отступы автоматически становятся пропорциональны ширине.
+
+Шкала множителей: `0..25` для margin/padding, `1..15` для gap, `1..20` для sz.
 
 ---
 
@@ -572,21 +560,7 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 <div ds="none md-flex lg-none"> <!-- flex только на md–lp -->
 ```
 
-Префиксы: `xs-`, `sm-`, `md-`, `lp-`, `lg-`, `dt-`, `xl-`
-
-### Only-варианты (точный брейкпоинт)
-
-Работают только в конкретном диапазоне ширины:
-
-```html
-<div ds="xs-only-none">   <!-- скрыт только на xs (0–359.98px) -->
-<div ds="sm-only-block">  <!-- block только на sm (360–767.98px) -->
-<div ds="md-only-none">   <!-- скрыт только на md (768–1023.98px) -->
-<div ds="lp-only-flex">   <!-- flex только на lp (1024–1279.98px) -->
-<div ds="lg-only-none">   <!-- скрыт только на lg (1280–1535.98px) -->
-<div ds="dt-only-block">  <!-- block только на dt (1536–1919.98px) -->
-<div ds="xl-only-flex">   <!-- flex только на xl (1920px+) -->
-```
+Префиксы: `sm-`, `md-`, `lp-`, `lg-`, `dt-`, `xl-`. Базовый брейкпоинт (xs, ≥0px) — без префикса.
 
 ### Gap. Также `gap` используется для управления расстоянием между дочерними элементами контейнера, работает для `grid` и `flex` контейнеров.
 
