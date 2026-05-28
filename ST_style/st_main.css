@@ -1992,9 +1992,6 @@
 *[ps~="fixed"] { --position: fixed }
 *[ps~="sticky"] { --position: sticky }
 
-
-/*ОПТИМИЗАЦИЯ, НАДО ЕЩЁ ИСПОЛЬЗОВАТЬ :is()*/
-
 *[ps*="center"]:is([ps~="absolute"], [ps~="fixed"], [ps~="sticky"]) {
     left: var(--position-left);
     top: var(--position-top);
@@ -2145,9 +2142,6 @@
     *[ds~="xl-only-grid"]   { --display: grid }
     *[ds~="xl-only-inline"] { --display: inline }
 }
-
-
-/* ОПТИМИЗАЦИЯ! НАДО ЕЁ ЕЩЁ ПРИМЕНЯТЬ! Подумать куда ещё :where() вставть, нулевой приоритет! (специфичность)*/
 
 :where(*[ds*=gap]:is([ds*="flex"], [ds*="grid"]), *[grid*="gap"]) {
     --gap: 0;
