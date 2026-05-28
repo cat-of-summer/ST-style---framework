@@ -6,7 +6,7 @@
 
 `st_main.css` — основной файл CSS-фреймворка ST_style. Реализует систему утилитарных HTML-атрибутов, CSS-сброс, типографику, систему отступов, grid-сетку, управление видимостью и базовые компоненты (`icon`, `mask`, `editor`).
 
-**Ключевой принцип**: стили управляются через HTML-атрибуты (`mt="6"`, `col="12 lg-3"`, `d="none lg-block"`), а не классы. Под капотом — CSS Custom Properties: атрибут устанавливает переменную, а правило-«применятель» читает эту переменную.
+**Ключевой принцип**: стили управляются через HTML-атрибуты (`mt="6"`, `col="12 lg-3"`, `ds="none lg-block"`), а не классы. Под капотом — CSS Custom Properties: атрибут устанавливает переменную, а правило-«применятель» читает эту переменную.
 
 **Подход к адаптивности**: mobile-first. Базовые значения — без медиа-запроса (для `xs`, ≥0px). Для каждого брейкпоинта добавляется `min-width` медиа-запрос, который переопределяет CSS Custom Property.
 
@@ -172,6 +172,32 @@
 | `fw="bold"`       | 700         |
 | `fw="extrabold"`  | 800         |
 | `fw="black"`      | 900         |
+
+---
+
+## Атрибут `sz` — точечный font-size
+
+Применяется к **любому** элементу. Устанавливает `font-size` с `!important`. В отличие от `fs` (шкала h1–p), `sz` задаёт конкретный множитель шага `--sz-step`.
+
+```html
+<p sz="14">font-size = 14 × --sz-step</p>
+<span sz="md-16 lg-20">16px на md, 20px на lg</span>
+```
+
+**Формула:** `sz="N"` → `font-size: calc(N * var(--sz-step))`.
+
+**Значения `--sz-step`:**
+- Снаружи `[container]`: `1px` (производное от `--space-step / 4`).
+- Внутри `[container]`: `0.1cqw` (автоматически, через `--space-step` → cqw-режим).
+- Override: `style="--sz-step: 1.2px"` или `style="--cq-step: 0.3cqw"`.
+
+**Доступные значения:** 1, 2, 3, …, 16, 18, 20 для каждого брейкпоинта (`xs/sm/md/lp/lg/dt/xl`).
+
+```html
+<p sz="12">                  <!-- 12px (вне cqw) -->
+<p sz="14" container>...</p> <!-- становится сам контейнером, sz=14 от его ширины -->
+<p sz="12 lg-16">            <!-- 12px на xs–lp, 16px на lg+ -->
+```
 
 ---
 
@@ -377,31 +403,70 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ### `section`
 
-Семантический тег `<section>` автоматически получает адаптивный `max-width`:
+Семантический тег `<section>` автоматически получает: `position: relative; width: 100%; margin: auto`.
 
-| Ширина экрана | max-width секции |
-|---------------|-----------------|
-| ≥0px (xs)     | 320px           |
-| ≥360px (sm)   | 340px           |
-| ≥595px        | 550px           |
-| ≥768px (md)   | 720px           |
-| ≥1024px (lp)  | 960px           |
-| ≥1280px (lg)  | 1200px          |
-| ≥1536px (dt)  | 1320px          |
-| ≥1920px (xl)  | 1600px          |
+### Атрибут `container`
 
-`section` также имеет: `position: relative; width: 100%; margin: auto`
+Обёртка с адаптивным `max-width` и **container-query**-контекстом. Применяется к любому элементу через атрибут.
 
-### `.container`
+```html
+<div container>...</div>              <!-- inline-size container -->
+<div container="block">...</div>      <!-- size container (по ширине и высоте) -->
+```
 
-Обёртка внутри `section`. Имеет те же базовые стили: `position: relative; width: 100%; margin: auto`.
+**Адаптивный `max-width`:**
 
-**Паттерн вёрстки секции**:
+| Ширина экрана | max-width |
+|---------------|-----------|
+| ≥0px (xs)     | 320px     |
+| ≥360px (sm)   | 340px     |
+| ≥595px        | 550px     |
+| ≥768px (md)   | 720px     |
+| ≥1024px (lp)  | 960px     |
+| ≥1280px (lg)  | 1200px    |
+| ≥1536px (dt)  | 1320px    |
+| ≥1920px (xl)  | 1600px    |
+
+Базовые стили: `position: relative; width: 100%; margin: auto` (через `:where()` — нулевая специфичность, легко переопределяется проектом).
+
+### cqw-режим масштабирования
+
+Внутри `*[container]` все step-based утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) **автоматически масштабируются** с шириной контейнера через `cqw`-единицы.
+
+**Как работает:** внутри контейнера переопределяется `--space-step` на `0.4cqw` (по умолчанию). Все утилиты считают свои значения через `calc(N * var(--space-step))` — значит, и они станут пропорциональны ширине. `--sz-step` производный от `--space-step` (`/4`), поэтому `sz` тоже скейлится.
+
+**Управление:**
+
+```html
+<!-- Стандартный режим: 0.4cqw -->
+<div container>
+    <div m="5">margin = 0.4cqw × 5 = 2cqw</div>
+    <p sz="14">font-size = 0.1cqw × 14 = 1.4cqw</p>
+</div>
+
+<!-- Более компактный шаг -->
+<div container style="--cq-step: 0.3cqw">
+    <div m="5">margin = 1.5cqw</div>
+</div>
+
+<!-- Развязать sz от cqw — задать абсолютный шаг -->
+<div container>
+    <p sz="14" style="--sz-step: 1.2px">font-size = 16.8px (фикс)</p>
+</div>
+```
+
+**Пример:** при ширине контейнера 1200px и `--cq-step: 0.4cqw`:
+- `m="5"` → 4.8px × 5 = 24px
+- `sz="14"` → 1.2px × 14 = 16.8px
+
+**Вложенность:** оба `[container]` и `[container="block"]` используют одно имя `container`, поэтому `@container` всегда смотрит на **ближайшего** предка-контейнер. Вложенные контейнеры масштабируются по своей ширине.
+
+**Паттерн вёрстки секции:**
 
 ```html
 <section mt="6">
-    <div class="container">
-        <!-- контент секции -->
+    <div container>
+        <!-- контент секции, все отступы скейлятся с шириной -->
     </div>
 </section>
 ```
@@ -468,7 +533,7 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 ```html
 <!-- 4 карточки в ряд на десктопе, 1 на мобилке -->
 <section mt="6">
-    <div class="container">
+    <div container>
         <div class="services" grid="">
             <article col="12 lg-3" sheen="hover" shadow="hover focus" tabindex="0">
                 <!-- содержимое карточки -->
@@ -537,7 +602,7 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ```html
 <!-- Кнопка только на мобилке -->
-<div class="container" mt="6" ds="block lg-none">
+<div container mt="6" ds="block lg-none">
     <button class="button button--wide button--orange" p="5">Забронировать</button>
 </div>
 
@@ -707,16 +772,16 @@ label > input, label > textarea {
 <body>
 
 <header>
-    <div class="container">
+    <div container>
         <!-- шапка с навигацией -->
     </div>
 </header>
 
 <main>
 
-    <!-- Каждая секция: section > .container > контент -->
+    <!-- Каждая секция: section > [container] > контент -->
     <section mt="3">
-        <div class="container">
+        <div container>
             <div class="section__header">
                 <div class="section__title">
                     <h2>Заголовок секции</h2>
@@ -730,7 +795,7 @@ label > input, label > textarea {
 
     <!-- Секция с grid-карточками -->
     <section mt="6">
-        <div class="container">
+        <div container>
             <div class="cards" grid="">
                 <article col="12 lg-3" sheen="hover" shadow="hover" tabindex="0">
                     <!-- карточка -->
@@ -742,7 +807,7 @@ label > input, label > textarea {
 </main>
 
 <footer>
-    <div class="container">
+    <div container>
         <!-- подвал -->
     </div>
 </footer>
@@ -806,9 +871,49 @@ html {
 | `pb`          | padding-bottom                        | `pb="4"`                          |
 | `grid`        | CSS Grid контейнер                    | `grid=""`, `grid="10"`           |
 | `col`         | Span и позиция в grid                 | `col="12 lg-3"`, `col="start-2"` |
-| `d`           | Display (показать/скрыть)             | `d="none lg-block"`, `d="flex"`  |
+| `ds`          | Display (показать/скрыть)             | `ds="none lg-block"`, `ds="flex"` |
+| `container`   | Адаптивный контейнер + cqw-скейлинг   | `container`, `container="block"` |
 | `icon`        | Flex-контейнер иконки                 | `icon=""`, `icon="square"`       |
 | `mask`        | CSS-маска для иконок                  | `mask=""` + `style="--mask: url(...)"` |
 | `fluid`       | fit-content размеры                   | `fluid=""`                        |
 | `checkbox`    | Кастомный стилизуемый чекбокс        | атрибут у `span` внутри `label`  |
 | `radio`       | Кастомная стилизуемая радио-кнопка   | атрибут у `span` внутри `label`  |
+| `sz`          | Точечный font-size (множитель)        | `sz="14"`, `sz="12 lg-16"`        |
+| `lc`          | Line-clamp (ограничение строк)        | `lc="3"`, `lc="3 lg-0"`           |
+| `ps`          | position элемента                     | `ps="absolute center"`            |
+| `ov`          | overflow                              | `ov="hidden"`, `ov="scroll y"`    |
+
+---
+
+## Прогрессивные техники
+
+### `@property` — прогрессивная надстройка
+
+Часть переменных зарегистрирована через `@property`. Это **не обязательная часть** фреймворка — корректность наследования обеспечивается локальным reset на родовых селекторах (`*[m]`, `*[col]`, `*[ds]` и т.д.). `@property` — поверх, для браузеров, которые поддерживают (Chrome 85+, Firefox 128+, Safari 16.4+):
+
+| Свойство          | Тип                    | Initial  | Inherits |
+|-------------------|------------------------|----------|----------|
+| `--space-step`    | `<length>`             | `4px`    | да       |
+| `--sz-step`       | `<length>`             | `1px`    | да       |
+| `--cq-step`       | `<length>`             | `0.4cqw` | да       |
+| `--grid-columns`  | `<integer>`            | `12`     | нет      |
+| `--col-span`      | `<integer>`            | `12`     | нет      |
+| `--col-start`     | `<integer> \| auto`    | `auto`   | нет      |
+
+**Бонусы там, где поддержано:**
+- **Type-safety.** Опечатка типа `style="--space-step: 4pxx"` не ломает `calc()` — браузер откатывается к `initial-value`.
+- **Анимация.** `transition: --space-step 0.3s` начинает работать — можно плавно менять spacing на hover/focus.
+
+В браузерах без `@property` — те же самые селекторы и custom-properties работают как обычные. Никакого degraded experience.
+
+### `:where()` для reset
+
+Все reset-стили (`html`, `body`, `*`, `img`, `h1–p`, `[container] max-width`) обёрнуты в `:where()` — специфичность **0,0,0**. Проектный класс перебивает reset без `!important`:
+
+```css
+/* Проектный CSS */
+.hero h1 { font-size: 48px; }   /* перебивает :where(h1) { font-size: 3.2em } */
+.wide-section[container] { max-width: 1800px; }  /* перебивает :where([container]) */
+```
+
+**Утилитарные атрибуты НЕ обёрнуты** в `:where()` — они должны побеждать обычные классы (`m="5"` сильнее `.card`).
