@@ -1615,12 +1615,14 @@ body {
 
 main,
 section,
-.container {
+*[container] {
     position: relative;
     width: 100%;
     margin-left: auto;
     margin-right: auto
 }
+*[container] { container-type: inline-size; }
+*[container="block"] { container-type: size; }
 
 picture,
 video,
@@ -1766,14 +1768,14 @@ h5 { font-size: var(--fs-h5) }
 h6 { font-size: var(--fs-h6) }
 p { font-size: var(--fs-p) }
 
-section { max-width: 320px }
-@media (min-width:360px) { section { max-width: 340px } }
-@media (min-width:595px) { section { max-width: 550px } }
-@media (min-width:768px) { section { max-width: 720px } }
-@media (min-width:1024px) { section { max-width: 960px } }
-@media (min-width:1280px) { section { max-width: 1200px } }
-@media (min-width:1536px) { section { max-width: 1320px } }
-@media (min-width:1920px) { section { max-width: 1600px } }
+*[container] { max-width: 320px }
+@media (min-width:360px) { *[container] { max-width: 340px } }
+@media (min-width:595px) { *[container] { max-width: 550px } }
+@media (min-width:768px) { *[container] { max-width: 720px } }
+@media (min-width:1024px) { *[container] { max-width: 960px } }
+@media (min-width:1280px) { *[container] { max-width: 1200px } }
+@media (min-width:1536px) { *[container] { max-width: 1320px } }
+@media (min-width:1920px) { *[container] { max-width: 1600px } }
 
 *[grid], *[grid~="12"] {
     --grid-columns: 12;
@@ -1987,7 +1989,7 @@ section { max-width: 320px }
     *[col~="xl-start-12"]  { --col-start: 12 }
 }
 
-*[ps] { position: var(--position) !important }
+*[ps] { --position: relative; position: var(--position) !important }
 
 *[ps~="relative"] { --position: relative }
 *[ps~="absolute"] { --position: absolute }
@@ -2016,8 +2018,8 @@ section { max-width: 320px }
 
 *[ov="hidden"] { --overflow-x: hidden; --overflow-y: hidden }
 *[ov~="scroll"] { --overflow-x: auto; --overflow-y: auto }
-*[ov~="y"] { --overflow-x: hidden }
-*[ov~="x"] { --overflow-y: hidden }
+*[ov~="y"] { --overflow-x: clip }
+*[ov~="x"] { --overflow-y: clip }
 
 *[ds] {
     --display: initial;
