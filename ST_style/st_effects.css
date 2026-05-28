@@ -14,14 +14,23 @@
     transition: inherit;
 }
 
+*[scale], *[rotate], *[raise], *[pulse], *[wobble], *[heartbeat], *[jello],
+*[bounce], *[spin], *[float], *[vibrate]                    { will-change: transform }
+*[blink], *[opacity]                                        { will-change: opacity }
+*[blur]                                                     { will-change: filter }
+*[shadow]                                                   { will-change: box-shadow }
+*[sheen]::before                                            { will-change: left }
+*[typing-text]                                              { will-change: width }
+*[typing-text]::after                                       { will-change: opacity }
+*[ripple]::before                                           { will-change: transform }
+*[shimmer-text]                                             { will-change: background-position }
+*[underline]::after                                         { will-change: width }
+
 /* raise */
 *[raise] {
     --transition-duration: var(--td-medium);
     --raise-hover: 0.5em;
     --raise-active: 1em;
-
-    will-change: transform;
-    animation: blink var(--blink-duration) step-end var(--blink-iteration-count)
 }
 
 *[raise~="hover"]:hover { transform: translateY(calc(-1 * var(--raise-hover))) }
@@ -35,7 +44,6 @@
     --scale-hover: 1.05;
     --scale-active: 0.95;
 
-    will-change: transform;
     transition-duration: var(--scale-duration);
 }
 
@@ -50,7 +58,6 @@
     --rotate-hover: 3deg;
     --rotate-active: -3deg;
 
-    will-change: transform;
     transition-duration: var(--rotate-duration);
 }
 
@@ -64,7 +71,6 @@
     --blur-duration: var(--transition-duration);
     --blur-amount: 5px;
 
-    will-change: blur;
     filter: blur(var(--blur-amount))
 }
 
@@ -89,7 +95,6 @@
     --shadow-active-blur: 8px;
     --shadow-active-color: rgba(0, 0, 0, 0.3);
 
-    will-change: box-shadow;
     transition-duration: var(--shadow-duration);
 }
 
@@ -108,20 +113,14 @@
     --transition-duration: var(--td-slow);
     --opacity-duration: var(--transition-duration);
     --opacity-iteration-count: var(--iteration-count);
+    --opacity-name: _opacity;
 
-    will-change: opacity;
-    animation: _opacity var(--opacity-duration) linear var(--opacity-iteration-count)
+    animation: var(--opacity-name) var(--opacity-duration) linear var(--opacity-iteration-count)
 }
 
 *[opacity~="infinite"] { --opacity-iteration-count: infinite }
-
-*[opacity~="hover"], *[opacity~="active"], *[opacity~="focus"] {
-    animation: none
-}
-
-*[opacity~="hover"]:hover, *[opacity~="active"]:active, *[opacity~="focus"]:focus {
-    animation: _opacity var(--opacity-duration) linear var(--opacity-iteration-count)
-}
+*[opacity~="hover"], *[opacity~="active"], *[opacity~="focus"] { --opacity-name: none }
+*[opacity~="hover"]:hover, *[opacity~="active"]:active, *[opacity~="focus"]:focus { --opacity-name: _opacity }
 
 /* blink */
 @keyframes blink {
@@ -132,20 +131,14 @@
     --transition-duration: 1s;
     --blink-duration: var(--transition-duration);
     --blink-iteration-count: var(--iteration-count);
+    --blink-name: blink;
 
-    will-change: opacity;
-    animation: blink var(--blink-duration) step-end var(--blink-iteration-count)
+    animation: var(--blink-name) var(--blink-duration) step-end var(--blink-iteration-count)
 }
 
 *[blink~="infinite"] { --blink-iteration-count: infinite }
-
-*[blink~="hover"], *[blink~="active"], *[blink~="focus"] {
-    animation: none
-}
-
-*[blink~="hover"]:hover, *[blink~="active"]:active, *[blink~="focus"]:focus {
-    animation: blink var(--blink-duration) step-end var(--blink-iteration-count)
-}
+*[blink~="hover"], *[blink~="active"], *[blink~="focus"] { --blink-name: none }
+*[blink~="hover"]:hover, *[blink~="active"]:active, *[blink~="focus"]:focus { --blink-name: blink }
 
 /* typing-text */
 @keyframes typing-text { 
@@ -161,7 +154,6 @@
     --typing-color: #000;
     --typing-width: 2px;
 
-    will-change: width;
     position: relative !important;
     display: inline-block;
     overflow: hidden;
@@ -173,7 +165,6 @@
 }
 
 *[typing-text]::after {
-    will-change: opacity;
     content: "";
     position: absolute;
     right: 0;
@@ -205,20 +196,14 @@
     --pulse-duration: var(--transition-duration);
     --pulse-scale: 1.03;
     --pulse-iteration-count: var(--iteration-count);
+    --pulse-name: pulse;
 
-    will-change: transform;
-    animation: pulse var(--pulse-duration) ease-in-out var(--pulse-iteration-count)
+    animation: var(--pulse-name) var(--pulse-duration) ease-in-out var(--pulse-iteration-count)
 }
 
 *[pulse~="infinite"] { --pulse-iteration-count: infinite }
-
-*[pulse~="hover"], *[pulse~="active"], *[pulse~="focus"] {
-    animation: none
-}
-
-*[pulse~="hover"]:hover, *[pulse~="active"]:active, *[pulse~="focus"]:focus {
-    animation: pulse var(--pulse-duration) ease-in-out var(--pulse-iteration-count)
-}
+*[pulse~="hover"], *[pulse~="active"], *[pulse~="focus"] { --pulse-name: none }
+*[pulse~="hover"]:hover, *[pulse~="active"]:active, *[pulse~="focus"]:focus { --pulse-name: pulse }
 
 /* wobble */
 @keyframes wobble {
@@ -233,23 +218,14 @@
     --wobble-duration: var(--transition-duration);
     --wobble-angle: 10deg;
     --wobble-iteration-count: var(--iteration-count);
+    --wobble-name: wobble;
 
-    will-change: transform;
-    animation: wobble var(--wobble-duration) ease-in-out var(--wobble-iteration-count)
+    animation: var(--wobble-name) var(--wobble-duration) ease-in-out var(--wobble-iteration-count)
 }
 
 *[wobble~="infinite"] { --wobble-iteration-count: infinite }
-
-/* поведение: когда указано hover/active/focus — проигрывается только при событии */
-*[wobble~="hover"],
-*[wobble~="active"],
-*[wobble~="focus"] {
-    animation: none
-}
-
-*[wobble~="hover"]:hover, *[wobble~="active"]:active, *[wobble~="focus"]:focus {
-    animation: wobble var(--wobble-duration) ease-in-out var(--wobble-iteration-count)
-}
+*[wobble~="hover"], *[wobble~="active"], *[wobble~="focus"] { --wobble-name: none }
+*[wobble~="hover"]:hover, *[wobble~="active"]:active, *[wobble~="focus"]:focus { --wobble-name: wobble }
 
 /* sheen */
 @keyframes sheen {
@@ -270,7 +246,6 @@
 }
 
 *[sheen]::before {
-    will-change: left;
     content: "";
     position: absolute;
     top: 0;
@@ -281,18 +256,12 @@
     transform: skewX(var(--sheen-angle));
     pointer-events: none;
     z-index: 10;
-    animation: sheen var(--sheen-duration) linear var(--sheen-iteration-count)
+    animation: var(--sheen-name, sheen) var(--sheen-duration) linear var(--sheen-iteration-count)
 }
 
 *[sheen~="infinite"] { --sheen-iteration-count: infinite }
-
-*[sheen~="hover"]::before, *[sheen~="active"]::before, *[sheen~="focus"]::before {
-    animation: none
-}
-
-*[sheen~="hover"]:hover::before, *[sheen~="active"]:active::before, *[sheen~="focus"]:focus::before {
-    animation: sheen var(--sheen-duration) linear var(--sheen-iteration-count)
-}
+*[sheen~="hover"], *[sheen~="active"], *[sheen~="focus"] { --sheen-name: none }
+*[sheen~="hover"]:hover, *[sheen~="active"]:active, *[sheen~="focus"]:focus { --sheen-name: sheen }
 
 /* vibrate */
 @keyframes vibrate {
@@ -313,7 +282,6 @@
     --vibrate-y: 1px;
     --vibrate-rotate: 0.5deg;
 
-    will-change: transform;
     animation: vibrate var(--vibrate-duration) linear var(--vibrate-iteration-count);
     animation-play-state: paused
 }
@@ -324,7 +292,7 @@
 
 *[vibrate~="reverse"] { animation-play-state: running }
 
-*[vibrate~="reverse"][vibrate~="hover"]:hover, *[vibrate~="reverse"][vibrate~="hover"]:active, *[vibrate~="reverse"][vibrate~="hover"]:focus {
+*[vibrate~="reverse"][vibrate~="hover"]:hover, *[vibrate~="reverse"][vibrate~="active"]:active, *[vibrate~="reverse"][vibrate~="focus"]:focus {
     animation-play-state: paused
 }
 
@@ -346,32 +314,16 @@
     --float-duration: var(--transition-duration);
     --float-iteration-count: var(--iteration-count);
     --float-range: 6px;
+    --float-name: floatY;
 
-    will-change: transform;
-    animation: floatY var(--float-duration) ease-in-out var(--float-iteration-count);
+    animation: var(--float-name) var(--float-duration) ease-in-out var(--float-iteration-count);
 }
 
-*[float~='horizontal'] {
-    animation: floatX var(--float-duration) ease-in-out var(--float-iteration-count);
-}
-
+*[float~="horizontal"] { --float-name: floatX }
 *[float~="infinite"] { --float-iteration-count: infinite; }
-
-*[float~="hover"], *[float~="active"], *[float~="focus"] {
-    animation: none;
-}
-
-*[float~="hover"]:hover,
-*[float~="active"]:active,
-*[float~="focus"]:focus {
-    animation: floatY var(--float-duration) ease-in-out var(--float-iteration-count);
-}
-
-*[float~="hover"][float~="horizontal"]:hover,
-*[float~="active"][float~="horizontal"]:active,
-*[float~="focus"][float~="horizontal"]:focus {
-    animation: floatX var(--float-duration) ease-in-out var(--float-iteration-count);
-}
+*[float~="hover"], *[float~="active"], *[float~="focus"] { --float-name: none }
+*[float~="hover"]:hover, *[float~="active"]:active, *[float~="focus"]:focus { --float-name: floatY }
+*[float~="horizontal"][float~="hover"]:hover, *[float~="horizontal"][float~="active"]:active, *[float~="horizontal"][float~="focus"]:focus { --float-name: floatX }
 
 /* heartbeat */
 @keyframes heartbeat {
@@ -387,20 +339,14 @@
     --heartbeat-iteration-count: var(--iteration-count);
     --heartbeat-first-scale: 1.10;
     --heartbeat-second-scale: 0.95;
+    --heartbeat-name: heartbeat;
 
-    will-change: transform;
-    animation: heartbeat var(--heartbeat-duration) cubic-bezier(.4, .0, .2, 1) var(--heartbeat-iteration-count)
+    animation: var(--heartbeat-name) var(--heartbeat-duration) cubic-bezier(.4, .0, .2, 1) var(--heartbeat-iteration-count)
 }
 
 *[heartbeat~="infinite"] { --heartbeat-iteration-count: infinite }
-
-*[heartbeat~="hover"], *[heartbeat~="active"], *[heartbeat~="focus"] {
-    animation: none
-}
-
-*[heartbeat~="hover"]:hover, *[heartbeat~="active"]:active, *[heartbeat~="focus"]:focus {
-    animation: heartbeat var(--heartbeat-duration) cubic-bezier(.4, .0, .2, 1) var(--heartbeat-iteration-count)
-}
+*[heartbeat~="hover"], *[heartbeat~="active"], *[heartbeat~="focus"] { --heartbeat-name: none }
+*[heartbeat~="hover"]:hover, *[heartbeat~="active"]:active, *[heartbeat~="focus"]:focus { --heartbeat-name: heartbeat }
 
 /* jello */
 @keyframes jello {
@@ -415,20 +361,14 @@
     --transition-duration: var(--td-medium);
     --jello-duration: var(--transition-duration);
     --jello-iteration-count: var(--iteration-count);
+    --jello-name: jello;
 
-    will-change: transform;
-    animation: jello var(--jello-duration) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count);
+    animation: var(--jello-name) var(--jello-duration) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count);
 }
 
 *[jello~="infinite"] { --jello-iteration-count: infinite }
-
-*[jello~="hover"], *[jello~="active"], *[jello~="focus"] {
-    animation: none
-}
-
-*[jello~="hover"]:hover, *[jello~="active"]:active, *[jello~="focus"]:focus {
-    animation: jello var(--jello-duration) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count)
-}
+*[jello~="hover"], *[jello~="active"], *[jello~="focus"] { --jello-name: none }
+*[jello~="hover"]:hover, *[jello~="active"]:active, *[jello~="focus"]:focus { --jello-name: jello }
 
 
 /* ripple */
@@ -447,7 +387,6 @@
 }
 
 *[ripple]::before {
-    will-change: transform;
     content: "";
     position: absolute;
     left: 50%;
@@ -478,7 +417,6 @@
     --shimmer-size: 100%;
     --shimmer-iteration-count: var(--iteration-count);
 
-    will-change: background-position;
     background: linear-gradient(90deg, transparent calc(50% - var(--shimmer-size)), var(--shimmer-color) 50%, transparent calc(50% + var(--shimmer-size)));
     background-size: 200% 100%;
     background-clip: text;
@@ -518,7 +456,6 @@
 }
 
 *[underline]::after {
-    will-change: width;
     content: "";
     position: absolute;
     left: 0;
@@ -536,11 +473,12 @@
 *[underline~="right"]::after { margin-right: 0 }
 *[underline~="left"][underline~="right"]::after { margin-left: auto; margin-right: auto; }
 
-*[underline]:not([underline~="hover"]):not([underline~="active"]):not([underline~="focus"])::after { width: 100% }
-
-*[underline~="hover"]:hover::after, *[underline~="active"]:active::after, *[underline~="focus"]:focus::after {
-    width: 100%
-}
+*[underline]:is(
+    :not([underline~="hover"]):not([underline~="active"]):not([underline~="focus"]),
+    [underline~="hover"]:hover,
+    [underline~="active"]:active,
+    [underline~="focus"]:focus
+)::after { width: 100% }
 
 /* spin */
 @keyframes spin { to { transform: rotate(360deg) } }
@@ -549,20 +487,14 @@
     --transition-duration: var(--td-slow);
     --spin-duration: var(--transition-duration);
     --spin-iteration-count: var(--iteration-count);
+    --spin-name: spin;
 
-    will-change: transform;
-    animation: spin var(--spin-duration) linear var(--spin-iteration-count);
+    animation: var(--spin-name) var(--spin-duration) linear var(--spin-iteration-count);
 }
 
 *[spin~="infinite"] { --spin-iteration-count: infinite }
-
-*[spin~="hover"], *[spin~="active"], *[spin~="focus"] {
-    animation: none
-}
-
-*[spin~="hover"]:hover, *[spin~="active"]:active, *[spin~="focus"]:focus {
-    animation: spin var(--spin-duration) linear var(--spin-iteration-count)
-}
+*[spin~="hover"], *[spin~="active"], *[spin~="focus"] { --spin-name: none }
+*[spin~="hover"]:hover, *[spin~="active"]:active, *[spin~="focus"]:focus { --spin-name: spin }
 
 /* bounce */
 @keyframes bounce {
@@ -581,20 +513,14 @@
     --bounce-duration: var(--transition-duration);
     --bounce-height: 30px;
     --bounce-iteration-count: var(--iteration-count);
+    --bounce-name: bounce;
 
-    will-change: transform;
-    animation: bounce var(--bounce-duration) ease-in-out var(--bounce-iteration-count)
+    animation: var(--bounce-name) var(--bounce-duration) ease-in-out var(--bounce-iteration-count)
 }
 
 *[bounce~="infinite"] { --bounce-iteration-count: infinite }
-
-*[bounce~="hover"], *[bounce~="active"], *[bounce~="focus"] {
-    animation: none
-}
-
-*[bounce~="hover"]:hover, *[bounce~="active"]:active, *[bounce~="focus"]:focus {
-    animation: bounce var(--bounce-duration) ease-in-out var(--bounce-iteration-count)
-}
+*[bounce~="hover"], *[bounce~="active"], *[bounce~="focus"] { --bounce-name: none }
+*[bounce~="hover"]:hover, *[bounce~="active"]:active, *[bounce~="focus"]:focus { --bounce-name: bounce }
 
 *[td], *[td]::before, *[td]::after { transition-duration: var(--transition-duration) !important }
 *[td="rapid"] { --transition-duration: var(--td-rapid) }
@@ -612,18 +538,8 @@
 *[infinite] { --iteration-count: infinite; }
 
 @media (prefers-reduced-motion:reduce) {
-    *[pulse],
-    *[wobble],
-    *[sheen]::before,
-    *[float], 
-    *[heartbeat], 
-    *[jello], 
-    *[ripple]::after, 
-    *[shimmer-text],
-    *[shadow-pop],
-    *[vibrate],
-    *[bounce],
-    *[spin] {
+    *:is([pulse], [wobble], [float], [heartbeat], [jello], [shimmer-text], [vibrate], [bounce], [spin], [opacity], [blink]),
+    *:is([sheen], [ripple])::before {
         animation: none !important;
         transition: none !important
     }
