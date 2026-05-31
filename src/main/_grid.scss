@@ -1,0 +1,35 @@
+@use 'sass:map';
+@use 'config' as cfg;
+
+*[grid], *[grid~="12"] {
+  --grid-columns: 12;
+
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr)
+}
+
+*[grid~="10"] { --grid-columns: 10; }
+
+*[col] {
+  --col-span: var(--grid-columns);
+  --col-start: auto;
+  grid-column: var(--col-start) / span var(--col-span)
+}
+
+@for $i from 1 through 12 {
+  *[col~="#{$i}"] { --col-span: #{$i}; }
+}
+@for $i from 1 through 12 {
+  *[col~="start-#{$i}"] { --col-start: #{$i}; }
+}
+
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    @for $i from 1 through 12 {
+      *[col~="#{$bp}-#{$i}"] { --col-span: #{$i}; }
+    }
+    @for $i from 1 through 12 {
+      *[col~="#{$bp}-start-#{$i}"] { --col-start: #{$i}; }
+    }
+  }
+}

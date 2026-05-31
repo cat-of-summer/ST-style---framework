@@ -1,0 +1,184 @@
+@use 'sass:map';
+@use 'config' as cfg;
+
+:where(*, *::before, *::after) {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: inherit;
+    font-style: inherit;
+    color: inherit;
+    vertical-align: middle;
+}
+
+:where(html) {
+    font-size: var(--font-size);
+    width: 100vw;
+    overflow-x: hidden;
+    scroll-behavior: smooth
+}
+
+:where(body) {
+    user-select: none;
+    width: 100vw;
+    overflow-x: hidden;
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+    line-height: 1;
+}
+
+:where(main, section, *[container]) {
+    position: relative;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto
+}
+*[container]         { container-type: inline-size; container-name: container; }
+*[container="block"] { container-type: size;        container-name: container; }
+
+:where(picture, video, canvas, svg) {
+    display: block;
+    overflow: hidden;
+    max-width: 100%;
+    height: auto;
+    line-height: 0
+}
+
+:where(img, iframe) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center
+}
+
+:where(input, textarea, button) { font-size: var(--fs-p) }
+:where(input::placeholder, textarea::placeholder) { font-size: inherit; font-weight: inherit; line-height: inherit; }
+:where(textarea:focus, input:focus, button:focus) { outline: none }
+
+:where(label) {
+    position: relative;
+    cursor: pointer
+}
+
+:where(label > input, label > textarea) {
+    width: 100%;
+    height: 100%;
+    resize: vertical;
+}
+
+:where(label:has(> *[checkbox], *[radio]):has(> input[type="checkbox"], input[type="radio"])) {
+    position: relative;
+    input[type="checkbox"], input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 1px;
+        height: 1px;
+        bottom: 0;
+        left: 0;
+        pointer-events: none;
+    }
+    *[checkbox], *[radio] {
+        cursor: pointer;
+        position: relative;
+    }
+    span[checkbox], span[radio] {
+        display: inline-block;
+        vertical-align: middle;
+        width: var(--fs-p);
+        height: var(--fs-p);
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+:where(button) {
+    background: none;
+    border: none
+}
+
+:where(li) { list-style: none }
+
+:where(hr) {
+	border: 0;
+	margin: 0
+}
+
+*[fluid] {
+    width: fit-content;
+    height: fit-content;
+}
+
+*[cover] {
+    width: 100%;
+    height: 100%
+}
+
+*[icon] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: content-box;
+    cursor: pointer;
+    position: relative;
+    width: max-content;
+    height: max-content;
+}
+
+*[icon~="square"] {
+    height: auto;
+    aspect-ratio: 1 / 1;
+}
+
+*[icon~="inline"] { display: inline-flex }
+
+*[icon] > * { flex: auto }
+
+*[icon]::after {
+    content: '';
+    position: absolute;
+    top: -1em;
+    left: -1em;
+    right: -1em;
+    bottom: -1em;
+    pointer-events: all;
+    background: rgba(0,0,0,0);
+    z-index: 10;
+}
+
+*[mask] {
+    --mask: '';
+    --color: #000;
+
+    mask: var(--mask) no-repeat center / contain;
+    background-color: var(--color);
+}
+
+:where(a, button) { cursor: pointer }
+
+:where(h1, h2, h3, h4, h5, h6, p) {
+    font-weight: inherit;
+    overflow-wrap: break-word
+}
+
+:where(h1) { font-size: var(--fs-h1) }
+:where(h2) { font-size: var(--fs-h2) }
+:where(h3) { font-size: var(--fs-h3) }
+:where(h4) { font-size: var(--fs-h4) }
+:where(h5) { font-size: var(--fs-h5) }
+:where(h6) { font-size: var(--fs-h6) }
+:where(p)  { font-size: var(--fs-p) }
+
+// [container] max-width ladder, from $breakpoints' `container` values. Steps
+// without a `container` value are skipped; below the first one it stays fluid.
+@each $bp, $data in cfg.$breakpoints {
+  $cw: map.get($data, container);
+  @if $cw {
+    @media (min-width: map.get($data, min)) {
+      :where(*[container]) { max-width: $cw; }
+    }
+  }
+}

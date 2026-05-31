@@ -1,0 +1,20 @@
+@keyframes wobble {
+    0%,
+    100% { transform: rotate(0deg) }
+    25% { transform: rotate(var(--wobble-angle)) }
+    75% { transform: rotate(calc(-1 * var(--wobble-angle))) }
+}
+
+*[wobble] {
+    --transition-duration: var(--td-fast);
+    --wobble-duration: var(--transition-duration);
+    --wobble-angle: 10deg;
+    --wobble-iteration-count: var(--iteration-count);
+    --wobble-name: wobble;
+
+    animation: var(--wobble-name) var(--wobble-duration) ease-in-out var(--wobble-iteration-count)
+}
+
+*[wobble~="infinite"] { --wobble-iteration-count: infinite }
+*[wobble~="hover"], *[wobble~="active"], *[wobble~="focus"] { --wobble-name: none }
+*[wobble~="hover"]:hover, *[wobble~="active"]:active, *[wobble~="focus"]:focus { --wobble-name: wobble }

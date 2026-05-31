@@ -1,0 +1,41 @@
+@use 'sass:map';
+@use 'config' as cfg;
+
+// [fs] — semantic font-size tokens.
+*[fs] { font-size: var(--font-size) !important; }
+@each $name, $val in cfg.$font-sizes {
+  *[fs="#{$name}"] { --font-size: var(--fs-#{$name}); }
+}
+
+// [lc] — line clamp. The clamp is applied only when no "0" value (base or any
+// breakpoint) is present; that guard selector is built from the breakpoint set.
+$lc-guard: ':not([lc~="0"])';
+@each $bp in map.keys(cfg.$breakpoints) {
+  $lc-guard: $lc-guard + ':not([lc~="#{$bp}-0"])';
+}
+
+*[lc] { --line-clamp: none; }
+
+*[lc]#{$lc-guard} {
+  -webkit-line-clamp: var(--line-clamp) !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+@for $i from 1 through cfg.$lc-max {
+  *[lc~="#{$i}"] { --line-clamp: #{$i}; }
+}
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    @for $i from 1 through cfg.$lc-max {
+      *[lc~="#{$bp}-#{$i}"] { --line-clamp: #{$i}; }
+    }
+  }
+}
+
+// [fw] — font weight.
+*[fw] { font-weight: var(--font-weight) !important; }
+@each $name, $val in cfg.$font-weights {
+  *[fw="#{$name}"] { --font-weight: var(--fw-#{$name}); }
+}

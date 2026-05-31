@@ -1,0 +1,31 @@
+@keyframes vibrate {
+    0%   { transform: translate(0, 0) rotate(0); }
+    10%  { transform: translate(var(--vibrate-x), var(--vibrate-y)) rotate(var(--vibrate-rotate)); }
+    30%  { transform: translate(calc(var(--vibrate-x) * -1), var(--vibrate-y)) rotate(calc(var(--vibrate-rotate) * -1)); }
+    50%  { transform: translate(var(--vibrate-x), calc(var(--vibrate-y) * -1)) rotate(var(--vibrate-rotate)); }
+    70%  { transform: translate(calc(var(--vibrate-x) * -1), calc(var(--vibrate-y) * -1)) rotate(calc(var(--vibrate-rotate) * -1)); }
+    90%  { transform: translate(var(--vibrate-x), var(--vibrate-y)) rotate(var(--vibrate-rotate)); }
+    100% { transform: translate(0, 0) rotate(0); }
+}
+
+*[vibrate] {
+    --transition-duration: var(--td-fast);
+    --vibrate-duration: var(--transition-duration);
+    --vibrate-iteration-count: infinite;
+    --vibrate-x: 2px;
+    --vibrate-y: 1px;
+    --vibrate-rotate: 0.5deg;
+
+    animation: vibrate var(--vibrate-duration) linear var(--vibrate-iteration-count);
+    animation-play-state: paused
+}
+
+*[vibrate~="hover"]:hover, *[vibrate~="active"]:active, *[vibrate~="focus"]:focus {
+    animation-play-state: running
+}
+
+*[vibrate~="reverse"] { animation-play-state: running }
+
+*[vibrate~="reverse"][vibrate~="hover"]:hover, *[vibrate~="reverse"][vibrate~="active"]:active, *[vibrate~="reverse"][vibrate~="focus"]:focus {
+    animation-play-state: paused
+}

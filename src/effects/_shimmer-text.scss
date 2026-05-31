@@ -1,0 +1,36 @@
+@keyframes shimmer {
+    0%   { background-position: 200% 0 }
+    100% { background-position: -200% 0 }
+}
+
+*[shimmer-text] {
+    --transition-duration: 2s;
+    --shimmer-duration: var(--transition-duration);
+    --shimmer-color: var(--color, black);
+    --shimmer-size: 100%;
+    --shimmer-iteration-count: var(--iteration-count);
+
+    background: linear-gradient(90deg, transparent calc(50% - var(--shimmer-size)), var(--shimmer-color) 50%, transparent calc(50% + var(--shimmer-size)));
+    background-size: 200% 100%;
+    background-clip: text;
+    animation: shimmer var(--shimmer-duration) linear infinite;
+}
+
+*[shimmer-text]:not([shimmer-text~="active"]):not([shimmer-text~="focus"]) { color: transparent }
+
+*[shimmer-text~="hover"] {
+    animation-play-state: paused
+}
+
+*[shimmer-text~="hover"]:hover {
+    animation-play-state: running
+}
+
+*[shimmer-text~="active"], *[shimmer-text~="focus"] {
+    animation: none
+}
+
+*[shimmer-text~="active"]:active, *[shimmer-text~="focus"]:focus {
+    color: transparent;
+    animation: shimmer var(--shimmer-duration) linear infinite
+}

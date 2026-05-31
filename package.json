@@ -1,0 +1,32 @@
+{
+  "name": "@cat-of-summer/st-style",
+  "version": "0.1.0",
+  "description": "Attribute-driven CSS utility framework (SCSS source, compiled CSS).",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cat-of-summer/css_projects.git"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "main": "dist/main.min.css",
+  "style": "dist/main.min.css",
+  "sass": "src/main/index.scss",
+  "exports": {
+    "./main.css": "./dist/main.min.css",
+    "./effects.css": "./dist/effects.min.css",
+    "./scss/*": "./src/*"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/build.mjs --watch",
+    "prepare": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}

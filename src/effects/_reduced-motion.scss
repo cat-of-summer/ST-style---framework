@@ -1,0 +1,7 @@
+@media (prefers-reduced-motion:reduce) {
+    *:is([pulse], [wobble], [float], [heartbeat], [jello], [shimmer-text], [vibrate], [bounce], [spin], [opacity], [blink], [tada], [swing]),
+    *:is([sheen], [ripple])::before {
+        animation: none !important;
+        transition: none !important
+    }
+}

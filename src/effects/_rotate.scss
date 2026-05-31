@@ -1,0 +1,12 @@
+*[rotate] {
+    --transition-duration: var(--td-medium);
+    --rotate-duration: var(--transition-duration);
+    --rotate-hover: 3deg;
+    --rotate-active: -3deg;
+
+    transition-duration: var(--rotate-duration);
+}
+
+*[rotate~="hover"]:hover { transform: rotate(var(--rotate-hover)) }
+*[rotate~="active"]:active { transform: rotate(var(--rotate-active)) }
+*[rotate~="focus"]:focus { transform: rotate(var(--rotate-active)) }

@@ -1,0 +1,33 @@
+// Entry point → dist/effects.min.css.
+// @use order controls emit order; keep it stable to preserve the cascade.
+@use 'root';
+@use 'reset';
+
+@use 'raise';
+@use 'scale';
+@use 'rotate';
+@use 'blur';
+@use 'shadow';
+@use 'opacity';
+@use 'blink';
+@use 'typing-text';
+@use 'pulse';
+@use 'wobble';
+@use 'sheen';
+@use 'vibrate';
+@use 'float';
+@use 'heartbeat';
+@use 'jello';
+@use 'ripple';
+@use 'shimmer-text';
+@use 'underline';
+@use 'spin';
+@use 'bounce';
+@use 'skew';
+@use 'glow';
+@use 'grayscale';
+@use 'tada';
+@use 'swing';
+
+@use 'duration';
+@use 'reduced-motion';

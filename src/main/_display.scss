@@ -1,0 +1,71 @@
+@use 'sass:map';
+@use 'config' as cfg;
+
+// [ps] — positioning.
+*[ps] { --position: relative; position: var(--position) !important }
+
+*[ps~="relative"] { --position: relative }
+*[ps~="absolute"] { --position: absolute }
+*[ps~="fixed"] { --position: fixed }
+*[ps~="sticky"] { --position: sticky }
+
+*[ps*="center"]:is([ps~="absolute"], [ps~="fixed"], [ps~="sticky"]) {
+    left: var(--position-left);
+    top: var(--position-top);
+    transform: translate(var(--position-translate-x), var(--position-translate-y));
+}
+*[ps~="center-x"] { --position-top: 0; --position-translate-y: 0 }
+*[ps~="center-y"] { --position-left: 0; --position-translate-x: 0 }
+*:is([ps~="center-x"][ps~="center-y"], [ps~="center"]) { --position-left: 50%; --position-top: 50%; --position-translate-x: -50%; --position-translate-y: -50% }
+
+// [ov] — overflow.
+*[ov] {
+    --overflow-x: visible;
+    --overflow-y: visible;
+
+    overflow-x: var(--overflow-x) !important;
+    overflow-y: var(--overflow-y) !important;
+}
+
+*[ov="hidden"] { --overflow-x: hidden; --overflow-y: hidden }
+*[ov~="scroll"] { --overflow-x: auto; --overflow-y: auto }
+*[ov~="y"] { --overflow-x: clip }
+*[ov~="x"] { --overflow-y: clip }
+
+// [ds] — display, with per-breakpoint variants.
+*[ds] {
+    --display: initial;
+    display: var(--display) !important;
+}
+
+// Display keywords [ds] exposes — a structural list local to this module.
+$values: (none, block, flex, grid, inline);
+
+@each $d in $values {
+  *[ds~="#{$d}"] { --display: #{$d}; }
+}
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    @each $d in $values {
+      *[ds~="#{$bp}-#{$d}"] { --display: #{$d}; }
+    }
+  }
+}
+
+// gap — shared by [ds] flex/grid and [grid].
+:where(*[ds*=gap]:is([ds*="flex"], [ds*="grid"]), *[grid*="gap"]) {
+    --gap: 0;
+    --gap-x: var(--gap);
+    --gap-y: var(--gap);
+    gap: calc(var(--gap-y) * var(--space-step)) calc(var(--gap-x) * var(--space-step));
+}
+
+@for $i from 1 through cfg.$gap-max {
+  *:is([ds~="gap-#{$i}"], [grid~="gap-#{$i}"]) { --gap: #{$i}; }
+}
+@for $i from 1 through cfg.$gap-max {
+  *:is([ds~="gap-x-#{$i}"], [grid~="gap-x-#{$i}"]) { --gap-x: #{$i}; }
+}
+@for $i from 1 through cfg.$gap-max {
+  *:is([ds~="gap-y-#{$i}"], [grid~="gap-y-#{$i}"]) { --gap-y: #{$i}; }
+}

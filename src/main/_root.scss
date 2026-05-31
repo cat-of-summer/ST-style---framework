@@ -1,0 +1,24 @@
+@use 'config' as cfg;
+
+@property --space-step   { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
+@property --sz-step      { syntax: "<length>";          inherits: true;  initial-value: 1px; }
+@property --cq-step      { syntax: "<length>";          inherits: true;  initial-value: 0.4cqw; }
+@property --grid-columns { syntax: "<integer>";         inherits: false; initial-value: 12; }
+@property --col-span     { syntax: "<integer>";         inherits: false; initial-value: 12; }
+@property --col-start    { syntax: "<integer> | auto";  inherits: false; initial-value: auto; }
+
+:root {
+    font-synthesis: none;
+    --font-size: #{cfg.$font-size};
+    --font-weight: var(--fw-normal);
+
+    --space-step: #{cfg.$space-step};
+    --sz-step: calc(var(--space-step) / 4);
+
+    @each $name, $val in cfg.$font-sizes {
+        --fs-#{$name}: #{$val};
+    }
+    @each $name, $val in cfg.$font-weights {
+        --fw-#{$name}: #{$val};
+    }
+}

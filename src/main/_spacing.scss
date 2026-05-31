@@ -1,0 +1,44 @@
+@use 'sass:map';
+@use 'config' as cfg;
+
+// [m] / [mt] / [mb] — vertical margin in --space-step units.
+*[m], *[mt], *[mb] {
+  --mt: 0; --mb: 0;
+  margin-top:    calc(var(--mt) * var(--space-step));
+  margin-bottom: calc(var(--mb) * var(--space-step));
+}
+
+@for $i from 0 through cfg.$space-max {
+  *:is([m~="#{$i}"], [mt~="#{$i}"]) { --mt: #{$i}; }
+  *:is([m~="#{$i}"], [mb~="#{$i}"]) { --mb: #{$i}; }
+}
+
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    @for $i from 0 through cfg.$space-max {
+      *:is([m~="#{$bp}-#{$i}"], [mt~="#{$bp}-#{$i}"]) { --mt: #{$i}; }
+      *:is([m~="#{$bp}-#{$i}"], [mb~="#{$bp}-#{$i}"]) { --mb: #{$i}; }
+    }
+  }
+}
+
+// [p] / [pt] / [pb] — vertical padding in --space-step units.
+*[p], *[pt], *[pb] {
+  --pt: 0; --pb: 0;
+  padding-top:    calc(var(--pt) * var(--space-step));
+  padding-bottom: calc(var(--pb) * var(--space-step));
+}
+
+@for $i from 0 through cfg.$space-max {
+  *:is([p~="#{$i}"], [pt~="#{$i}"]) { --pt: #{$i}; }
+  *:is([p~="#{$i}"], [pb~="#{$i}"]) { --pb: #{$i}; }
+}
+
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    @for $i from 0 through cfg.$space-max {
+      *:is([p~="#{$bp}-#{$i}"], [pt~="#{$bp}-#{$i}"]) { --pt: #{$i}; }
+      *:is([p~="#{$bp}-#{$i}"], [pb~="#{$bp}-#{$i}"]) { --pb: #{$i}; }
+    }
+  }
+}

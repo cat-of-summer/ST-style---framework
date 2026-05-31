@@ -1,0 +1,27 @@
+@keyframes floatY {
+    0%, 100% { transform: translateY(0) }
+    25%      { transform: translateY(var(--float-range)) }
+    75%      { transform: translateY(calc(-1 * var(--float-range))) }
+}
+
+@keyframes floatX {
+    0%, 100% { transform: translateX(0) }
+    25%      { transform: translateX(var(--float-range)) }
+    75%      { transform: translateX(calc(-1 * var(--float-range))) }
+}
+
+*[float] {
+    --transition-duration: var(--td-slow);
+    --float-duration: var(--transition-duration);
+    --float-iteration-count: var(--iteration-count);
+    --float-range: 6px;
+    --float-name: floatY;
+
+    animation: var(--float-name) var(--float-duration) ease-in-out var(--float-iteration-count);
+}
+
+*[float~="horizontal"] { --float-name: floatX }
+*[float~="infinite"] { --float-iteration-count: infinite; }
+*[float~="hover"], *[float~="active"], *[float~="focus"] { --float-name: none }
+*[float~="hover"]:hover, *[float~="active"]:active, *[float~="focus"]:focus { --float-name: floatY }
+*[float~="horizontal"][float~="hover"]:hover, *[float~="horizontal"][float~="active"]:active, *[float~="horizontal"][float~="focus"]:focus { --float-name: floatX }

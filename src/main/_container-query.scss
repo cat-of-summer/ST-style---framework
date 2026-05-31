@@ -1,0 +1,5 @@
+// Inside any [container], switch --space-step to the container-query unit so
+// spacing/gaps scale with the container instead of the viewport.
+@container container (width >= 0px) {
+    * { --space-step: var(--cq-step, 0.4cqw); }
+}

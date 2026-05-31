@@ -1,0 +1,62 @@
+// Build-time configuration for the `main` bundle.
+//
+// Override before loading the bundle:
+//   @use '@cat-of-summer/st-style/scss/main/config' with ($breakpoints: (...));
+//   @use '@cat-of-summer/st-style/scss/main';
+//
+// These control WHICH utility classes are generated, plus the DEFAULTS for the
+// runtime CSS custom properties emitted in :root (e.g. --space-step, --fs-h1).
+// Those custom properties stay overridable at runtime — config just defines the
+// defaults once. See src/main/_root.scss.
+
+// ── Responsive breakpoints (single source of truth) ─────────────────────────
+// One scale drives every responsive feature. Per breakpoint:
+//   min       — min-width threshold for [sz], [lc], [m]/[p], [col], [ds]
+//               and the [container] max-width.
+//   container — [container] max-width from this breakpoint up. Optional: omit
+//               it and the container stays fluid (100%) at that step. Below the
+//               first `container` value the container is fluid anyway.
+// Insertion order is preserved in the generated output.
+$breakpoints: (
+  xs: (min: 360px,  container: 340px),   // phone
+  sm: (min: 576px,  container: 540px),   // large phone / small tablet
+  md: (min: 768px,  container: 720px),   // tablet
+  lp: (min: 1024px, container: 960px),   // small laptop
+  lg: (min: 1280px, container: 1200px),  // laptop
+  dt: (min: 1536px, container: 1320px),  // desktop
+  xl: (min: 1920px, container: 1600px),  // wide
+) !default;
+
+// ── Scales (contiguous ranges) ──────────────────────────────────────────────
+$sz-max:    20 !default;  // [sz]          1..N
+$space-max: 25 !default;  // [m] / [p]     0..N
+$gap-max:   15 !default;  // [ds] / [grid] gap   1..N
+$lc-max:    10 !default;  // [lc]          1..N
+
+// ── Typography tokens (emitted as CSS custom properties in :root) ───────────
+// Map key = utility value + custom-property suffix; map value = the default.
+// Drive [fs]/[fw] AND --fs-<name>/--fw-<name>; still overridable at runtime.
+$font-size: 10px !default;   // → --font-size (root font-size)
+$font-sizes: (               // [fs="<key>"] → --fs-<key>
+  h1: 3.2em,
+  h2: 2.4em,
+  h3: 2em,
+  h4: 1.8em,
+  h5: 1.6em,
+  h6: 1.4em,
+  p:  1.2em,
+) !default;
+$font-weights: (             // [fw="<key>"] → --fw-<key>
+  'thin':       100,
+  'extralight': 200,
+  'light':      300,
+  'normal':     400,
+  'medium':     500,
+  'semibold':   600,
+  'bold':       700,
+  'extrabold':  800,
+  'black':      900,
+) !default;
+
+// ── Spacing ─────────────────────────────────────────────────────────────────
+$space-step: 4px !default;   // base unit → --space-step (--sz-step = /4)

@@ -1,0 +1,22 @@
+*[shadow] {
+    --transition-duration: var(--td-medium);
+    --shadow-duration: var(--transition-duration);
+
+    --shadow-hover-offset: 5px;
+    --shadow-hover-offsetX: var(--shadow-hover-offset);
+    --shadow-hover-offsetY: var(--shadow-hover-offset);
+    --shadow-hover-blur: 10px;
+    --shadow-hover-color: rgba(0, 0, 0, 0.2);
+
+    --shadow-active-offset: 2px;
+    --shadow-active-offsetX: var(--shadow-hover-offset);
+    --shadow-active-offsetY: var(--shadow-hover-offset);
+    --shadow-active-blur: 8px;
+    --shadow-active-color: rgba(0, 0, 0, 0.3);
+
+    transition-duration: var(--shadow-duration);
+}
+
+*[shadow~="hover"]:hover { box-shadow: var(--shadow-hover-offsetX) var(--shadow-hover-offsetY) var(--shadow-hover-blur) var(--shadow-hover-color) }
+*[shadow~="active"]:active { box-shadow: var(--shadow-active-offsetX) var(--shadow-active-offsetY) var(--shadow-active-blur) var(--shadow-active-color) }
+*[shadow~="focus"]:focus { box-shadow: var(--shadow-active-offsetX) var(--shadow-active-offsetY) var(--shadow-active-blur) var(--shadow-active-color) }

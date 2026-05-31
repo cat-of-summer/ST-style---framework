@@ -1,0 +1,18 @@
+@keyframes pulse {
+    0%, 100% { transform: scale(1) }
+    50% { transform: scale(var(--pulse-scale)) }
+}
+
+*[pulse] {
+    --transition-duration: var(--td-medium);
+    --pulse-duration: var(--transition-duration);
+    --pulse-scale: 1.03;
+    --pulse-iteration-count: var(--iteration-count);
+    --pulse-name: pulse;
+
+    animation: var(--pulse-name) var(--pulse-duration) ease-in-out var(--pulse-iteration-count)
+}
+
+*[pulse~="infinite"] { --pulse-iteration-count: infinite }
+*[pulse~="hover"], *[pulse~="active"], *[pulse~="focus"] { --pulse-name: none }
+*[pulse~="hover"]:hover, *[pulse~="active"]:active, *[pulse~="focus"]:focus { --pulse-name: pulse }

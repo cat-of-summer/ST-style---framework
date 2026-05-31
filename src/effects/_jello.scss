@@ -1,0 +1,20 @@
+@keyframes jello {
+    0%   { transform: scale3d(1,1,1); }
+    30%  { transform: scale3d(1.25,0.85,1); }
+    45%  { transform: scale3d(0.9,1.05,1); }
+    60%  { transform: scale3d(1.05,0.95,1); }
+    100% { transform: scale3d(1,1,1); }
+}
+
+*[jello] {
+    --transition-duration: var(--td-medium);
+    --jello-duration: var(--transition-duration);
+    --jello-iteration-count: var(--iteration-count);
+    --jello-name: jello;
+
+    animation: var(--jello-name) var(--jello-duration) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count);
+}
+
+*[jello~="infinite"] { --jello-iteration-count: infinite }
+*[jello~="hover"], *[jello~="active"], *[jello~="focus"] { --jello-name: none }
+*[jello~="hover"]:hover, *[jello~="active"]:active, *[jello~="focus"]:focus { --jello-name: jello }

@@ -1,0 +1,12 @@
+*[glow] {
+    --transition-duration: var(--td-medium);
+    --glow-duration: var(--transition-duration);
+    --glow-color: rgba(0, 150, 255, 0.7);
+    --glow-size: 16px;
+
+    transition-duration: var(--glow-duration);
+}
+
+*[glow~="hover"]:hover { box-shadow: 0 0 var(--glow-size) var(--glow-color) }
+*[glow~="active"]:active { box-shadow: 0 0 var(--glow-size) var(--glow-color) }
+*[glow~="focus"]:focus { box-shadow: 0 0 var(--glow-size) var(--glow-color) }

@@ -1,0 +1,36 @@
+*[underline] {
+    --transition-duration: var(--td-slow);
+    --underline-duration: var(--transition-duration);
+    --underline-color: currentColor;
+    --underline-width: 2px;
+    --underline-offset: 2px;
+    --underline-start: 0%;
+    --underline-direction: center;
+
+    position: relative
+}
+
+*[underline]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    bottom: calc(-1 * var(--underline-offset));
+    height: var(--underline-width);
+    width: var(--underline-start);
+    background: var(--underline-color);
+    transition: width var(--underline-duration) ease
+}
+
+*[underline~="left"]::after { margin-left: 0 }
+*[underline~="right"]::after { margin-right: 0 }
+*[underline~="left"][underline~="right"]::after { margin-left: auto; margin-right: auto; }
+
+*[underline]:is(
+    :not([underline~="hover"]):not([underline~="active"]):not([underline~="focus"]),
+    [underline~="hover"]:hover,
+    [underline~="active"]:active,
+    [underline~="focus"]:focus
+)::after { width: 100% }

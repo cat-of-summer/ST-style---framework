@@ -1,0 +1,18 @@
+@keyframes _opacity {
+    0% { opacity: 1 }
+    50% { opacity: 0 }
+    100% { opacity: 1 }
+}
+
+*[opacity] {
+    --transition-duration: var(--td-slow);
+    --opacity-duration: var(--transition-duration);
+    --opacity-iteration-count: var(--iteration-count);
+    --opacity-name: _opacity;
+
+    animation: var(--opacity-name) var(--opacity-duration) linear var(--opacity-iteration-count)
+}
+
+*[opacity~="infinite"] { --opacity-iteration-count: infinite }
+*[opacity~="hover"], *[opacity~="active"], *[opacity~="focus"] { --opacity-name: none }
+*[opacity~="hover"]:hover, *[opacity~="active"]:active, *[opacity~="focus"]:focus { --opacity-name: _opacity }

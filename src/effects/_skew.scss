@@ -1,0 +1,12 @@
+*[skew] {
+    --transition-duration: var(--td-medium);
+    --skew-duration: var(--transition-duration);
+    --skew-hover: 10deg;
+    --skew-active: -10deg;
+
+    transition-duration: var(--skew-duration);
+}
+
+*[skew~="hover"]:hover { transform: skewX(var(--skew-hover)) }
+*[skew~="active"]:active { transform: skewX(var(--skew-active)) }
+*[skew~="focus"]:focus { transform: skewX(var(--skew-active)) }

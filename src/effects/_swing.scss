@@ -1,0 +1,21 @@
+@keyframes swing {
+    20%  { transform: rotate3d(0, 0, 1, 15deg) }
+    40%  { transform: rotate3d(0, 0, 1, -10deg) }
+    60%  { transform: rotate3d(0, 0, 1, 5deg) }
+    80%  { transform: rotate3d(0, 0, 1, -5deg) }
+    100% { transform: rotate3d(0, 0, 1, 0deg) }
+}
+
+*[swing] {
+    --transition-duration: var(--td-slow);
+    --swing-duration: var(--transition-duration);
+    --swing-iteration-count: var(--iteration-count);
+    --swing-name: swing;
+
+    transform-origin: top center;
+    animation: var(--swing-name) var(--swing-duration) ease-in-out var(--swing-iteration-count)
+}
+
+*[swing~="infinite"] { --swing-iteration-count: infinite }
+*[swing~="hover"], *[swing~="active"], *[swing~="focus"] { --swing-name: none }
+*[swing~="hover"]:hover, *[swing~="active"]:active, *[swing~="focus"]:focus { --swing-name: swing }

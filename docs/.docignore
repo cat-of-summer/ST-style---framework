@@ -183,9 +183,18 @@ build/
 .git/
 .github/
 docs/
+scripts/
 __pycache__/
 .cache/
 .tmp/
 .vscode/
 .idea/
 bower_components/
+
+# Project metadata — not documented
+package.json
+
+# SCSS: document only the bundle entry points (src/<bundle>/index.scss),
+# not the partials. The negation must come after the *.scss exclusion.
+*.scss
+!index.scss

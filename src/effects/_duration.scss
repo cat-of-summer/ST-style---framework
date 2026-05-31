@@ -1,0 +1,10 @@
+@use 'config' as cfg;
+
+// [td] — transition-duration override, [infinite] — iteration count.
+*[td], *[td]::before, *[td]::after { transition-duration: var(--transition-duration) !important }
+@each $name, $val in cfg.$durations {
+  *[td="#{$name}"] { --transition-duration: var(--td-#{$name}); }
+}
+*[td="none"] { --transition-duration: none }
+
+*[infinite] { --iteration-count: infinite; }

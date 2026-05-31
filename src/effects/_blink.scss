@@ -1,0 +1,16 @@
+@keyframes blink {
+    50% { opacity: 0 }
+}
+
+*[blink] {
+    --transition-duration: 1s;
+    --blink-duration: var(--transition-duration);
+    --blink-iteration-count: var(--iteration-count);
+    --blink-name: blink;
+
+    animation: var(--blink-name) var(--blink-duration) step-end var(--blink-iteration-count)
+}
+
+*[blink~="infinite"] { --blink-iteration-count: infinite }
+*[blink~="hover"], *[blink~="active"], *[blink~="focus"] { --blink-name: none }
+*[blink~="hover"]:hover, *[blink~="active"]:active, *[blink~="focus"]:focus { --blink-name: blink }

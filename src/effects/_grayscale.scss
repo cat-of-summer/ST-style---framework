@@ -1,0 +1,12 @@
+*[grayscale] {
+    --transition-duration: var(--td-medium);
+    --grayscale-duration: var(--transition-duration);
+    --grayscale-amount: 100%;
+
+    filter: grayscale(var(--grayscale-amount));
+    transition-duration: var(--grayscale-duration);
+}
+
+*[grayscale]:hover, *[grayscale]:active, *[grayscale]:focus {
+    filter: grayscale(0)
+}

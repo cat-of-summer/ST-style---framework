@@ -1,0 +1,12 @@
+*[scale] {
+    --transition-duration: var(--td-medium);
+    --scale-duration: var(--transition-duration);
+    --scale-hover: 1.05;
+    --scale-active: 0.95;
+
+    transition-duration: var(--scale-duration);
+}
+
+*[scale~="hover"]:hover { transform: scale(var(--scale-hover)) }
+*[scale~="active"]:active { transform: scale(var(--scale-active)) }
+*[scale~="focus"]:focus { transform: scale(var(--scale-active)) }

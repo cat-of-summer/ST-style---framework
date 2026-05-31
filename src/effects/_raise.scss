@@ -1,0 +1,9 @@
+*[raise] {
+    --transition-duration: var(--td-medium);
+    --raise-hover: 0.5em;
+    --raise-active: 1em;
+}
+
+*[raise~="hover"]:hover { transform: translateY(calc(-1 * var(--raise-hover))) }
+*[raise~="active"]:active { transform: translateY(calc(-1 * var(--raise-active))) }
+*[raise~="focus"]:focus { transform: translateY(calc(-1 * var(--raise-active))) }

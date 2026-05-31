@@ -1,0 +1,14 @@
+@keyframes spin { to { transform: rotate(360deg) } }
+
+*[spin] {
+    --transition-duration: var(--td-slow);
+    --spin-duration: var(--transition-duration);
+    --spin-iteration-count: var(--iteration-count);
+    --spin-name: spin;
+
+    animation: var(--spin-name) var(--spin-duration) linear var(--spin-iteration-count);
+}
+
+*[spin~="infinite"] { --spin-iteration-count: infinite }
+*[spin~="hover"], *[spin~="active"], *[spin~="focus"] { --spin-name: none }
+*[spin~="hover"]:hover, *[spin~="active"]:active, *[spin~="focus"]:focus { --spin-name: spin }

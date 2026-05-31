@@ -1,0 +1,10 @@
+@use 'config' as cfg;
+
+:root {
+    --transition-duration: var(--td-rapid);
+    --iteration-count: 1;
+
+    @each $name, $val in cfg.$durations {
+        --td-#{$name}: #{$val};
+    }
+}

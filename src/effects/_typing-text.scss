@@ -1,0 +1,43 @@
+@keyframes typing-text {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+*[typing-text] {
+    --transition-duration: 3s;
+    --typing-duration: var(--transition-duration);
+    --typing-steps: 24;
+    --typing-chars: 10;
+    --typing-color: #000;
+    --typing-width: 2px;
+
+    position: relative !important;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    min-width: calc(var(--typing-chars) * 1ch);
+    max-width: max-content;
+    animation: typing-text var(--typing-duration) steps(var(--typing-steps), end) forwards;
+}
+
+*[typing-text]::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: inline-block;
+    width: var(--typing-width);
+    background: var(--typing-color);
+
+    animation: blink 1s step-end infinite;
+}
+
+*[typing-text~="hover"], *[typing-text~="active"], *[typing-text~="focus"] {
+    animation-play-state: paused
+}
+
+*[typing-text~="hover"]:hover, *[typing-text~="active"]:active, *[typing-text~="focus"]:focus {
+    animation-play-state: running;
+}

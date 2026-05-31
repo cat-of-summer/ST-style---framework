@@ -1,10 +1,14 @@
 <!-- DOCGEN:START -->
-# st_effects.css
+# index.scss
 <!-- DOCGEN:END -->
+
+# Бандл `effects`
+
+Исходник: `src/effects/index.scss` → собирается в `dist/effects.min.css`. По эффекту на partial (`src/effects/_<effect>.scss`); длительности — карта `$durations` в `src/effects/_config.scss`.
 
 ## Что это
 
-`st_effects.css` — файл визуальных эффектов ST_style. Реализует 20 анимационных и трансформационных эффектов через HTML-атрибуты. Правила применяются к `*`, `*::before`, `*::after`, что обеспечивает автоматический transition на все дочерние псевдоэлементы.
+`effects` — бандл визуальных эффектов ST_style. Реализует 25 анимационных и трансформационных эффектов через HTML-атрибуты. Правила применяются к `*`, `*::before`, `*::after`, что обеспечивает автоматический transition на все дочерние псевдоэлементы.
 
 **Ключевые принципы:**
 - Эффекты управляются HTML-атрибутами: `raise="hover"`, `shadow="hover focus"`, `sheen="hover"`
@@ -16,21 +20,29 @@
 
 ## Подключение
 
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cat-of-summer/css_projects/ST_style/st_effects.min.css">
+```js
+import '@cat-of-summer/st-style/effects.css';   // → dist/effects.min.css
 ```
+
+Установка пакета (приватный репо, по токену) — см. корневой `README.md`.
 
 ---
 
 ## Глобальные переменные
 
+Все длительности — из карты `$durations` (`src/effects/_config.scss`). `_root.scss`
+эмитит **каждый** ключ как `--td-<key>` в `:root`, так что переменные
+overridable в рантайме и расширяемы (добавь ключ в `$durations`).
+
 ```css
 :root {
-    /* Длительность переходов -->
+    /* Длительности переходов (из $durations) */
     --td-rapid:  0.1s;
     --td-fast:   0.325s;
     --td-medium: 0.55s;
     --td-slow:   0.775s;
+    --td-1s: 1s; --td-2s: 2s; --td-3s: 3s;
+    --td-5s: 5s; --td-10s: 10s; --td-15s: 15s;
 
     /* Количество итераций анимаций по умолчанию */
     --iteration-count: 1;
@@ -43,15 +55,16 @@
 
 Управляет `transition-duration` для элемента **и его псевдоэлементов** (`::before`, `::after`).
 
+Каждый `td="<key>"` подставляет `var(--td-<key>)`, а сами `--td-*` берутся из
+`$durations`. Набор ключей расширяется/меняется в конфиге.
+
 ```html
-<div td="fast">         <!-- transition: 0.325s -->
-<div td="medium">       <!-- transition: 0.55s -->
-<div td="slow">         <!-- transition: 0.775s -->
-<div td="rapid">        <!-- transition: 0.1s -->
-<div td="1s">           <!-- transition: 1s -->
-<div td="2s">           <!-- transition: 2s -->
-<div td="3s">           <!-- transition: 3s -->
-<div td="5s">           <!-- transition: 5s -->
+<div td="fast">         <!-- var(--td-fast)  = 0.325s -->
+<div td="medium">       <!-- var(--td-medium) = 0.55s -->
+<div td="slow">         <!-- var(--td-slow)  = 0.775s -->
+<div td="rapid">        <!-- var(--td-rapid) = 0.1s -->
+<div td="1s">           <!-- var(--td-1s) = 1s -->
+<div td="15s">          <!-- var(--td-15s) = 15s -->
 <div td="none">         <!-- transition: none -->
 ```
 
@@ -65,6 +78,8 @@
 | `2s`      | 2s           |
 | `3s`      | 3s           |
 | `5s`      | 5s           |
+| `10s`     | 10s          |
+| `15s`     | 15s          |
 | `none`    | none         |
 
 ---
@@ -547,6 +562,86 @@ box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 
 ---
 
+### `skew` — наклон
+
+Наклоняет элемент по оси X (`transform: skewX()`) при триггере.
+
+```css
+--skew-hover:  10deg;    /* наклон при hover */
+--skew-active: -10deg;   /* наклон при active */
+```
+
+```html
+<div skew="hover">
+<div skew="hover active">
+<div skew="hover" style="--skew-hover: 20deg">
+```
+
+---
+
+### `glow` — свечение
+
+Цветное неоновое свечение через `box-shadow: 0 0 …` при триггере (в отличие от серой тени `shadow`).
+
+```css
+--glow-color: rgba(0, 150, 255, 0.7);   /* цвет свечения */
+--glow-size:  16px;                       /* радиус размытия */
+```
+
+```html
+<button glow="hover">
+<a glow="hover focus">
+<div glow="hover" style="--glow-color: #f0a; --glow-size: 24px">
+```
+
+---
+
+### `grayscale` — обесцвечивание
+
+По умолчанию ч/б (`filter: grayscale(100%)`), при триггере возвращается цвет (зеркало `blur`).
+
+```css
+--grayscale-amount: 100%;   /* степень обесцвечивания по умолчанию */
+```
+
+```html
+<img grayscale="">          <!-- постоянно ч/б -->
+<img grayscale="hover">     <!-- ч/б, цвет при наведении -->
+<img grayscale="hover" style="--grayscale-amount: 60%">
+```
+
+> Принцип как у `blur`: без триггера применён фильтр, при срабатывании события он снимается.
+
+---
+
+### `tada` — «та-да»
+
+Привлекающая внимание анимация (масштаб + покачивание), канонический `tada` из animate.css.
+
+```html
+<div tada="">              <!-- один раз при загрузке -->
+<div tada="hover">        <!-- при наведении -->
+<div tada="" infinite="">  <!-- непрерывно -->
+```
+
+Фиксированные ключевые кадры, без кастомных переменных.
+
+---
+
+### `swing` — качание
+
+Качание на оси сверху (`transform-origin: top center`), канонический `swing` из animate.css.
+
+```html
+<div swing="">             <!-- один раз -->
+<div swing="hover">       <!-- при наведении -->
+<div swing="" infinite=""> <!-- непрерывно -->
+```
+
+Фиксированные ключевые кадры, без кастомных переменных.
+
+---
+
 ## Полный справочник эффектов
 
 | Атрибут        | Тип        | Псевдоэлемент | Триггеры без авто | Ключевые переменные                    |
@@ -571,6 +666,11 @@ box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 | `underline`   | animation  | ::after       | hover, left, right | `--underline-color`, `--underline-width`, `--underline-offset` |
 | `spin`        | animation  | —             | hover             | `--spin-duration`                      |
 | `bounce`      | animation  | —             | hover             | `--bounce-height`                      |
+| `skew`        | transform  | —             | hover, active     | `--skew-hover`, `--skew-active`        |
+| `glow`        | box-shadow | —             | hover, active, focus | `--glow-color`, `--glow-size`       |
+| `grayscale`   | filter     | —             | hover             | `--grayscale-amount`                   |
+| `tada`        | animation  | —             | hover             | —                                      |
+| `swing`       | animation  | —             | hover             | —                                      |
 
 ---
 
@@ -624,11 +724,11 @@ box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 
 ```css
 @media (prefers-reduced-motion: reduce) {
-    /* Все анимации и переходы отключаются */
-    *[opacity], *[blink], *[typing-text], *[pulse],
-    *[wobble], *[sheen], *[vibrate], *[float],
-    *[heartbeat], *[jello], *[shimmer-text],
-    *[underline], *[spin], *[bounce], *[ripple] {
+    /* Анимационные эффекты отключаются */
+    *[pulse], *[wobble], *[float], *[heartbeat], *[jello],
+    *[shimmer-text], *[vibrate], *[bounce], *[spin],
+    *[opacity], *[blink], *[tada], *[swing],
+    *[sheen]::before, *[ripple]::before {
         animation: none !important;
         transition: none !important;
     }

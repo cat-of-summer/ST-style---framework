@@ -1,10 +1,14 @@
 <!-- DOCGEN:START -->
-# st_main.css
+# index.scss
 <!-- DOCGEN:END -->
+
+# Бандл `main`
+
+Исходник: `src/main/index.scss` → собирается в `dist/main.min.css`. Authored в SCSS (partials в `src/main/`, конфиг в `src/main/_config.scss`); сборка — `npm run build`. Этот документ описывает **скомпилированный** CSS и разметку.
 
 ## Что это
 
-`st_main.css` — основной файл CSS-фреймворка ST_style. Реализует систему утилитарных HTML-атрибутов, CSS-сброс, типографику, систему отступов, grid-сетку, управление видимостью и базовые компоненты (`icon`, `mask`, `editor`).
+`main` — основной бандл CSS-фреймворка ST_style. Реализует систему утилитарных HTML-атрибутов, CSS-сброс, типографику, систему отступов, grid-сетку, управление видимостью и базовые компоненты (`icon`, `mask`, `editor`).
 
 **Ключевой принцип**: стили управляются через HTML-атрибуты (`mt="6"`, `col="12 lg-3"`, `ds="none lg-block"`), а не классы. Под капотом — CSS Custom Properties: атрибут устанавливает переменную, а правило-«применятель» читает эту переменную.
 
@@ -14,27 +18,47 @@
 
 ## Подключение
 
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/cat-of-summer/css_projects/ST_style/st_main.min.css">
+Репозиторий приватный. Установка через npm по токену (см. корневой `README.md`):
+
+```bash
+npm install "git+https://<PAT>@github.com/cat-of-summer/css_projects.git#v0.1.0"
 ```
+
+```js
+import '@cat-of-summer/st-style/main.css';      // → dist/main.min.css
+import '@cat-of-summer/st-style/effects.css';   // → dist/effects.min.css
+```
+
+CDN (jsDelivr `/npm/`) заработает после публикации пакета в публичный npm:
+
+```
+https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
+```
+
+Кастомизация при сборке — `@use '.../scss/main/config' with (...)` (см. `README.md`).
 
 ---
 
 ## Брейкпоинты
 
-| Префикс | min-width | max-width   | Описание                 |
-|---------|-----------|-------------|--------------------------|
-| `xs`    | 0px       | 359.98px    | Самые маленькие экраны   |
-| `sm`    | 360px     | 767.98px    | Мобильные                |
-| `md`    | 768px     | 1023.98px   | Планшеты                 |
-| `lp`    | 1024px    | 1279.98px   | Ноутбуки                 |
-| `lg`    | 1280px    | 1535.98px   | Широкие экраны           |
-| `dt`    | 1536px    | 1919.98px   | Десктопы                 |
-| `xl`    | 1920px    | —           | Широкоформатные          |
+Единая шкала задаётся картой `$breakpoints` в `src/main/_config.scss` и управляет
+утилитами **и** контейнером. Базовое (без префикса) значение действует с ≥0px;
+префикс брейкпоинта подключается с его `min-width`.
 
-Для `-only` вариантов (только атрибут `ds`) используются диапазоны `min + max`.
+| Префикс | min-width | Описание               |
+|---------|-----------|------------------------|
+| *(нет)* | 0px       | Базовое, все экраны    |
+| `xs`    | 360px     | Телефон                |
+| `sm`    | 576px     | Большой телефон        |
+| `md`    | 768px     | Планшеты               |
+| `lp`    | 1024px    | Ноутбуки               |
+| `lg`    | 1280px    | Широкие экраны         |
+| `dt`    | 1536px    | Десктопы               |
+| `xl`    | 1920px    | Широкоформатные        |
 
-> **Note:** базовый брейкпоинт `xs` (≥0px) не требует префикса. `m="3 lg-6"` — это «3 на xs+, 6 на lg+». Префикс `xs-` больше не поддерживается (был удалён как избыточный).
+> **Note:** базовое (безпрефиксное) значение действует на всех ширинах. `m="3 lg-6"` —
+> это «3 везде, 6 на lg+». `m="xs-3"` — 3 начиная с ≥360px. Имена/пороги брейкпоинтов
+> меняются в одном месте — `$breakpoints`.
 
 ---
 
@@ -179,7 +203,7 @@
 - Внутри `[container]`: `0.1cqw` (автоматически, через `--space-step` → cqw-режим).
 - Override: `style="--sz-step: 1.2px"` или `style="--cq-step: 0.3cqw"`.
 
-**Доступные значения:** 1, 2, 3, …, 16, 18, 20 для каждого брейкпоинта (`xs/sm/md/lp/lg/dt/xl`).
+**Доступные значения:** 1, 2, 3, …, 20 (непрерывно, `$sz-max` в конфиге) для каждого брейкпоинта (`xs/sm/md/lp/lg/dt/xl`).
 
 ```html
 <p sz="12">                  <!-- 12px (вне cqw) -->
@@ -318,8 +342,9 @@ ps="fixed center-x center-y"
 Числа **1–10** для каждого брейкпоинта:
 
 ```
-lc="0"  lc="1"  lc="2"  ...  lc="10"       -- базовые (xs, ≥0px)
-lc="sm-0" ... lc="sm-10"                    -- ≥360px
+lc="0"  lc="1"  lc="2"  ...  lc="10"       -- базовые (без префикса, ≥0px)
+lc="xs-0" ... lc="xs-10"                    -- ≥360px
+lc="sm-0" ... lc="sm-10"                    -- ≥576px
 lc="md-0" ... lc="md-10"                    -- ≥768px
 lc="lp-0" ... lc="lp-10"                    -- ≥1024px
 lc="lg-0" ... lc="lg-10"                    -- ≥1280px
@@ -364,8 +389,9 @@ lc="xl-0" ... lc="xl-10"                    -- ≥1920px
 Числа **0–25** (шаг ×4px) для каждого брейкпоинта:
 
 ```
-mt="0"  mt="1"  mt="2"  ...  mt="25"       -- базовые (xs, ≥0px)
-mt="sm-0" ... mt="sm-25"                    -- ≥360px
+mt="0"  mt="1"  mt="2"  ...  mt="25"       -- базовые (без префикса, ≥0px)
+mt="xs-0" ... mt="xs-25"                    -- ≥360px
+mt="sm-0" ... mt="sm-25"                    -- ≥576px
 mt="md-0" ... mt="md-25"                    -- ≥768px
 mt="lp-0" ... mt="lp-25"                    -- ≥1024px
 mt="lg-0" ... mt="lg-25"                    -- ≥1280px
@@ -402,18 +428,18 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 <div container="block">...</div>      <!-- size container (по ширине и высоте) -->
 ```
 
-**Адаптивный `max-width`:**
+**Адаптивный `max-width`** (значения `container` в `$breakpoints`; ниже первой ступени контейнер fluid — 100%):
 
-| Ширина экрана | max-width |
-|---------------|-----------|
-| ≥0px (xs)     | 320px     |
-| ≥360px (sm)   | 340px     |
-| ≥595px        | 550px     |
-| ≥768px (md)   | 720px     |
-| ≥1024px (lp)  | 960px     |
-| ≥1280px (lg)  | 1200px    |
-| ≥1536px (dt)  | 1320px    |
-| ≥1920px (xl)  | 1600px    |
+| Ширина экрана | max-width      |
+|---------------|----------------|
+| <360px        | 100% (fluid)   |
+| ≥360px (xs)   | 340px          |
+| ≥576px (sm)   | 540px          |
+| ≥768px (md)   | 720px          |
+| ≥1024px (lp)  | 960px          |
+| ≥1280px (lg)  | 1200px         |
+| ≥1536px (dt)  | 1320px         |
+| ≥1920px (xl)  | 1600px         |
 
 Базовые стили: `position: relative; width: 100%; margin: auto` (через `:where()` — нулевая специфичность, легко переопределяется проектом).
 
@@ -560,7 +586,7 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 <div ds="none md-flex lg-none"> <!-- flex только на md–lp -->
 ```
 
-Префиксы: `sm-`, `md-`, `lp-`, `lg-`, `dt-`, `xl-`. Базовый брейкпоинт (xs, ≥0px) — без префикса.
+Префиксы: `xs-` (≥360px), `sm-` (≥576px), `md-`, `lp-`, `lg-`, `dt-`, `xl-`. Базовое значение — без префикса (≥0px).
 
 ### Gap. Также `gap` используется для управления расстоянием между дочерними элементами контейнера, работает для `grid` и `flex` контейнеров.
 
@@ -736,8 +762,8 @@ label > input, label > textarea {
 <html lang="ru">
 <head>
     <!-- CSS: сначала фреймворк, потом проектные стили -->
-    <link rel="stylesheet" href="st_main.min.css">
-    <link rel="stylesheet" href="st_animation.min.css">
+    <link rel="stylesheet" href="main.min.css">
+    <link rel="stylesheet" href="effects.min.css">
     <link rel="stylesheet" href="root.css">        <!-- переменные проекта -->
     <link rel="stylesheet" href="header.css">
     <link rel="stylesheet" href="main.css">
@@ -824,8 +850,8 @@ html {
 
 **Общий порядок подключения стилей:**
 1. Внешние библиотеки (Swiper и т.д.)
-2. `st_main.min.css` — базовый фреймворк
-3. `st_effects.min.css` — анимации
+2. `main.min.css` — базовый фреймворк
+3. `effects.min.css` — анимации
 4. `root.css` — проектные переменные
 5. `header.css`, `main.css`, `footer.css`, `modals.css` — компоненты
 

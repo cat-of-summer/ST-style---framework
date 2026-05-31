@@ -1,0 +1,17 @@
+*,
+*::before,
+*::after {
+    transition: inherit;
+}
+
+*[scale], *[rotate], *[raise], *[pulse], *[wobble], *[heartbeat], *[jello],
+*[bounce], *[spin], *[float], *[vibrate], *[skew], *[tada], *[swing] { will-change: transform }
+*[blink], *[opacity]                                        { will-change: opacity }
+*[blur], *[grayscale]                                       { will-change: filter }
+*[shadow], *[glow]                                          { will-change: box-shadow }
+*[sheen]::before                                            { will-change: left }
+*[typing-text]                                              { will-change: width }
+*[typing-text]::after                                       { will-change: opacity }
+*[ripple]::before                                           { will-change: transform }
+*[shimmer-text]                                             { will-change: background-position }
+*[underline]::after                                         { will-change: width }

@@ -1,0 +1,22 @@
+// Build-time configuration for the `effects` bundle.
+//
+// Override before loading the bundle:
+//   @use '@cat-of-summer/st-style/scss/effects/config' with ($durations: (...));
+//   @use '@cat-of-summer/st-style/scss/effects';
+
+// ── [td] transition durations ───────────────────────────────────────────────
+// One associative map of every duration token. Each key is emitted as
+// --td-<key> in :root (overridable at runtime) and exposed as the [td="<key>"]
+// utility. Add/rename keys freely.
+$durations: (
+  rapid:  0.1s,
+  fast:   0.325s,
+  medium: 0.55s,
+  slow:   0.775s,
+  '1s':   1s,
+  '2s':   2s,
+  '3s':   3s,
+  '5s':   5s,
+  '10s':  10s,
+  '15s':  15s,
+) !default;
