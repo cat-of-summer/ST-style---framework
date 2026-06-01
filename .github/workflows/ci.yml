@@ -9,10 +9,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    environment: ${{ github.ref_name }}
+
+    env:
+      BUILD_COMMAND: ${{ vars.BUILD_COMMAND }}
+      CI_COMMAND:    ${{ vars.CI_COMMAND }}
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ vars.NODE_VERSION || '20' }}
-      - run: npm install --no-audit --no-fund
-      - run: npm run build
+
+      - name: Build
+        if: ${{ env.BUILD_COMMAND != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          $BUILD_COMMAND
+
+      - name: Run CI command
+        if: ${{ env.CI_COMMAND != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          $CI_COMMAND
+
+      - name: Nothing configured
+        if: ${{ env.BUILD_COMMAND == '' && env.CI_COMMAND == '' }}
+        run: echo "::warning::Neither BUILD_COMMAND nor CI_COMMAND is set for environment '${{ github.ref_name }}'; skipping checks"
