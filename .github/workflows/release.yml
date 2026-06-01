@@ -39,7 +39,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          $BUILD_COMMAND
+          eval "$BUILD_COMMAND"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

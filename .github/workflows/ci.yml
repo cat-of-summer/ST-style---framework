@@ -24,14 +24,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          $BUILD_COMMAND
+          eval "$BUILD_COMMAND"
 
       - name: Run CI command
         if: ${{ env.CI_COMMAND != '' }}
         shell: bash
         run: |
           set -euo pipefail
-          $CI_COMMAND
+          eval "$CI_COMMAND"
 
       - name: Nothing configured
         if: ${{ env.BUILD_COMMAND == '' && env.CI_COMMAND == '' }}
