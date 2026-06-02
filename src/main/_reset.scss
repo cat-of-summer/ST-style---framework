@@ -16,7 +16,9 @@
     font-size: var(--font-size);
     width: 100vw;
     overflow-x: hidden;
-    scroll-behavior: smooth
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
 }
 
 :where(body) {
@@ -55,6 +57,9 @@
 :where(input, textarea, button) { font-size: var(--fs-p) }
 :where(input::placeholder, textarea::placeholder) { font-size: inherit; font-weight: inherit; line-height: inherit; }
 :where(textarea:focus, input:focus, button:focus) { outline: none }
+:where(input, textarea) { -webkit-user-select: auto; }
+:where(textarea) { white-space: revert; }
+::placeholder { color: unset; }
 
 :where(label) {
     position: relative;
@@ -101,6 +106,24 @@
 }
 
 :where(li) { list-style: none }
+
+:where(table) { border-collapse: collapse; }
+
+:where(meter) { -webkit-appearance: revert; appearance: revert; }
+
+:where([contenteditable]:not([contenteditable="false"])) {
+    -webkit-user-modify: read-write;
+    -moz-user-modify: read-write;
+    overflow-wrap: break-word;
+    -webkit-user-select: auto;
+}
+
+:where(dialog:modal) {
+    all: revert;
+    box-sizing: border-box;
+}
+:where(summary) { list-style: none; }
+::-webkit-details-marker { display: none; }
 
 :where(hr) {
 	border: 0;

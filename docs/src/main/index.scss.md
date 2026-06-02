@@ -128,16 +128,43 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 }
 ```
 
-- `html`: `font-size: var(--font-size)`, `overflow-x: hidden`, `scroll-behavior: smooth`
+- `html`: `font-size: var(--font-size)`, `overflow-x: hidden`, `scroll-behavior: smooth`, `text-size-adjust: none`
 - `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`
 - `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`
 - `img`, `iframe`: `width: 100%; height: 100%; object-fit: cover; object-position: center`
 - `input`, `textarea`, `button`: `font-size: var(--fs-p)`, `outline: none` при фокусе
+- `table`: `border-collapse: collapse`
 - `li`: `list-style: none`
 - `h1–h6`,`p`: `font-weight: inherit; overflow-wrap: break-word`
 - `h1–p`: размеры из `--fs-*` переменных
 - `button`: без фона и бордера
 - `a`, `button`: `cursor: pointer`
+
+### Кросс-браузерные правки
+
+Reset фреймворка делает два «агрессивных» шага — `user-select: none` на `body` и
+`display: block` на медиа (`picture/video/canvas/svg`). Чтобы они не ломали штатное
+поведение, добавлены точечные восстановления:
+
+- **`html { text-size-adjust: none }`** — отключает раздувание шрифта в landscape на
+  мобильном Safari (с `-webkit-` префиксом).
+- **`:where(input, textarea) { -webkit-user-select: auto }`** — на Safari `user-select: none`
+  у `body` блокирует выделение и редактирование текста в полях; правило возвращает ввод.
+- **`:where(textarea) { white-space: revert }`** — фикс переноса строк в `<textarea>` (Safari).
+- **`::placeholder { color: unset }`** — сбрасывает приглушённый UA-цвет плейсхолдера
+  (фреймворк ровняет только шрифт плейсхолдера).
+- **`:where(meter) { appearance: revert }`** — возвращает `<meter>` возможность стилизации.
+- **`:where([contenteditable]:not([contenteditable="false"]))`** — `user-modify: read-write`
+  + `-webkit-user-select: auto` + `overflow-wrap: break-word`: редактируемые области остаются
+  рабочими, несмотря на `user-select: none` у `body`.
+- **`:where(dialog:modal) { all: revert }`** + `:where(summary) { list-style: none }`
+  + `::-webkit-details-marker { display: none }` — глобальный сброс `border/margin/padding`
+  ломает нативный модальный `<dialog>` и добавляет лишний маркер `<details>`; правила это
+  восстанавливают (безвредны, если нативные элементы не используются).
+- **`:where([hidden]) { display: none }`** — стоит **последним** в файле. Author-уровневое
+  `display: block` на `picture/video/svg/canvas` иначе перебивает UA-правило `[hidden]`
+  (specificity у обоих 0,0,0 → выигрывает правило, идущее позже по порядку), и `<svg hidden>`
+  оставался бы видимым.
 
 ---
 

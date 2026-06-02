@@ -60,3 +60,4 @@ $font-weights: (             // [fw="<key>"] → --fw-<key>
 
 // ── Spacing ─────────────────────────────────────────────────────────────────
 $space-step: 4px !default;   // base unit → --space-step (--sz-step = /4)
+$cq-step:    0.4 !default;   // cqw multiplier inside [container]; 0.4cqw ≈ $space-step at 1000px

@@ -2,7 +2,7 @@
 
 @property --space-step   { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
 @property --sz-step      { syntax: "<length>";          inherits: true;  initial-value: 1px; }
-@property --cq-step      { syntax: "<length>";          inherits: true;  initial-value: 0.4cqw; }
+@property --cq-step      { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$cq-step}cqw; }
 @property --grid-columns { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-span     { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-start    { syntax: "<integer> | auto";  inherits: false; initial-value: auto; }
