@@ -2,13 +2,9 @@
 @use 'config' as cfg;
 
 :where(*, *::before, *::after) {
+    all: unset;
+    display: revert;
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font-family: inherit;
-    font-style: inherit;
-    color: inherit;
     vertical-align: middle;
 }
 
@@ -100,11 +96,6 @@
     }
 }
 
-:where(button) {
-    background: none;
-    border: none
-}
-
 :where(li) { list-style: none }
 
 :where(table) { border-collapse: collapse; }
@@ -183,7 +174,6 @@
 :where(a, button) { cursor: pointer }
 
 :where(h1, h2, h3, h4, h5, h6, p) {
-    font-weight: inherit;
     overflow-wrap: break-word
 }
 
