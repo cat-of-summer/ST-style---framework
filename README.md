@@ -91,65 +91,48 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-`.github/workflows/release.yml` builds `dist/` and creates a GitHub Release with
-`main.min.css` and `effects.min.css` attached. Ordinary pushes run only
-`ci.yml`, which validates that the SCSS compiles.
+`.github/workflows/release.yml` builds `dist/`, publishes the package to GitHub
+Packages, and creates a GitHub Release with `main.min.css` and `effects.min.css`
+attached. Ordinary pushes run only `ci-cd.yml`, which validates that the SCSS compiles.
 
-## A. Install from the (private) repository
+## A. Use via npm
 
-The repository is private, so consumers authenticate with a read-only token.
+Пакет опубликован в GitHub Packages (приватный реестр). Для установки нужен
+read-only токен GitHub.
 
-1. Create a **fine-grained PAT**: GitHub → Settings → Developer settings →
-   Fine-grained tokens → repository `css_projects`, permission **Contents:
-   Read-only**.
-2. Install a tagged version (the `prepare` script compiles `dist/` automatically):
+### 1. Скопировать `.npmrc` в проект потребителя
 
-   ```bash
-   npm install "git+https://<PAT>@github.com/cat-of-summer/css_projects.git#v0.1.0"
-   ```
+Скопируйте файл `.npmrc` из корня этого репозитория к себе в проект — токен уже вписан.
 
-   Or declare it in `package.json` and keep the token out of the URL (better for CI):
-
-   ```json
-   "dependencies": {
-     "@cat-of-summer/st-style": "git+https://github.com/cat-of-summer/css_projects.git#v0.1.0"
-   }
-   ```
-
-   ```bash
-   git config --global url."https://x:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
-   npm install
-   ```
-
-3. Use the compiled CSS:
-
-   ```js
-   import '@cat-of-summer/st-style/main.css';
-   import '@cat-of-summer/st-style/effects.css';
-   ```
-
-   Or import the SCSS source and override config (see **Configuration** above).
-
-> ⚠️ `npm ci --ignore-scripts` skips `prepare`, so `dist/` won't be built. In
-> such pipelines, add `sass` and run `npm run build` (or compile the SCSS) yourself.
-
-## B. CDN (after publishing — future)
-
-While the repository is private there is no public CDN: jsDelivr/unpkg only serve
-public sources, and a token can't be placed in a browser URL. Once the package is
-published to public npm (`npm publish` — `prepack` compiles `dist/` into the
-tarball), the CDN works with no project changes:
-
-```
-https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
-https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/effects.min.css
-```
-
-## C. Download release artifacts (now)
-
-Each GitHub Release has the compiled files attached. For a private repo,
-downloading requires authentication:
+### 2. Установить
 
 ```bash
-gh release download v0.1.0 -R cat-of-summer/css_projects
+npm install @cat-of-summer/st-style
+```
+
+### 4. Использовать
+
+Скомпилированный CSS:
+
+```js
+import '@cat-of-summer/st-style/main.css';
+import '@cat-of-summer/st-style/effects.css';
+```
+
+Или SCSS-источник с переопределением конфига (см. **Configuration** выше):
+
+```scss
+@use '@cat-of-summer/st-style/scss/main/config' with (
+  $breakpoints: ( … )
+);
+@use '@cat-of-summer/st-style/scss/main';
+```
+
+## B. Скачать артефакты релиза
+
+К каждому GitHub Release прикреплены скомпилированные файлы. Для приватного
+репозитория нужна аутентификация:
+
+```bash
+gh release download v0.1.0 -R cat-of-summer/ST-style---framework
 ```

@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/cat-of-summer/css_projects.git"
+    "url": "git+https://github.com/cat-of-summer/ST-style---framework.git"
   },
   "files": [
     "src",
@@ -25,6 +25,10 @@
     "watch": "node scripts/build.mjs --watch",
     "prepare": "node scripts/build.mjs",
     "prepack": "node scripts/build.mjs"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "devDependencies": {
     "sass": "^1.77.0"
