@@ -28,6 +28,9 @@ jobs:
 
     environment: ${{ needs.get-branch.outputs.branch }}
 
+    outputs:
+      publish_to_npm: ${{ vars.PUBLISH_TO_NPM }}
+
     env:
       BUILD_COMMAND: ${{ vars.BUILD_COMMAND }}
       RELEASE_FILES: ${{ vars.RELEASE_FILES }}
@@ -96,8 +99,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   npm-publish:
-    needs: get-branch
-    if: ${{ vars.PUBLISH_TO_NPM == 'true' }}
+    needs: [get-branch, release]
+    if: ${{ needs.release.outputs.publish_to_npm == 'true' }}
     runs-on: ubuntu-latest
 
     environment: ${{ needs.get-branch.outputs.branch }}
@@ -119,6 +122,7 @@ jobs:
           set -euo pipefail
           eval "$BUILD_COMMAND"
 
+      - name: Override npm auth for publish
+        run: sed -i 's|//npm.pkg.github.com/:_authToken=.*|//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}|' .npmrc
+
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
