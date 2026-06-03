@@ -1,7 +1,12 @@
 @use 'config' as cfg;
 
-// Inside any [container], switch --space-step to the container-query unit so
+[cq] {
+    container-type: inline-size;
+    container-name: cq;
+}
+
+// Inside any [cq] element, switch --space-step to the container-query unit so
 // spacing/gaps scale with the container instead of the viewport.
-@container container (width >= 0px) {
+@container cq (width >= 0px) {
     * { --space-step: var(--cq-step, #{cfg.$cq-step}cqw); }
 }
