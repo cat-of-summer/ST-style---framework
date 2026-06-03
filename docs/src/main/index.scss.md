@@ -107,7 +107,7 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 
 **Формула**: `mt="N"` → `margin-top: calc(N * var(--space-step))` = `N × 4px`.
 
-Утилиты `m/mt/mb`, `p/pt/pb`, `gap` хранят **число-множитель** в custom-property (`--mt`, `--mb`, `--pt`, `--pb`, `--gap`, `--gap-x`, `--gap-y`), а applier умножает на `--space-step` через `calc()`. Это позволяет внутри `[container]` подменить `--space-step` на `cqw` — и **все** отступы автоматически становятся пропорциональны ширине.
+Утилиты `m/mt/mb`, `p/pt/pb`, `gap` хранят **число-множитель** в custom-property (`--mt`, `--mb`, `--pt`, `--pb`, `--gap`, `--gap-x`, `--gap-y`), а applier умножает на `--space-step` через `calc()`. Это позволяет внутри `container="query"` подменить `--space-step` на `cqw` — и **все** отступы автоматически становятся пропорциональны ширине.
 
 Шкала множителей: `0..25` для margin/padding, `1..15` для gap, `1..20` для sz.
 
@@ -226,15 +226,15 @@ Reset фреймворка делает два «агрессивных» шаг
 **Формула:** `sz="N"` → `font-size: calc(N * var(--sz-step))`.
 
 **Значения `--sz-step`:**
-- Снаружи `[container]`: `1px` (производное от `--space-step / 4`).
-- Внутри `[container]`: `0.1cqw` (автоматически, через `--space-step` → cqw-режим).
+- Снаружи `container="query"`: `1px` (производное от `--space-step / 4`).
+- Внутри `container="query"`: `0.1cqw` (автоматически, через `--space-step` → cqw-режим).
 - Override: `style="--sz-step: 1.2px"` или `style="--cq-step: 0.3cqw"`.
 
 **Доступные значения:** 1, 2, 3, …, 20 (непрерывно, `$sz-max` в конфиге) для каждого брейкпоинта (`xs/sm/md/lp/lg/dt/xl`).
 
 ```html
 <p sz="12">                  <!-- 12px (вне cqw) -->
-<p sz="14" container>...</p> <!-- становится сам контейнером, sz=14 от его ширины -->
+<p sz="14" container="query">...</p> <!-- query-контейнер: sz=14 масштабируется с его шириной -->
 <p sz="12 lg-16">            <!-- 12px на xs–lp, 16px на lg+ -->
 ```
 
@@ -448,14 +448,23 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ### Атрибут `container`
 
-Обёртка с адаптивным `max-width` и **container-query**-контекстом. Применяется к любому элементу через атрибут.
+Обёртка с адаптивным `max-width` и **container-query**-контекстом. Применяется к любому элементу через атрибут. Значение атрибута — набор слов-модификаторов через пробел.
+
+| Значение | container-type | cqw/cqh-скейлинг отступов | cqh доступен |
+|---|---|---|---|
+| `container` | `inline-size` | нет | нет |
+| `container="block"` | `size` | нет | да |
+| `container="query"` | `inline-size` | **да** | нет |
+| `container="query block"` | `size` | **да** | да |
 
 ```html
-<div container>...</div>              <!-- inline-size container -->
-<div container="block">...</div>      <!-- size container (по ширине и высоте) -->
+<div container>...</div>                  <!-- только ресайз + max-width -->
+<div container="block">...</div>          <!-- size-контейнер (ширина и высота) -->
+<div container="query">...</div>          <!-- inline-size + cqw-скейлинг отступов -->
+<div container="query block">...</div>    <!-- size + cqw-скейлинг + cqh -->
 ```
 
-**Адаптивный `max-width`** (значения `container` в `$breakpoints`; ниже первой ступени контейнер fluid — 100%):
+**Адаптивный `max-width`** применяется ко всем вариантам `container` (значения `container` в `$breakpoints`; ниже первой ступени контейнер fluid — 100%):
 
 | Ширина экрана | max-width      |
 |---------------|----------------|
@@ -470,44 +479,82 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 Базовые стили: `position: relative; width: 100%; margin: auto` (через `:where()` — нулевая специфичность, легко переопределяется проектом).
 
-### cqw-режим масштабирования
+### cqw-режим масштабирования (`query`)
 
-Внутри `*[container]` все step-based утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) **автоматически масштабируются** с шириной контейнера через `cqw`-единицы.
+Добавление слова `query` к атрибуту `container` включает **cqw-режим**: все step-based утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) внутри контейнера начинают масштабироваться с его шириной.
 
-**Как работает:** внутри контейнера переопределяется `--space-step` на `0.4cqw` (по умолчанию). Все утилиты считают свои значения через `calc(N * var(--space-step))` — значит, и они станут пропорциональны ширине. `--sz-step` производный от `--space-step` (`/4`), поэтому `sz` тоже скейлится.
+**Как работает:** внутри `container="query"` переопределяется `--space-step` на `0.4cqw` (по умолчанию). Все утилиты считают значения через `calc(N * var(--space-step))` — они становятся пропорциональны ширине контейнера. `--sz-step` производный (`/4`), поэтому `sz` тоже скейлится.
 
-**Управление:**
+Простой `container` (без `query`) оставляет `--space-step: 4px` — отступы фиксированы в px независимо от ширины.
+
+**Управление cqw-шагом:**
 
 ```html
-<!-- Стандартный режим: 0.4cqw -->
-<div container>
+<!-- Стандартный режим: --cq-step = 0.4cqw -->
+<div container="query">
     <div m="5">margin = 0.4cqw × 5 = 2cqw</div>
     <p sz="14">font-size = 0.1cqw × 14 = 1.4cqw</p>
 </div>
 
 <!-- Более компактный шаг -->
-<div container style="--cq-step: 0.3cqw">
+<div container="query" style="--cq-step: 0.3cqw">
     <div m="5">margin = 1.5cqw</div>
 </div>
 
 <!-- Развязать sz от cqw — задать абсолютный шаг -->
-<div container>
+<div container="query">
     <p sz="14" style="--sz-step: 1.2px">font-size = 16.8px (фикс)</p>
 </div>
 ```
 
 **Пример:** при ширине контейнера 1200px и `--cq-step: 0.4cqw`:
-- `m="5"` → 4.8px × 5 = 24px
-- `sz="14"` → 1.2px × 14 = 16.8px
+- `m="5"` → `0.4cqw × 5` = `4.8px × 5` = `24px`
+- `sz="14"` → `0.1cqw × 14` = `1.2px × 14` = `16.8px`
 
-**Вложенность:** оба `[container]` и `[container="block"]` используют одно имя `container`, поэтому `@container` всегда смотрит на **ближайшего** предка-контейнер. Вложенные контейнеры масштабируются по своей ширине.
+### cqw и cqh в проектном CSS
+
+`cqw` и `cqh` — единицы контейнерных запросов CSS. `1cqw` = 1% ширины ближайшего именованного предка-контейнера, `1cqh` = 1% его высоты.
+
+**Все варианты `container` создают именованный контейнер**, поэтому `cqw`/`cqh` можно использовать в проектном CSS напрямую — не только через утилиты фреймворка:
+
+```css
+/* Проектный CSS — прямое использование cqw */
+.card__title  { font-size: 3cqw; }
+.card__image  { height: 25cqw; }
+.hero__text   { padding: 2cqw 4cqw; }
+```
+
+**`cqh`** доступен только внутри `size`-контейнеров (`container="block"` или `container="query block"`). В `inline-size`-контейнерах (`container`, `container="query"`) высота не отслеживается и `cqh` равен `0`:
+
+```html
+<!-- cqh работает: container-type: size отслеживает и ширину, и высоту -->
+<div container="query block" style="height: 400px">
+    <div style="height: 50cqh"><!-- 200px --></div>
+    <div m="5"><!-- margin = 0.4cqw × 5, cqw от ширины --></div>
+</div>
+
+<!-- cqh НЕ работает: container-type: inline-size не отслеживает высоту -->
+<div container="query">
+    <div style="height: 50cqh"><!-- 0px, cqh не определён --></div>
+</div>
+```
+
+**Вложенность:** все варианты `container` используют имя `container`, поэтому `@container` в проектном CSS смотрит на **ближайшего** предка. `container="query"` дополнительно регистрирует имя `query-ctx` (служебное, для внутреннего переопределения `--space-step`). Вложенные контейнеры масштабируются независимо по своей ширине:
+
+```html
+<div container="query">                    <!-- 1200px → 1cqw = 12px -->
+    <div container="query" style="width: 600px">  <!-- 600px → 1cqw = 6px -->
+        <div m="5"><!-- margin = 0.4cqw × 5 = 12px (от 600px) --></div>
+    </div>
+</div>
+```
 
 **Паттерн вёрстки секции:**
 
 ```html
 <section mt="6">
-    <div container>
-        <!-- контент секции, все отступы скейлятся с шириной -->
+    <div container="query">
+        <!-- контент: все отступы масштабируются с шириной контейнера -->
     </div>
 </section>
 ```
@@ -899,7 +946,7 @@ html {
 | `grid`        | CSS Grid контейнер                    | `grid=""`, `grid="10"`           |
 | `col`         | Span и позиция в grid                 | `col="12 lg-3"`, `col="start-2"` |
 | `ds`          | Display (показать/скрыть)             | `ds="none lg-block"`, `ds="flex"` |
-| `container`   | Адаптивный контейнер + cqw-скейлинг   | `container`, `container="block"` |
+| `container`   | Адаптивный контейнер; `query` включает cqw-скейлинг | `container`, `container="block"`, `container="query"`, `container="query block"` |
 | `icon`        | Flex-контейнер иконки                 | `icon=""`, `icon="square"`       |
 | `mask`        | CSS-маска для иконок                  | `mask=""` + `style="--mask: url(...)"` |
 | `fluid`       | fit-content размеры                   | `fluid=""`                        |

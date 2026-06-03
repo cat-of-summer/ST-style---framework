@@ -32,8 +32,8 @@
     margin-left: auto;
     margin-right: auto
 }
-*[container]         { container-type: inline-size; container-name: container; }
-*[container="block"] { container-type: size;        container-name: container; }
+*[container]         { container-type: inline-size; }
+*[container="block"] { container-type: size; }
 
 :where(picture, video, canvas, svg) {
     display: block;

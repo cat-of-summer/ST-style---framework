@@ -1,12 +1,16 @@
 @use 'config' as cfg;
 
-[cq] {
-    container-type: inline-size;
-    container-name: cq;
+// All containers get the base name; query variants additionally register
+// "query-ctx" so @container can target only them.
+*[container]          { container-name: container; }
+*[container~="query"] { container-name: container query-ctx; }
+
+// "query block" (any order) → size container (tracks both width and height, enables cqh)
+*[container~="query"][container~="block"] {
+    container-type: size;
 }
 
-// Inside any [cq] element, switch --space-step to the container-query unit so
-// spacing/gaps scale with the container instead of the viewport.
-@container cq (width >= 0px) {
+// Inside any query-ctx container override --space-step to cqw-based scaling.
+@container query-ctx (width >= 0px) {
     * { --space-step: var(--cq-step, #{cfg.$cq-step}cqw); }
 }
