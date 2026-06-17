@@ -1,7 +1,7 @@
 @use 'sass:map';
 @use 'config' as cfg;
 
-:where(*, *::before, *::after):not(svg, svg *, img, video, canvas, iframe) {
+:where(*:not(svg, svg *, img, video, canvas, iframe), *::before, *::after) {
     all: unset;
     display: revert;
     box-sizing: border-box;
