@@ -1,9 +1,14 @@
 @use 'sass:map';
 @use 'config' as cfg;
 
-:where(*, *::before, *::after) {
+:where(*, *::before, *::after):not(svg, svg *, img, video, canvas, iframe) {
     all: unset;
     display: revert;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+:where(svg, svg *, img, video, canvas, iframe) {
     box-sizing: border-box;
     vertical-align: middle;
 }

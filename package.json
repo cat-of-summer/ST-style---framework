@@ -1,6 +1,6 @@
 {
   "name": "@cat-of-summer/st-style",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "Attribute-driven CSS utility framework (SCSS source, compiled CSS).",
   "type": "module",
   "license": "MIT",
