@@ -448,20 +448,23 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ### Атрибут `container`
 
-Обёртка с адаптивным `max-width` и **container-query**-контекстом. Применяется к любому элементу через атрибут. Значение атрибута — набор слов-модификаторов через пробел.
+Обёртка с адаптивным `max-width` **и** контекстом масштабирования отступов. Применяется к любому элементу. Значение — набор слов-токенов через пробел, задающих **три независимые оси** (все mobile-first, с bp-префиксами):
 
-| Значение | container-type | cqw/cqh-скейлинг отступов | cqh доступен |
-|---|---|---|---|
-| `container` | `inline-size` | нет | нет |
-| `container="block"` | `size` | нет | да |
-| `container="query"` | `inline-size` | **да** | нет |
-| `container="query block"` | `size` | **да** | да |
+| Ось | Токены | Что делает |
+|-----|--------|-----------|
+| **режим** | `query` / `static` (+ `md-query`, `lg-static`, …) | per-breakpoint: `query` делает элемент **источником** — потомки масштабируют отступы в `cqw`; `static` — фиксированные px. При конфликте на одном уровне побеждает `static` (безопасный дефолт — выкл). |
+| **шаг** | число: `1`, `md-2`, `lg-4`, … | per-breakpoint интенсивность: шаг = `N × $cq-unit` (build-time `$cq-unit = 0.4cqw`): `1 → 0.4cqw` (= bare `query`), `2 → 0.8cqw`, `5 → 2cqw`. Диапазон `1…$cq-max` (по умолчанию `20`). |
+| **ось Y** | `block` (глобально, без bp) | там где активен `query`, источник отслеживает и высоту (`container-type: size`, включает `cqh`). Под `static` игнорируется. |
+
+> **Голый `container` (без `query`/`static`) — только лэйаут** (ширина, центрирование, адаптивный `max-width`). Он **не** источник масштабирования и **не** container-query контекст. Чтобы включить `cqw`, добавь `query`.
 
 ```html
-<div container>...</div>                  <!-- только ресайз + max-width -->
-<div container="block">...</div>          <!-- size-контейнер (ширина и высота) -->
-<div container="query">...</div>          <!-- inline-size + cqw-скейлинг отступов -->
-<div container="query block">...</div>    <!-- size + cqw-скейлинг + cqh -->
+<div container>...</div>                        <!-- только лэйаут + max-width, отступы в px -->
+<div container="query">...</div>                <!-- источник: отступы масштабируются в cqw -->
+<div container="query block">...</div>          <!-- + отслеживание высоты (cqh) -->
+<div container="query lg-static">...</div>      <!-- cqw до lg, фикс px от lg -->
+<div container="static md-query">...</div>      <!-- фикс px до md, cqw от md -->
+<div container="query 2 md-1 lg-5">...</div>    <!-- шаг 0.8cqw → 0.4cqw (md) → 2cqw (lg) -->
 ```
 
 **Адаптивный `max-width`** применяется ко всем вариантам `container` (значения `container` в `$breakpoints`; ниже первой ступени контейнер fluid — 100%):
@@ -479,82 +482,189 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 Базовые стили: `position: relative; width: 100%; margin: auto` (через `:where()` — нулевая специфичность, легко переопределяется проектом).
 
-### cqw-режим масштабирования (`query`)
+### Как работает масштабирование
 
-Добавление слова `query` к атрибуту `container` включает **cqw-режим**: все step-based утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) внутри контейнера начинают масштабироваться с его шириной.
+Все step-утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) считаются как `calc(N × var(--space-step))`. По умолчанию `--space-step: 4px` — фикс. Внутри **источника** (`query`) правило `@container` подменяет `--space-step` на `var(--cq-step)` (cqw), и **все** отступы/размеры разом становятся пропорциональны ширине контейнера. `--sz-step` производный (`--space-step / 4`), поэтому `sz` скейлится тоже.
 
-**Как работает:** внутри `container="query"` переопределяется `--space-step` на `0.4cqw` (по умолчанию). Все утилиты считают значения через `calc(N * var(--space-step))` — они становятся пропорциональны ширине контейнера. `--sz-step` производный (`/4`), поэтому `sz` тоже скейлится.
-
-Простой `container` (без `query`) оставляет `--space-step: 4px` — отступы фиксированы в px независимо от ширины.
-
-**Управление cqw-шагом:**
+> **`--cq-step` — это множитель, полный аналог `--space-step`, только в `cqw`.** Снаружи контейнера ты ремасштабируешь всё, переопределяя `--space-step`; внутри `query` — переопределяя `--cq-step` (правило `@container` подставляет его в `--space-step`). Токены `query`/число — просто шорткаты, которые проставляют `--cq-step`.
 
 ```html
-<!-- Стандартный режим: --cq-step = 0.4cqw -->
-<div container="query">
-    <div m="5">margin = 0.4cqw × 5 = 2cqw</div>
-    <p sz="14">font-size = 0.1cqw × 14 = 1.4cqw</p>
-</div>
+<!-- снаружи: множитель --space-step (px) -->
+<div style="--space-step: 6px"><p p="5">5 × 6px = 30px</p></div>
 
-<!-- Более компактный шаг -->
-<div container="query" style="--cq-step: 0.3cqw">
-    <div m="5">margin = 1.5cqw</div>
-</div>
+<!-- внутри query: тот же приём, множитель --cq-step (cqw) -->
+<div container="query" style="--cq-step: 0.6cqw"><p p="5">5 × 0.6cqw = 3cqw</p></div>
+```
 
-<!-- Развязать sz от cqw — задать абсолютный шаг -->
-<div container="query">
-    <p sz="14" style="--sz-step: 1.2px">font-size = 16.8px (фикс)</p>
+«Гонки» px↔cqw нет: cqw-подмена действует, только пока предок несёт служебное имя `query-ctx`; иначе берётся базовое `--space-step` — обычный каскад.
+
+### Токены-шорткаты для `--cq-step`
+
+| Токен | Что ставит в `--cq-step` |
+|-------|--------------------------|
+| `query` | `$cq-unit` cqw (по умолчанию `0.4cqw`) — «1 шаг» |
+| число `N` | `N × $cq-unit` cqw (напр. `5 → 2cqw`); `container="1"` ≡ `query` |
+| `static` | `var(--cq-fixed)` — фикс px (по умолчанию = `--space-step`) |
+
+`$cq-unit` и `$cq-max` (верхняя граница чисел) — **build-time** конфиг (`src/main/_config.scss`, меняется через `@use … with (...)`). В рантайме переопределяй `--cq-step` (или `--cq-fixed` для `static`) в CSS/`style` — этого достаточно.
+
+```html
+<div container="query">                     <!-- шаг 0.4cqw -->
+    <div m="5">margin = 5 × 0.4cqw = 2cqw</div>
+    <p sz="14">font-size = 14 × 0.1cqw = 1.4cqw  (--sz-step = --cq-step/4)</p>
 </div>
 ```
 
-**Пример:** при ширине контейнера 1200px и `--cq-step: 0.4cqw`:
-- `m="5"` → `0.4cqw × 5` = `4.8px × 5` = `24px`
-- `sz="14"` → `0.1cqw × 14` = `1.2px × 14` = `16.8px`
+**Пример** при ширине 1200px и `--cq-step: 0.4cqw` (0.4cqw = 4.8px):
+- `m="5"` → `5 × 4.8px` = `24px`
+- `sz="14"` → `14 × 1.2px` = `16.8px`
 
-### cqw и cqh в проектном CSS
+### Режим по брейкпоинтам: `query` / `static`
 
-`cqw` и `cqh` — единицы контейнерных запросов CSS. `1cqw` = 1% ширины ближайшего именованного предка-контейнера, `1cqh` = 1% его высоты.
-
-**Все варианты `container` создают именованный контейнер**, поэтому `cqw`/`cqh` можно использовать в проектном CSS напрямую — не только через утилиты фреймворка:
-
-```css
-/* Проектный CSS — прямое использование cqw */
-.card__title  { font-size: 3cqw; }
-.card__image  { height: 25cqw; }
-.hero__text   { padding: 2cqw 4cqw; }
-```
-
-**`cqh`** доступен только внутри `size`-контейнеров (`container="block"` или `container="query block"`). В `inline-size`-контейнерах (`container`, `container="query"`) высота не отслеживается и `cqh` равен `0`:
+`query` включает cqw, `static` — фикс px. Оба — базовые и с bp-префиксом, mobile-first; больший брейкпоинт побеждает; при конфликте на одном уровне (`query static`) выигрывает `static`.
 
 ```html
-<!-- cqh работает: container-type: size отслеживает и ширину, и высоту -->
-<div container="query block" style="height: 400px">
-    <div style="height: 50cqh"><!-- 200px --></div>
-    <div m="5"><!-- margin = 0.4cqw × 5, cqw от ширины --></div>
-</div>
+<div container="query lg-static">...</div>      <!-- cqw до lg (1280px), фикс px от lg -->
+<div container="static md-query">...</div>      <!-- фикс px до md, cqw от md -->
+<div container="query md-static lg-query">...   <!-- cqw → фикс (md) → снова cqw (lg) -->
+```
 
-<!-- cqh НЕ работает: container-type: inline-size не отслеживает высоту -->
-<div container="query">
-    <div style="height: 50cqh"><!-- 0px, cqh не определён --></div>
+`static` не просто «снимает источник» — он изолирует поддерево на фикс px даже под внешним cqw-предком (становится query-ctx контейнером с `--cq-step: var(--cq-fixed)`).
+
+### Число как интенсивность (по брейкпоинтам)
+
+```html
+<div container="query 2 md-1 lg-5">
+    <p p="4">шаг 0.8cqw → 0.4cqw (md) → 2cqw (lg); padding = 4 × шаг</p>
 </div>
 ```
 
-**Вложенность:** все варианты `container` используют имя `container`, поэтому `@container` в проектном CSS смотрит на **ближайшего** предка. `container="query"` дополнительно регистрирует имя `query-ctx` (служебное, для внутреннего переопределения `--space-step`). Вложенные контейнеры масштабируются независимо по своей ширине:
+Под `static` число игнорируется (фикс px побеждает — `static` эмитится последним):
 
 ```html
-<div container="query">                    <!-- 1200px → 1cqw = 12px -->
-    <div container="query" style="width: 600px">  <!-- 600px → 1cqw = 6px -->
-        <div m="5"><!-- margin = 0.4cqw × 5 = 12px (от 600px) --></div>
+<div container="query lg-static lg-5">...</div>  <!-- на lg: фикс px, «5» проигнорирован -->
+```
+
+### Источник vs не-источник (шаг относительно родителя)
+
+Источником (container-query контекстом) элемент становится **только** при `query`/`static`. Голый `container` и «числовой» `container` (без `query`/`static`) — **не** источники. Отсюда два разных смысла числа:
+
+```html
+<div container="query">                        <!-- ИСТОЧНИК, ширина 1000px, шаг 0.4cqw -->
+    <p p="4">4 × 0.4cqw = 1.6cqw = 16px</p>
+
+    <!-- ребёнок БЕЗ query: НЕ источник → число меняет шаг
+         ОТНОСИТЕЛЬНО родителя (cqw всё ещё от 1000px) -->
+    <div container="2">
+        <p p="4">4 × 0.8cqw(1000px) = 3.2cqw = 32px</p>
+    </div>
+
+    <!-- ребёнок С query: НОВЫЙ источник → cqw от него самого -->
+    <div container="query 2" style="width: 500px">
+        <p p="4">4 × 0.8cqw(500px) = 16px</p>
     </div>
 </div>
 ```
 
-**Паттерн вёрстки секции:**
+Так `container="md-5 lg-1"` на ребёнке меняет интенсивность относительно родителя-источника, а `container="query md-5 lg-1"` переносит точку отсчёта на сам элемент.
+
+> Если над «числовым» контейнером нет ни одного `query`-предка — масштабировать не от чего: правило `@container` не срабатывает, `--space-step` остаётся базовым (число без эффекта). Сырой `cqw` в таком месте резолвится от вьюпорта (дефолт CSS).
+
+### `block` — высота и `cqh`
+
+Глобальный флаг (без bp). Где активен `query`, источник получает `container-type: size` и начинает отслеживать высоту — доступен `cqh`. Под `static` игнорируется.
+
+```html
+<!-- cqh работает: size-контейнер отслеживает и ширину, и высоту -->
+<div container="query block" style="height: 400px">
+    <div style="height: 50cqh"><!-- 200px --></div>
+    <div m="5"><!-- margin по-прежнему от ширины (cqw) --></div>
+</div>
+
+<!-- cqh НЕ работает: inline-size высоту не отслеживает -->
+<div container="query">
+    <div style="height: 50cqh"><!-- 0px --></div>
+</div>
+```
+
+### Сырой `cqw` / `cqh` в проектном CSS
+
+`1cqw` = 1% ширины ближайшего предка-**источника** (`query`/`static`), `1cqh` = 1% его высоты (только под `block`). Источник можно использовать напрямую в проектном CSS:
+
+```css
+.card__title { font-size: 3cqw; }
+.card__image { height: 25cqh; }   /* нужен container="query block" */
+```
+
+> **Голый `container` больше НЕ создаёт container-query контекст** (только лэйаут + `max-width`). Для сырых `cqw`/`cqh` нужен `query`/`static` на предке.
+
+> **`font-size` и брейкпоинты.** Сырой `font-size: 3cqw` **не выключается** токеном `static` (он зависит от `container-type`, а не от имени `query-ctx`). Чтобы шрифт переключался fluid↔fixed по брейкпоинтам — используй `[sz]` (он на `--sz-step`, откатывается к фикс px там, где источник `static`):
+
+```html
+<div container="query lg-static">
+    <h2 sz="24">fluid до lg, фикс 24px от lg — автоматически</h2>
+    <h2 style="font-size: 6cqw">останется fluid и на lg (static не влияет на сырой cqw)</h2>
+</div>
+```
+
+### Рантайм-override (аналог `--space-step`)
+
+| Переменная | Дефолт | Аналог | Что делает |
+|---|---|---|---|
+| `--cq-step` | `0.4cqw` | `--space-step` (px) | множитель отступов внутри `query`; переопредели в CSS/`style`, чтобы ремасштабировать контейнер |
+| `--cq-fixed` | `var(--space-step)` | — | фикс-шаг, к которому откатывается `static` |
+
+```html
+<div container="query" style="--cq-step: 0.6cqw">крупнее весь контейнер</div>
+<div container="static" style="--cq-fixed: 6px">фикс 6px вместо 4px</div>
+```
+
+### Вложенность
+
+Источники вкладываются и масштабируются независимо — каждый по своей ширине. `@container` в проектном CSS смотрит на ближайшего предка-источника (служебное имя `query-ctx`; плюс имя `container`).
+
+```html
+<div container="query">                              <!-- 1200px → 0.4cqw = 4.8px -->
+    <div container="query" style="width: 600px">     <!-- 600px → 0.4cqw = 2.4px -->
+        <div m="5"><!-- 5 × 0.4cqw(600px) = 12px --></div>
+    </div>
+</div>
+```
+
+### Частые кейсы
+
+```html
+<!-- 1. Просто адаптивная обёртка (без масштабирования) -->
+<section mt="6"><div container>...</div></section>
+
+<!-- 2. Fluid, который «замерзает» на десктопе -->
+<div container="query lg-static">...</div>
+
+<!-- 3. Масштаб только на мелких, фикс на крупных -->
+<div container="query md-static">...</div>
+
+<!-- 4. Наоборот: фикс на мобилке, fluid от планшета -->
+<div container="static md-query">...</div>
+
+<!-- 5. Разная «сила» по брейкпоинтам -->
+<div container="query 3 md-2 lg-6">...</div>
+
+<!-- 6. Дочерний блок с меньшим шагом относительно секции -->
+<div container="query"><aside container="1">...</aside></div>
+
+<!-- 7. Вложенный источник со своим отсчётом + высота (cqh) -->
+<div container="query block"><div container="query 2" style="width:50%">...</div></div>
+
+<!-- 8. Переопределить множитель точечно -->
+<div container="query" style="--cq-step: 0.5cqw">...</div>
+```
+
+### Паттерн вёрстки секции
 
 ```html
 <section mt="6">
-    <div container="query">
-        <!-- контент: все отступы масштабируются с шириной контейнера -->
+    <div container="query lg-static">
+        <!-- отступы масштабируются с шириной до lg, затем фиксируются -->
     </div>
 </section>
 ```
@@ -946,7 +1056,7 @@ html {
 | `grid`        | CSS Grid контейнер                    | `grid=""`, `grid="10"`           |
 | `col`         | Span и позиция в grid                 | `col="12 lg-3"`, `col="start-2"` |
 | `ds`          | Display (показать/скрыть)             | `ds="none lg-block"`, `ds="flex"` |
-| `container`   | Адаптивный контейнер; `query` включает cqw-скейлинг | `container`, `container="block"`, `container="query"`, `container="query block"` |
+| `container`   | Адаптивный контейнер; оси `query`/`static`, число (шаг), `block` | `container`, `container="query lg-static"`, `container="query 2 md-1"`, `container="query block"` |
 | `icon`        | Flex-контейнер иконки                 | `icon=""`, `icon="square"`       |
 | `mask`        | CSS-маска для иконок                  | `mask=""` + `style="--mask: url(...)"` |
 | `fluid`       | fit-content размеры                   | `fluid=""`                        |

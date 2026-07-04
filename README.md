@@ -16,6 +16,52 @@ Markup uses attributes instead of classes:
 <button scale="hover" shadow="hover active">Click</button>
 ```
 
+## Container scaling
+
+`[container]` drives fluid, container-relative spacing. All spacing/sizing
+utilities (`[m]`/`[p]`/`[gap]`/`[sz]`) are multiples of `--space-step`; inside a
+scaling **source** `--space-step` becomes `cqw`, so the whole subtree scales with
+the container's width. Три оси задаются одним атрибутом, токены через пробел:
+
+| ось | токены | что делает |
+|-----|--------|-----------|
+| **query / static** | `query`, `static`, `md-query`, `lg-static`, … | per-breakpoint: `query` — элемент становится источником (потомки масштабируются в `cqw`); `static` — фиксированный px. `static` побеждает при конфликте. |
+| **число** | `1`, `md-2`, `lg-5`, … | per-breakpoint cq-step: `N → N * $cq-unit` cqw (build-time `$cq-unit = 0.4cqw`, т.е. `1 → 0.4cqw` = bare `query`, `2 → 0.8cqw`, `5 → 2cqw`). На источнике — шаг для потомков; на голом `[container]` — переопределяет шаг **относительно предка-источника**, сам источником не становясь. |
+| **block** | `block` | глобальный флаг: где `query` активен, источник ещё и по высоте (`container-type: size`, включает `cqh`). Под `static` игнорируется. |
+
+```html
+<!-- cqw до md, фикс px md–lg, крупнее (2cqw) от lg -->
+<section container="query md-static lg-5">
+  <article p="4">…</article>
+
+  <!-- ребёнок: свой шаг 0.8cqw ОТНОСИТЕЛЬНО секции-источника, не новый источник -->
+  <div container="md-2 lg-1"><p p="4">…</p></div>
+</section>
+```
+
+Голый `[container]` — только лэйаут (ширина/центрирование/max-width-ладдер), **не**
+источник масштабирования; добавь `query`, чтобы включить `cqw`.
+
+**Множитель — рантайм.** `--cq-step` — множитель отступов внутри `query`, полный
+аналог `--space-step` (снаружи): правило `@container` подставляет `--cq-step` в
+`--space-step`. Переопредели его в CSS/`style`, чтобы ремасштабировать контейнер:
+
+```html
+<div container="query" style="--cq-step: 0.6cqw">…</div>   <!-- как style="--space-step: …" -->
+```
+
+Токены `query`/число — шорткаты для `--cq-step`. Build-time конфиг
+(`src/main/_config.scss`): `$cq-unit` (cqw в одном числовом шаге), `$cq-max` (верхняя
+граница чисел). Рантайм-переменные: `--cq-step` (множитель) и `--cq-fixed` (фикс-шаг
+для `static`, по умолчанию `= --space-step`).
+
+**Сырой `cqw` вручную.** Если пишешь `font-size: 4cqw` в своём CSS — поставь
+`query` на предке: он задаёт `container-type: inline-size`, и `cqw` резолвится
+относительно него. Но сырой `cqw` **не выключается** токеном `static` (он зависит
+от `container-type`, а не от имени `query-ctx`). Чтобы font-size переключался
+fluid↔fixed по брейкпоинтам, используй токен `[sz]` (он на `--sz-step` = `--space-step/4`
+и откатывается к фикс px автоматически, когда источник `static`), а не сырой `cqw`.
+
 ## Development
 
 ```bash

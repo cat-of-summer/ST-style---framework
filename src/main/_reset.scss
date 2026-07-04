@@ -37,8 +37,8 @@
     margin-left: auto;
     margin-right: auto
 }
-*[container]         { container-type: inline-size; }
-*[container="block"] { container-type: size; }
+// container-type is set only on scaling sources (query/static) — see
+// _container-query.scss. A bare [container] is layout-only, not a cqw source.
 
 :where(picture, video, canvas, svg) {
     display: block;

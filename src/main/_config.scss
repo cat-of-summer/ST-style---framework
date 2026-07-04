@@ -32,6 +32,7 @@ $sz-max:    20 !default;  // [sz]          1..N
 $space-max: 25 !default;  // [m] / [p]     0..N
 $gap-max:   15 !default;  // [ds] / [grid] gap   1..N
 $lc-max:    10 !default;  // [lc]          1..N
+$cq-max:    20 !default;  // [container]    1..N (numeric step tokens)
 
 // ── Typography tokens (emitted as CSS custom properties in :root) ───────────
 // Map key = utility value + custom-property suffix; map value = the default.
@@ -60,4 +61,7 @@ $font-weights: (             // [fw="<key>"] → --fw-<key>
 
 // ── Spacing ─────────────────────────────────────────────────────────────────
 $space-step: 4px !default;   // base unit → --space-step (--sz-step = /4)
-$cq-step:    0.4 !default;   // cqw multiplier inside [container]; 0.4cqw ≈ $space-step at 1000px
+                             // also reused as the fixed step for `static` (--cq-fixed)
+
+// ── Container query scaling ─────────────────────────────────────────────────
+$cq-unit: 0.4 !default;   // cqw step: bare `query` = $cq-unit cqw; token N → N*$cq-unit cqw

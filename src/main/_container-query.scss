@@ -1,16 +1,69 @@
+@use 'sass:map';
 @use 'config' as cfg;
 
-// All containers get the base name; query variants additionally register
-// "query-ctx" so @container can target only them.
-*[container]          { container-name: container; }
-*[container~="query"] { container-name: container query-ctx; }
+// ─────────────────────────────────────────────────────────────────────────
+// [container] scaling — three orthogonal, space-separated token axes:
+//
+//   query / static   per-breakpoint. query → this element is a scaling SOURCE
+//                    (a query-ctx container) whose descendants scale in cqw.
+//                    static → fixed px. static wins ties (safe default = off).
+//                    Base tokens (query/static) and bp variants (md-query, …).
+//   <number>         per-breakpoint cq-step: token N → N * $cq-unit cqw
+//                    (compiled to a literal, e.g. 5 → 2cqw at $cq-unit=0.4).
+//                    On a source → the step for its descendants. On a bare
+//                    [container] (no query/static) → overrides the step
+//                    relative to the ANCESTOR source, without itself becoming
+//                    a source (so `container="md-5 lg-1"` on a child re-scales
+//                    relative to its parent).
+//   block            global flag (no bp). Where query is active the source
+//                    tracks height too (container-type: size, enables cqh).
+//                    Ignored wherever static.
+//
+// Precedence is carried purely by source order — every selector is wrapped in
+// :where() (0 specificity): query-default → numbers → static, base rules first
+// then breakpoints ascending (larger breakpoint wins). Same base-then-@media
+// shape as _spacing/_sizing/_display.
+// ─────────────────────────────────────────────────────────────────────────
 
-// "query block" (any order) → size container (tracks both width and height, enables cqh)
-*[container~="query"][container~="block"] {
-    container-type: size;
+// ── Base tokens (≥0px) ──────────────────────────────────────────────────
+// query → source ON, default (1-unit cqw) step
+:where(*[container~="query"]) {
+  container-type: inline-size;
+  container-name: container query-ctx;
+  --cq-step: #{cfg.$cq-unit}cqw;
+}
+// block (global) → size container wherever query is active
+:where(*[container~="query"][container~="block"]) { container-type: size; }
+// numeric steps — override the bare-query default
+@for $i from 1 through cfg.$cq-max {
+  :where(*[container~="#{$i}"]) { --cq-step: #{$i * cfg.$cq-unit}cqw; }
+}
+// static → source with a FIXED step (reverse wins → emitted last; block ignored)
+:where(*[container~="static"]) {
+  container-type: inline-size;
+  container-name: container query-ctx;
+  --cq-step: var(--cq-fixed);
 }
 
-// Inside any query-ctx container override --space-step to cqw-based scaling.
-@container query-ctx (width >= 0px) {
-    * { --space-step: var(--cq-step, #{cfg.$cq-step}cqw); }
+// ── Per-breakpoint variants ─────────────────────────────────────────────
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    :where(*[container~="#{$bp}-query"]) {
+      container-type: inline-size;
+      container-name: container query-ctx;
+      --cq-step: #{cfg.$cq-unit}cqw;
+    }
+    :where(*[container~="#{$bp}-query"][container~="block"]) { container-type: size; }
+    @for $i from 1 through cfg.$cq-max {
+      :where(*[container~="#{$bp}-#{$i}"]) { --cq-step: #{$i * cfg.$cq-unit}cqw; }
+    }
+    :where(*[container~="#{$bp}-static"]) {
+      container-type: inline-size;
+      container-name: container query-ctx;
+      --cq-step: var(--cq-fixed);
+    }
+  }
 }
+
+// Inside any query-ctx source, descendants take cq-step as their space unit.
+@container query-ctx (width >= 0px) { * { --space-step: var(--cq-step); } }
