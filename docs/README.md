@@ -8,6 +8,7 @@
 ## Файлы
 
 - [.npmrc](.npmrc.md)
+- [LICENSE](LICENSE.md)
 
 <!-- DOCGEN:END -->
 
