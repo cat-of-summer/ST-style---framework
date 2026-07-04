@@ -27,8 +27,8 @@
     "prepack": "node scripts/build.mjs"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "devDependencies": {
     "sass": "^1.77.0"

@@ -83,34 +83,31 @@ properties — override `--space-step`, `--fs-h1`, `--td-fast`, … in your own 
 
 ## Releasing
 
-Releases are triggered by **pushing a tag** (not by ordinary pushes):
+Releases are triggered by **pushing a `v*` tag** (not by ordinary pushes):
 
 ```bash
-# bump "version" in package.json, commit, then:
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.3.2
+git push origin v0.3.2
 ```
 
-`.github/workflows/release.yml` builds `dist/`, publishes the package to GitHub
-Packages, and creates a GitHub Release with `main.min.css` and `effects.min.css`
-attached. Ordinary pushes run only `ci-cd.yml`, which validates that the SCSS compiles.
+`.github/workflows/release.yml` builds `dist/`, creates a GitHub Release with
+`main.min.css` and `effects.min.css` attached, and — when the environment
+variable `PUBLISH_METHOD=npm` is set — publishes the package to **npm**
+(registry.npmjs.org) and **GitHub Packages**. The published version is derived
+from the tag (`v0.3.2` → `0.3.2`), so the tag is the source of truth. Ordinary
+pushes run only `ci-cd.yml`, which validates that the SCSS compiles.
 
 ## A. Use via npm
 
-Пакет опубликован в GitHub Packages (приватный реестр). Для установки нужен
-read-only токен GitHub.
+Пакет опубликован в публичном реестре npm — токен и `.npmrc` не нужны.
 
-### 1. Скопировать `.npmrc` в проект потребителя
-
-Скопируйте файл `.npmrc` из корня этого репозитория к себе в проект — токен уже вписан.
-
-### 2. Установить
+### 1. Установить
 
 ```bash
 npm install @cat-of-summer/st-style
 ```
 
-### 4. Использовать
+### 2. Использовать
 
 Скомпилированный CSS:
 
@@ -130,9 +127,8 @@ import '@cat-of-summer/st-style/effects.css';
 
 ## B. Скачать артефакты релиза
 
-К каждому GitHub Release прикреплены скомпилированные файлы. Для приватного
-репозитория нужна аутентификация:
+К каждому GitHub Release прикреплены скомпилированные файлы:
 
 ```bash
-gh release download v0.1.0 -R cat-of-summer/ST-style---framework
+gh release download v0.3.2 -R cat-of-summer/ST-style---framework
 ```
