@@ -198,3 +198,5 @@ package.json
 # not the partials. The negation must come after the *.scss exclusion.
 *.scss
 !index.scss
+.npmrc
+LICENSE
