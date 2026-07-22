@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — эффекты: все кейсы</title>
+
+<!-- Собранный бандл эффектов -->
+<link rel="stylesheet" href="../dist/effects.min.css">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Раскладка, карточки, «чипы».
+  Поведение эффектов задаётся исключительно атрибутами (raise, scale, sheen,
+  ripple, float, td, infinite …). Каждый чип помечен своим триггером.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 20px 18px 90px; }
+  h1 { font-size: 30px; margin: .2em 0; }
+  h2 { font-size: 21px; color: #2b3040; margin: 0 0 4px; }
+  h3 { font-size: 15px; margin: 0; }
+  p  { margin: .3em 0; line-height: 1.45; }
+  code, .k { background: #eef1f5; color: #b0306a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .85em; }
+  .lead { color: #5b616e; }
+
+  #hud { position: sticky; top: 0; z-index: 50; background: #16181d; color: #e7eaf0; padding: 10px 16px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; font-size: 13px; }
+  #hud .legend { font-family: ui-monospace, monospace; }
+  #hud .legend b { color: #7dd3fc; }
+  #hud button { border: 1px solid #3a4150; background: #232732; color: #e7eaf0; border-radius: 6px; padding: 6px 12px; cursor: pointer; font: inherit; }
+  #hud button:hover { background: #2c313d; }
+
+  .group { margin-top: 30px; }
+  .group > .lead { margin-bottom: 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px; }
+
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .card .stage { min-height: 120px; display: flex; align-items: center; justify-content: center; background: repeating-linear-gradient(45deg,#fafbfc,#fafbfc 10px,#f2f4f7 10px,#f2f4f7 20px); border-radius: 8px; overflow: visible; }
+  .card.clip .stage { overflow: hidden; }
+  .badge { display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; color: #475569; background: #eef1f5; border-radius: 4px; padding: 2px 6px; }
+  .desc { font-size: 13px; color: #5b616e; }
+
+  /* демо-объекты */
+  .chip { width: 88px; height: 88px; border-radius: 14px; background: linear-gradient(135deg,#6366f1,#ec4899 55%,#f59e0b); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 13px; box-shadow: 0 1px 2px rgba(0,0,0,.15); user-select: none; }
+  .chip.sq { border-radius: 10px; }
+  .ico { width: 64px; height: 64px; color: #6d5efc; }
+  .btn { border: 0; background: #6366f1; color: #fff; padding: 12px 20px; border-radius: 10px; font: 600 14px/1 system-ui; cursor: pointer; }
+  .btn.outline { background: #fff; color: #6366f1; border: 1px solid #c7d2fe; }
+  .txt { font-size: 22px; font-weight: 700; }
+  /* тёмная обёртка для shimmer — фон НЕ на самом элементе, иначе перекроет градиент */
+  .shimmer-bg { background: #16181d; padding: 10px 16px; border-radius: 8px; }
+  a.link { color: #6366f1; text-decoration: none; font-weight: 600; font-size: 18px; }
+  .note { border-left: 3px solid #f0b429; background: #fff8e6; padding: 8px 12px; border-radius: 0 6px 6px 0; color: #5b4b16; font-size: 13px; margin-top: 10px; }
+  .replay { align-self: flex-start; border: 1px solid #cbd2db; background: #fff; border-radius: 6px; padding: 4px 10px; cursor: pointer; font: 12px ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span class="legend">триггеры: <b>hover</b> · <b>active</b> (клик) · <b>focus</b> · <b>infinite</b> · пусто = авто</span>
+  <button id="replay-all">▶ проиграть одноразовые заново</button>
+  <span class="legend" style="color:#86efac">reduced-motion уважается — при системной настройке анимации выключаются</span>
+</div>
+
+<div class="wrap">
+
+<h1>Эффекты ST-style — все кейсы</h1>
+<p class="lead">Подключён только <code>../dist/effects.min.css</code>. Каждый чип управляется атрибутами.
+  <b>Наводи</b> курсор на hover-карточки, <b>кликай</b> по active/ripple, а анимации показаны в
+  <code>infinite</code> для наглядности (рядом — их одноразовый вариант с кнопкой «проиграть»).</p>
+
+<!-- ═══════════ td — длительность ═══════════ -->
+<div class="group">
+  <h2>Длительность перехода — <code>[td]</code></h2>
+  <p class="lead">Управляет <code>transition-duration</code> элемента и его псевдоэлементов. Значения из
+    карты <code>$durations</code>: rapid 0.1s · fast 0.325s · medium 0.55s · slow 0.775s · 1s…15s · none.
+    Наведи — почувствуй разницу скорости (эффект <code>raise+scale</code>).</p>
+  <div class="grid">
+    <div class="card"><div class="stage"><div class="chip" raise="hover" scale="hover" td="rapid">rapid</div></div><span class="badge">td="rapid" (0.1s)</span></div>
+    <div class="card"><div class="stage"><div class="chip" raise="hover" scale="hover" td="fast">fast</div></div><span class="badge">td="fast" (0.325s)</span></div>
+    <div class="card"><div class="stage"><div class="chip" raise="hover" scale="hover" td="medium">medium</div></div><span class="badge">td="medium" (0.55s)</span></div>
+    <div class="card"><div class="stage"><div class="chip" raise="hover" scale="hover" td="slow">slow</div></div><span class="badge">td="slow" (0.775s)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ Состояние / наведение ═══════════ -->
+<div class="group">
+  <h2>Состояние — hover / active / focus</h2>
+  <p class="lead">Трансформации, фильтры, тени по состоянию. Плавность даёт <code>td</code>.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="stage"><div class="chip" raise="hover active" td="fast">raise</div></div>
+      <h3>raise — подъём</h3>
+      <span class="badge">raise="hover active" td="fast"</span>
+      <p class="desc">translateY вверх при hover, ещё выше при active. Вары <code>--raise-hover/-active</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip" scale="hover active">scale</div></div>
+      <h3>scale — масштаб</h3>
+      <span class="badge">scale="hover active"</span>
+      <p class="desc">hover → 1.05, active → 0.95 (нажатие). <code>--scale-hover/-active</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><svg class="ico" rotate="hover" td="fast" style="--rotate-hover:20deg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 5 5.6.6-4 3.9 1 5.5L12 19.8 6.9 22.5l1-5.5-4-3.9L9.6 7z"/></svg></div>
+      <h3>rotate — поворот</h3>
+      <span class="badge">rotate="hover" · style --rotate-hover</span>
+      <p class="desc">Поворот при hover (по умолч. 3°). Здесь угол увеличен: <code>--rotate-hover: 20deg</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip" skew="hover active" td="fast">skew</div></div>
+      <h3>skew — наклон</h3>
+      <span class="badge">skew="hover active"</span>
+      <p class="desc">skewX при hover/active. <code>--skew-hover/-active</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip" blur="hover" td="medium">blur</div></div>
+      <h3>blur — размытие</h3>
+      <span class="badge">blur="hover" td="medium"</span>
+      <p class="desc">Изначально размыт, при hover — резкий. <code>--blur-amount</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip" grayscale="hover">gray</div></div>
+      <h3>grayscale — обесцвечивание</h3>
+      <span class="badge">grayscale="hover"</span>
+      <p class="desc">Ч/б по умолчанию, цвет при hover (зеркало blur). <code>--grayscale-amount</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip sq" shadow="hover active" td="fast">shadow</div></div>
+      <h3>shadow — тень</h3>
+      <span class="badge">shadow="hover active focus"</span>
+      <p class="desc">box-shadow при hover, плоская при нажатии. Работает и по focus.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip sq" glow="hover" td="medium" style="--glow-color:#22d3ee;--glow-size:22px">glow</div></div>
+      <h3>glow — свечение</h3>
+      <span class="badge">glow="hover" · --glow-color/-size</span>
+      <p class="desc">Цветное неоновое свечение (в отличие от серой shadow).</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ Псевдоэлементы / текст ═══════════ -->
+<div class="group">
+  <h2>Псевдоэлементы и текст</h2>
+  <div class="grid">
+
+    <div class="card clip">
+      <div class="stage"><div class="chip sq" sheen="hover" td="medium">sheen</div></div>
+      <h3>sheen — блик</h3>
+      <span class="badge">sheen="hover" (::before, overflow hidden)</span>
+      <p class="desc">Белая полоса проходит по элементу. Есть <code>sheen="" infinite</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><button class="btn" ripple="hover" style="--ripple-color:rgba(255,255,255,.55)">наведи — ripple</button></div>
+      <h3>ripple — волна</h3>
+      <span class="badge">ripple="hover" (::before, без авто) · есть active</span>
+      <p class="desc">Круговая волна от центра. На <code>hover</code> — по наведению; на <code>active</code> нужно зажимать. <code>--ripple-color</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage" style="gap:16px;flex-direction:column">
+        <a href="#" class="link" underline="hover">из центра</a>
+        <a href="#" class="link" underline="left hover">слева направо</a>
+        <a href="#" class="link" underline="right hover">справа налево</a>
+      </div>
+      <h3>underline — подчёркивание</h3>
+      <span class="badge">underline="hover | left hover | right hover"</span>
+      <p class="desc">Анимированная линия через <code>::after</code>. <code>--underline-color/-width/-offset</code>.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><h3 class="txt" typing-text="" data-oneshot style="--typing-steps:16;--typing-chars:16;--typing-color:#6366f1;--typing-duration:2.2s">печатает текст…</h3></div>
+      <h3>typing-text — печатная машинка</h3>
+      <span class="badge">typing-text="" · steps/chars = кол-во символов</span>
+      <p class="desc">Текст появляется посимвольно с курсором. Кнопка «проиграть» перезапустит.</p>
+      <button class="replay" data-replay>▶ проиграть</button>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="shimmer-bg"><h3 class="txt" shimmer-text="" infinite="" style="--shimmer-color:#fff;--shimmer-size:60%;-webkit-background-clip:text;-webkit-text-fill-color:transparent">SHIMMER</h3></div></div>
+      <h3>shimmer-text — мерцание текста</h3>
+      <span class="badge">shimmer-text="" infinite (color → transparent)</span>
+      <p class="desc">Градиентный блик поверх текста (<code>background-clip: text</code>). Нужен фон для читаемости.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════ Непрерывные анимации (infinite) ═══════════ -->
+<div class="group">
+  <h2>Анимации — показаны в <code>infinite</code></h2>
+  <p class="lead">Без <code>infinite</code> проигрываются один раз при загрузке (или по <code>hover</code>).
+    Скорость — через <code>td</code> / свои <code>--*-duration</code>.</p>
+  <div class="grid">
+
+    <div class="card"><div class="stage"><div class="chip" float="" infinite="">float ↕</div></div><h3>float — парение</h3><span class="badge">float="" infinite · --float-range</span></div>
+    <div class="card"><div class="stage"><div class="chip" float="horizontal" infinite="">float ↔</div></div><h3>float horizontal</h3><span class="badge">float="horizontal" infinite</span></div>
+    <div class="card"><div class="stage"><svg class="ico" spin="" infinite="" td="1s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" /></svg></div><h3>spin — вращение</h3><span class="badge">spin="" infinite td="1s"</span></div>
+    <div class="card"><div class="stage"><div class="chip" pulse="" infinite="">pulse</div></div><h3>pulse — пульсация</h3><span class="badge">pulse="" infinite · --pulse-scale</span></div>
+    <div class="card"><div class="stage"><div class="chip" heartbeat="" infinite="">♥</div></div><h3>heartbeat — сердцебиение</h3><span class="badge">heartbeat="" infinite</span></div>
+    <div class="card"><div class="stage"><div class="chip" vibrate="reverse">vibrate</div></div><h3>vibrate — дрожание</h3><span class="badge">vibrate="reverse" (непрерывно) · hover</span></div>
+    <div class="card"><div class="stage"><div class="chip" bounce="" infinite="">bounce</div></div><h3>bounce — прыжок</h3><span class="badge">bounce="" infinite · --bounce-height</span></div>
+    <div class="card"><div class="stage"><div class="chip" wobble="" infinite="">wobble</div></div><h3>wobble — покачивание</h3><span class="badge">wobble="" infinite · --wobble-angle</span></div>
+    <div class="card"><div class="stage"><div class="chip" blink="" infinite="">blink</div></div><h3>blink — мигание</h3><span class="badge">blink="" infinite (steps)</span></div>
+    <div class="card"><div class="stage"><div class="chip" swing="" infinite="">swing</div></div><h3>swing — качание</h3><span class="badge">swing="" infinite</span></div>
+
+  </div>
+</div>
+
+<!-- ═══════════ Одноразовые + replay ═══════════ -->
+<div class="group">
+  <h2>Одноразовые (attention-seekers) — кнопкой «проиграть»</h2>
+  <p class="lead">Эти эффекты естественны как разовый акцент. Здесь без <code>infinite</code>; нажми
+    «проиграть» (или общую кнопку в шапке), чтобы перезапустить. Также поддерживают <code>hover</code>.</p>
+  <div class="grid">
+
+    <div class="card"><div class="stage"><div class="chip" tada="" data-oneshot>tada</div></div><h3>tada — «та-да»</h3><span class="badge">tada="" · hover</span><button class="replay" data-replay>▶ проиграть</button></div>
+    <div class="card"><div class="stage"><div class="chip" jello="" data-oneshot>jello</div></div><h3>jello — желе</h3><span class="badge">jello="" · hover</span><button class="replay" data-replay>▶ проиграть</button></div>
+    <div class="card"><div class="stage"><div class="chip" bounce="" data-oneshot>bounce</div></div><h3>bounce (разово)</h3><span class="badge">bounce="" · hover</span><button class="replay" data-replay>▶ проиграть</button></div>
+    <div class="card"><div class="stage"><div class="chip" heartbeat="" data-oneshot>♥</div></div><h3>heartbeat (разово)</h3><span class="badge">heartbeat="" · hover</span><button class="replay" data-replay>▶ проиграть</button></div>
+    <div class="card"><div class="stage"><div class="chip" opacity="" data-oneshot>opacity</div></div><h3>opacity — появление</h3><span class="badge">opacity="" · infinite · td</span><button class="replay" data-replay>▶ проиграть</button></div>
+    <div class="card"><div class="stage"><div class="chip" pulse="" data-oneshot>pulse</div></div><h3>pulse (разово)</h3><span class="badge">pulse="" · hover · infinite</span><button class="replay" data-replay>▶ проиграть</button></div>
+
+  </div>
+</div>
+
+<!-- ═══════════ Комбинации / реальные кейсы ═══════════ -->
+<div class="group">
+  <h2>Комбинации — как в реальном проекте</h2>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">
+
+    <div class="card clip">
+      <div class="stage">
+        <div class="chip sq" style="width:100%;height:96px" sheen="hover" shadow="hover" raise="hover" td="medium">карточка</div>
+      </div>
+      <h3>Карточка услуги</h3>
+      <span class="badge">sheen="hover" shadow="hover" raise="hover" td="medium"</span>
+      <p class="desc">Блик + тень + подъём одним наведением.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><button class="btn" scale="hover active" shadow="hover active" ripple="hover" td="fast">кнопка</button></div>
+      <h3>Интерактивная кнопка</h3>
+      <span class="badge">scale + shadow + ripple="hover" + td="fast"</span>
+      <p class="desc">Масштаб/тень по состоянию, волна при наведении.</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><div class="chip" float="" pulse="" infinite="" td="slow">decor</div></div>
+      <h3>Декоративный элемент</h3>
+      <span class="badge">float="" pulse="" infinite td="slow"</span>
+      <p class="desc">Парит и пульсирует одновременно (два атрибута).</p>
+    </div>
+
+    <div class="card">
+      <div class="stage"><button class="btn outline" glow="hover focus" scale="hover" td="medium" tabindex="0">hover / focus</button></div>
+      <h3>Свечение по focus</h3>
+      <span class="badge">glow="hover focus" scale="hover"</span>
+      <p class="desc">Наведи мышью или перейди Tab — свечение и на фокусе.</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="note">
+  <b>infinite</b> — атрибут-флаг: делает анимацию элемента бесконечной
+  (<code>--iteration-count: infinite</code>). <b>td="none"</b> отключает переход.
+  Все анимации автоматически глушатся при системном <code>prefers-reduced-motion: reduce</code>.
+</div>
+
+</div><!-- /wrap -->
+
+<!-- Демо-скрипт: перезапуск одноразовых анимаций (не часть фреймворка) -->
+<script>
+  // Перезапуск CSS-анимации: снять атрибут-эффект → форс-reflow → вернуть.
+  function replay(el){
+    // определить, какой из эффект-атрибутов на элементе рестартить
+    const FX = ['tada','jello','bounce','heartbeat','opacity','pulse','wobble','swing','blink','typing-text','vibrate'];
+    const attr = FX.find(a => el.hasAttribute(a));
+    if (!attr) return;
+    const val = el.getAttribute(attr);
+    el.removeAttribute(attr);
+    void el.offsetWidth;          // форсируем reflow, чтобы анимация сбросилась
+    el.setAttribute(attr, val);
+  }
+  // кнопка внутри карточки
+  document.querySelectorAll('[data-replay]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const el = btn.closest('.card').querySelector('[data-oneshot]');
+      if (el) replay(el);
+    });
+  });
+  // общая кнопка в шапке
+  document.getElementById('replay-all').addEventListener('click', () => {
+    document.querySelectorAll('[data-oneshot]').forEach(replay);
+  });
+</script>
+</body>
+</html>
