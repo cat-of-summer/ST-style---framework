@@ -1,26 +1,78 @@
+@use 'sass:map';
+@use 'sass:list';
+@use 'sass:math';
 @use 'config' as cfg;
 
 @property --space-step   { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
-@property --sz-step      { syntax: "<length>";          inherits: true;  initial-value: 1px; }
 @property --cq-step      { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$cq-unit}cqw; }
+@property --fs-scale     { syntax: "<number>";          inherits: true;  initial-value: 1; }
 @property --grid-columns { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-span     { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-start    { syntax: "<integer> | auto";  inherits: false; initial-value: auto; }
 
+// ── Font-size ramp anchors ──────────────────────────────────────────────
+// Ordered points: (min-width, css-var-name, default-size). Base at 0, then one
+// per breakpoint. Default size = explicit $font-sizes-bp anchor or the $fs-step
+// ramp. The css-var is emitted in :root (runtime-tunable); the default size is
+// used to bake the fluid slope between anchors (see below).
+$points: ((0px, --font-size-base, cfg.$font-size),);
+$n: 0;
+@each $bp, $data in cfg.$breakpoints {
+  $n: $n + 1;
+  $def: cfg.$font-size + $n * cfg.$fs-step;
+  @if map.has-key(cfg.$font-sizes-bp, $bp) { $def: map.get(cfg.$font-sizes-bp, $bp); }
+  $points: list.append($points, (map.get($data, min), --font-size-#{$bp}, $def));
+}
+
 :root {
     font-synthesis: none;
-    --font-size: #{cfg.$font-size};
+    --fs-scale: 1;
+    --fs: calc(var(--font-size) * var(--fs-scale));
     --font-weight: var(--fw-normal);
 
     --space-step: #{cfg.$space-step};
-    --sz-step: calc(var(--space-step) / 4);
-
     --cq-fixed: var(--space-step);   // fixed step `static` falls back to (tracks themed base)
 
+    // per-breakpoint anchors (paste real UI values or override in project CSS)
+    @each $pt in $points {
+        #{list.nth($pt, 2)}: #{list.nth($pt, 3)};
+    }
+
     @each $name, $val in cfg.$font-sizes {
-        --fs-#{$name}: #{$val};
+        --fs-#{$name}: calc(#{$val} * var(--fs));
     }
     @each $name, $val in cfg.$font-weights {
         --fw-#{$name}: #{$val};
+    }
+}
+
+// ── Fluid ramp: one clamp() segment per interval, through the anchors ─────
+// --font-size interpolates linearly with 100vw between consecutive anchors and
+// is clamped to that pair, so it is continuous (no jumps) and hits each anchor
+// exactly at its breakpoint min-width. Endpoints read the runtime vars; the vw
+// slope is baked from the default sizes (CSS can't divide length by length).
+$len: list.length($points);
+@for $i from 1 through $len {
+    $pt:   list.nth($points, $i);
+    $w:    list.nth($pt, 1);
+    $var:  list.nth($pt, 2);
+    $size: list.nth($pt, 3);
+
+    @if $i < $len {
+        $next:  list.nth($points, $i + 1);
+        $wB:    list.nth($next, 1);
+        $varB:  list.nth($next, 2);
+        $sizeB: list.nth($next, 3);
+        $slope: math.div($sizeB - $size, $wB - $w);   // unitless (px/px)
+        $decl:  clamp(var(#{$var}), calc(var(#{$var}) + #{$slope} * (100vw - #{$w})), var(#{$varB}));
+
+        @if $w == 0px {
+            :root { --font-size: #{$decl}; }
+        } @else {
+            @media (min-width: $w) { :root { --font-size: #{$decl}; } }
+        }
+    } @else {
+        // top anchor: plateau (no upper segment)
+        @media (min-width: $w) { :root { --font-size: var(#{$var}); } }
     }
 }

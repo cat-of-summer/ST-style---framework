@@ -28,7 +28,7 @@ $breakpoints: (
 ) !default;
 
 // ── Scales (contiguous ranges) ──────────────────────────────────────────────
-$sz-max:    20 !default;  // [sz]          1..N
+$fs-max:    10 !default;  // [fs] scale    1..N up (N) and down (dN) → ±N*$fs-scale-step
 $space-max: 25 !default;  // [m] / [p]     0..N
 $gap-max:   15 !default;  // [ds] / [grid] gap   1..N
 $lc-max:    10 !default;  // [lc]          1..N
@@ -36,16 +36,36 @@ $cq-max:    20 !default;  // [container]    1..N (numeric step tokens)
 
 // ── Typography tokens (emitted as CSS custom properties in :root) ───────────
 // Map key = utility value + custom-property suffix; map value = the default.
-// Drive [fs]/[fw] AND --fs-<name>/--fw-<name>; still overridable at runtime.
-$font-size: 10px !default;   // → --font-size (root font-size)
-$font-sizes: (               // [fs="<key>"] → --fs-<key>
-  h1: 3.2em,
-  h2: 2.4em,
-  h3: 2em,
-  h4: 1.8em,
-  h5: 1.6em,
-  h6: 1.4em,
-  p:  1.2em,
+// Drive [tx]/[fw] AND --fs-<name>/--fw-<name>; still overridable at runtime.
+//
+// Typography scaling model (see _root.scss / _typography.scss):
+//   --font-size  base env: fluid clamp ramp (outside) / calibrated cqw (inside `query`)
+//   --fs-scale   group multiplier from [fs], inherited, default 1
+//   --fs         = calc(var(--font-size) * var(--fs-scale))   ← single lever
+//   --fs-<key>   = calc(<value> * var(--fs))                  ← size tokens
+//
+// Ramp is a per-segment fluid clamp() through per-breakpoint ANCHORS:
+//   --font-size-base + one --font-size-<bp> per breakpoint (emitted in :root).
+// Between two consecutive anchors --font-size interpolates linearly with 100vw
+// (slope baked at build time — CSS can't divide length/length), clamped to the
+// pair. Anchors are exact at each breakpoint min-width and can be tuned at
+// runtime via the --font-size-<bp> vars (endpoints stay exact; the between-slope
+// stays as configured). For fluid parity inside `query`, set anchors here (the
+// cqw calibration is baked from these values).
+$font-size: 10px !default;   // → --font-size-base (anchor below the first breakpoint)
+$fs-step:   0.75px !default; // default anchor generator: bp n → $font-size + n*$fs-step
+$font-sizes-bp: () !default; // explicit per-breakpoint anchors from the UI, e.g.
+                             //   (md: 14px, lg: 16px, xl: 18px) — others fall back to
+                             //   the $fs-step ramp. Paste real design values here.
+$fs-scale-step: 0.05 !default; // [fs] step size: fs="N" → 1 + N*step, fs="dN" → 1 - N*step
+$font-sizes: (               // [tx="<key>"] → font-size: var(--fs-<key>); value = ×--fs multiplier
+  h1: 3.2,
+  h2: 2.4,
+  h3: 2,
+  h4: 1.8,
+  h5: 1.6,
+  h6: 1.4,
+  p:  1.2,
 ) !default;
 $font-weights: (             // [fw="<key>"] → --fw-<key>
   'thin':       100,

@@ -1,4 +1,6 @@
 @use 'sass:map';
+@use 'sass:list';
+@use 'sass:math';
 @use 'config' as cfg;
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -22,8 +24,24 @@
 // Precedence is carried purely by source order — every selector is wrapped in
 // :where() (0 specificity): query-default → numbers → static, base rules first
 // then breakpoints ascending (larger breakpoint wins). Same base-then-@media
-// shape as _spacing/_sizing/_display.
+// shape as _spacing/_typography/_display.
+//
+// FONT scaling inside a source is carried by --cq-fs (a parallel of --cq-step):
+//   query  → --cq-fs = calibrated cqw so that at the container's max-width the
+//            font-size equals the ramped px for that breakpoint (see _root.scss);
+//            narrower container → smaller, fluid. Calibration is per breakpoint
+//            because the container max-width grows along the ladder.
+//   static → --cq-fs = var(--font-size), i.e. frozen to the ramped px (no cqw).
+// The @container rule at the bottom maps --cq-fs → --font-size for descendants,
+// so every --fs-* token (and custom --fs-*) becomes fluid/frozen automatically.
 // ─────────────────────────────────────────────────────────────────────────
+
+// Reference container width for the base (<first breakpoint) calibration.
+$first-bp: list.nth(map.keys(cfg.$breakpoints), 1);
+$first-c:  map.get(map.get(cfg.$breakpoints, $first-bp), container);
+
+// calib($c, $f) → number of cqw so that at width $c the font-size is $f.
+@function calib($c, $f) { @return math.div($f, $c) * 100; }
 
 // ── Base tokens (≥0px) ──────────────────────────────────────────────────
 // query → source ON, default (1-unit cqw) step
@@ -31,6 +49,7 @@
   container-type: inline-size;
   container-name: container query-ctx;
   --cq-step: #{cfg.$cq-unit}cqw;
+  --cq-fs: #{calib($first-c, cfg.$font-size)}cqw;
 }
 // block (global) → size container wherever query is active
 :where(*[container~="query"][container~="block"]) { container-type: size; }
@@ -43,20 +62,37 @@
   container-type: inline-size;
   container-name: container query-ctx;
   --cq-step: var(--cq-fixed);
+  --cq-fs: var(--font-size);
 }
 
 // ── Per-breakpoint variants ─────────────────────────────────────────────
+$n: 0;
 @each $bp, $data in cfg.$breakpoints {
+  $n: $n + 1;
+  $c: map.get($data, container);
+  $f: cfg.$font-size + $n * cfg.$fs-step;
+  @if map.has-key(cfg.$font-sizes-bp, $bp) { $f: map.get(cfg.$font-sizes-bp, $bp); }
+  $fs-cqw: var(--font-size);
+  @if $c { $fs-cqw: #{calib($c, $f)}cqw; }
+
   @media (min-width: map.get($data, min)) {
+    // Recalibrate every query source to this viewport's container width, even a
+    // bare `query` source (its container max-width changed along the ladder).
+    :where(*[container~="query"]) { --cq-fs: #{$fs-cqw}; }
+
     :where(*[container~="#{$bp}-query"]) {
       container-type: inline-size;
       container-name: container query-ctx;
       --cq-step: #{cfg.$cq-unit}cqw;
+      --cq-fs: #{$fs-cqw};
     }
     :where(*[container~="#{$bp}-query"][container~="block"]) { container-type: size; }
     @for $i from 1 through cfg.$cq-max {
       :where(*[container~="#{$bp}-#{$i}"]) { --cq-step: #{$i * cfg.$cq-unit}cqw; }
     }
+    // static last → freezes font/step for this breakpoint (beats query recalib).
+    :where(*[container~="static"]),
+    :where(*[container~="#{$bp}-static"]) { --cq-fs: var(--font-size); }
     :where(*[container~="#{$bp}-static"]) {
       container-type: inline-size;
       container-name: container query-ctx;
@@ -65,5 +101,11 @@
   }
 }
 
-// Inside any query-ctx source, descendants take cq-step as their space unit.
-@container query-ctx (width >= 0px) { * { --space-step: var(--cq-step); } }
+// Inside any query-ctx source, descendants take cq-step as their space unit and
+// cq-fs as their font-size base.
+@container query-ctx (width >= 0px) {
+  * {
+    --space-step: var(--cq-step);
+    --font-size: var(--cq-fs);
+  }
+}

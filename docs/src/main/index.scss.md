@@ -64,25 +64,77 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 
 ## `:root` — кастомные свойства
 
-### Базовый шрифт
+### Базовый шрифт и ramp
 
 ```css
---font-size: 10px  /* 1rem = 10px во всём документе */
+--font-size: 10px;                     /* база на самом узком экране */
+--fs-scale:  1;                        /* групповой множитель [fs], наследуется */
+--fs: calc(var(--font-size) * var(--fs-scale));   /* единый рычаг типографики */
 ```
 
-Это самое важное число: `font-size` у `html` выставлен в `var(--font-size)`, поэтому `1.2rem = 12px`, `2rem = 20px`.
+`--font-size` — база всей типографики (все токены `--fs-*` — множители `--fs`,
+плюс `html/body`, поля/чекбоксы). На отступы, grid и `max-width` контейнера она
+**не** влияет.
+
+**Ramp — fluid `clamp()` по якорям.** На каждый брейкпоинт эмитится
+переменная-якорь `--font-size-<bp>` (плюс `--font-size-base` для `<xs`):
+
+```css
+--font-size-base: 10px;  --font-size-xs: 10.75px;  --font-size-sm: 11.5px;
+--font-size-md: 12.25px; --font-size-lp: 13px;     --font-size-lg: 13.75px;
+--font-size-dt: 14.5px;  --font-size-xl: 15.25px;   /* по умолчанию 10px + n·0.75px */
+```
+
+Между двумя соседними якорями `--font-size` **плавно** интерполируется по `100vw`
+(один `clamp()`-сегмент на интервал), поэтому переход непрерывный, а в самих
+брейкпоинтах значение точно равно якорю. Итог: body ≈12→18px, h1 ≈32→49px без
+скачков; отступы остаются на своей шкале.
+
+**Свои значения из макета.** Задай якоря в проектном `:root` (глобально — ramp
+считается на `:root`):
+
+```css
+:root { --font-size-md: 16px; --font-size-lg: 20px; --font-size-xl: 22px; }
+```
+
+Либо в build-time конфиге картой `$font-sizes-bp: (md: 16px, lg: 20px, …)`
+(незаданные брейкпоинты донастраиваются линейно из `$fs-step`). Значения в точках
+точные; наклон между ними печётся при сборке (CSS не умеет делить `length/length`,
+поэтому коэффициент при `vw` — build-time). Для точной fluid-параллели **внутри**
+`container="query"` задавай якоря в конфиге — оттуда же берётся cqw-калибровка.
+
+> Один общий `clamp()` через все точки невозможен (это один линейный участок).
+> Поэтому — по сегменту `clamp()` на интервал; media-запрос лишь переключает
+> сегмент, ступеней нет.
+
+> `1rem` теперь зависит от ширины (не фиксированные 10px). В разметке опирайся на
+> токены (`tx="h2"`, `--fs-*`), а не на сырые `rem`.
 
 ### Размеры шрифтов
 
-| Переменная  | Значение | px   |
-|-------------|----------|------|
-| `--fs-h1`   | 3.2rem   | 32px |
-| `--fs-h2`   | 2.4rem   | 24px |
-| `--fs-h3`   | 2.0rem   | 20px |
-| `--fs-h4`   | 1.8rem   | 18px |
-| `--fs-h5`   | 1.6rem   | 16px |
-| `--fs-h6`   | 1.4rem   | 14px |
-| `--fs-p`    | 1.2rem   | 12px |
+Токены — безразмерные множители `--fs` (`--fs-h1 = calc(3.2 * var(--fs))`), поэтому
+масштабируются вместе с ramp, `[fs]`-множителем и container-query. Значения px ниже —
+для базового брейкпоинта (`--font-size: 10px`):
+
+| Переменная  | Множитель | px (база) |
+|-------------|-----------|-----------|
+| `--fs-h1`   | ×3.2      | 32px |
+| `--fs-h2`   | ×2.4      | 24px |
+| `--fs-h3`   | ×2.0      | 20px |
+| `--fs-h4`   | ×1.8      | 18px |
+| `--fs-h5`   | ×1.6      | 16px |
+| `--fs-h6`   | ×1.4      | 14px |
+| `--fs-p`    | ×1.2      | 12px |
+
+**Свои токены.** Добавь ключ в карту `$font-sizes` конфига (сгенерит `[tx="p1"]`),
+либо задай рантайм-переменную и примени напрямую:
+
+```css
+:root { --fs-p1: calc(1.1 * var(--fs-p)); }   /* сам вливается в ramp/scale/cqw */
+```
+```html
+<p style="font-size: var(--fs-p1)">…</p>
+```
 
 ### Веса шрифтов
 
@@ -102,14 +154,13 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 
 ```css
 --space-step: 4px;
---sz-step:    calc(var(--space-step) / 4);   /* = 1px */
 ```
 
 **Формула**: `mt="N"` → `margin-top: calc(N * var(--space-step))` = `N × 4px`.
 
 Утилиты `m/mt/mb`, `p/pt/pb`, `gap` хранят **число-множитель** в custom-property (`--mt`, `--mb`, `--pt`, `--pb`, `--gap`, `--gap-x`, `--gap-y`), а applier умножает на `--space-step` через `calc()`. Это позволяет внутри `container="query"` подменить `--space-step` на `cqw` — и **все** отступы автоматически становятся пропорциональны ширине.
 
-Шкала множителей: `0..25` для margin/padding, `1..15` для gap, `1..20` для sz.
+Шкала множителей: `0..25` для margin/padding, `1..15` для gap. Масштаб шрифта — отдельно (`[fs]`, `±1..10` шагов по 5%).
 
 ---
 
@@ -128,14 +179,17 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 }
 ```
 
-- `html`: `font-size: var(--font-size)`, `overflow-x: hidden`, `scroll-behavior: smooth`, `text-size-adjust: none`
-- `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`
+- `html`: `font-size: var(--font-size)`, `overflow-x: hidden`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
+- `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--font-size)`, `line-height: 1`, `overflow-wrap: break-word`, `hyphens: auto`
 - `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`
 - `img`, `iframe`: `width: 100%; height: 100%; object-fit: cover; object-position: center`
 - `input`, `textarea`, `button`: `font-size: var(--fs-p)`, `outline: none` при фокусе
-- `table`: `border-collapse: collapse`
+- `textarea`: `resize: vertical; field-sizing: content`
+- `table`: `border-collapse: collapse; border-spacing: 0`
 - `li`: `list-style: none`
+- `:disabled`: `cursor: not-allowed`
 - `h1–h6`,`p`: `font-weight: inherit; overflow-wrap: break-word`
+- `h1–h6`: `text-wrap: balance`; `p`: `text-wrap: pretty`
 - `h1–p`: размеры из `--fs-*` переменных
 - `button`: без фона и бордера
 - `a`, `button`: `cursor: pointer`
@@ -168,25 +222,28 @@ Reset фреймворка делает два «агрессивных» шаг
 
 ---
 
-## Атрибут `fs` — размер шрифта
+## Атрибут `tx` — размер шрифта (именованный токен)
 
-Применяется к **любому** элементу. Устанавливает `font-size` с `!important`.
+Применяется к **любому** элементу. Устанавливает `font-size` с `!important` из
+токенов `--fs-*`. (Раньше это был атрибут `fs`; теперь `fs` — множитель, см. ниже.)
 
 ```html
-<p fs="h2">Крупный текст</p>
-<span fs="h5">Маленький заголовок</span>
-<div fs="p">Обычный текст</div>
+<p tx="h2">Крупный текст</p>
+<span tx="h5">Маленький заголовок</span>
+<div tx="p">Обычный текст</div>
 ```
 
-| Значение  | Размер   | px   |
-|-----------|----------|------|
-| `fs="h1"` | 3.2rem   | 32px |
-| `fs="h2"` | 2.4rem   | 24px |
-| `fs="h3"` | 2.0rem   | 20px |
-| `fs="h4"` | 1.8rem   | 18px |
-| `fs="h5"` | 1.6rem   | 16px |
-| `fs="h6"` | 1.4rem   | 14px |
-| `fs="p"`  | 1.2rem   | 12px |
+| Значение  | Множитель | px (база) |
+|-----------|-----------|-----------|
+| `tx="h1"` | ×3.2      | 32px |
+| `tx="h2"` | ×2.4      | 24px |
+| `tx="h3"` | ×2.0      | 20px |
+| `tx="h4"` | ×1.8      | 18px |
+| `tx="h5"` | ×1.6      | 16px |
+| `tx="h6"` | ×1.4      | 14px |
+| `tx="p"`  | ×1.2      | 12px |
+
+Кастомные ключи добавляются в карту `$font-sizes` конфига → появляется `tx="p1"`.
 
 ---
 
@@ -214,29 +271,43 @@ Reset фреймворка делает два «агрессивных» шаг
 
 ---
 
-## Атрибут `sz` — точечный font-size
+## Атрибут `fs` — групповой множитель размера
 
-Применяется к **любому** элементу. Устанавливает `font-size` с `!important`. В отличие от `fs` (шкала h1–p), `sz` задаёт конкретный множитель шага `--sz-step`.
-
-```html
-<p sz="14">font-size = 14 × --sz-step</p>
-<span sz="md-16 lg-20">16px на md, 20px на lg</span>
-```
-
-**Формула:** `sz="N"` → `font-size: calc(N * var(--sz-step))`.
-
-**Значения `--sz-step`:**
-- Снаружи `container="query"`: `1px` (производное от `--space-step / 4`).
-- Внутри `container="query"`: `0.1cqw` (автоматически, через `--space-step` → cqw-режим).
-- Override: `style="--sz-step: 1.2px"` или `style="--cq-step: 0.3cqw"`.
-
-**Доступные значения:** 1, 2, 3, …, 20 (непрерывно, `$sz-max` в конфиге) для каждого брейкпоинта (`xs/sm/md/lp/lg/dt/xl`).
+Знаковый множитель `font-size` для элемента **и его потомков** (наследуется через
+`--fs-scale`). Шаг — 5% (`$fs-scale-step`). Потомок переопределяет своим `fs`.
 
 ```html
-<p sz="12">                  <!-- 12px (вне cqw) -->
-<p sz="14" container="query">...</p> <!-- query-контейнер: sz=14 масштабируется с его шириной -->
-<p sz="12 lg-16">            <!-- 12px на xs–lp, 16px на lg+ -->
+<section fs="2">          <!-- вся группа ×1.10 -->
+  <h2>заголовок ×1.10</h2>
+  <p>текст ×1.10</p>
+  <p fs="d1">этот абзац ×0.95 (переопределил)</p>
+</section>
 ```
+
+**Формула:** `fs="N"` → `--fs-scale: 1 + N×0.05`; `fs="dN"` → `1 − N×0.05`
+(`d` = down). `fs="0"` — нейтрально (×1.00).
+
+| Токен     | Множитель |
+|-----------|-----------|
+| `fs="d4"` | ×0.80 |
+| `fs="d2"` | ×0.90 |
+| `fs="0"`  | ×1.00 |
+| `fs="2"`  | ×1.10 |
+| `fs="4"`  | ×1.20 |
+
+**По брейкпоинтам** (mobile-first, больший выигрывает): `fs="lg-2"`, `fs="lg-d2"`.
+
+```html
+<div fs="2 lg-4">          <!-- ×1.10 на xs–lp, ×1.20 на lg+ -->
+<div fs="d1 md-0">         <!-- ×0.95 → ×1.00 с md -->
+```
+
+**Доступно:** `1..10` вверх (`N`) и вниз (`dN`) — `$fs-max` в конфиге — для каждого
+брейкпоинта. Масштаб касается только шрифта (не отступов).
+
+> Ставь `fs` на **контейнер-обёртку**. На самом элементе токены/дефолты (`tx`,
+> `:where(h1..p)`) сохраняют свой размер (`<p fs="2">` = размер `p` ×1.10), а голый
+> `<div>`/`<span>` с `fs` берёт базовый размер ×множитель.
 
 ---
 
@@ -484,7 +555,9 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ### Как работает масштабирование
 
-Все step-утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`, `sz`) считаются как `calc(N × var(--space-step))`. По умолчанию `--space-step: 4px` — фикс. Внутри **источника** (`query`) правило `@container` подменяет `--space-step` на `var(--cq-step)` (cqw), и **все** отступы/размеры разом становятся пропорциональны ширине контейнера. `--sz-step` производный (`--space-step / 4`), поэтому `sz` скейлится тоже.
+Все step-утилиты (`m`, `mt`, `mb`, `p`, `pt`, `pb`, `gap`) считаются как `calc(N × var(--space-step))`. По умолчанию `--space-step: 4px` — фикс. Внутри **источника** (`query`) правило `@container` подменяет `--space-step` на `var(--cq-step)` (cqw), и **все** отступы разом становятся пропорциональны ширине контейнера.
+
+**Шрифт** масштабируется параллельно, через `--cq-fs`: внутри `query` правило `@container` подменяет `--font-size` на откалиброванный `cqw`, подобранный так, что при 100% ширине контейнера пиксельный размер `h1`/`tx`/`--fs-*` совпадает с фикс-режимом на этом брейкпоинте (у́же контейнер → плавно меньше). Под `static` шрифт замораживается в px (`--cq-fs: var(--font-size)`). Кастомные токены (`--fs-p1`) вливаются автоматически.
 
 > **`--cq-step` — это множитель, полный аналог `--space-step`, только в `cqw`.** Снаружи контейнера ты ремасштабируешь всё, переопределяя `--space-step`; внутри `query` — переопределяя `--cq-step` (правило `@container` подставляет его в `--space-step`). Токены `query`/число — просто шорткаты, которые проставляют `--cq-step`.
 
@@ -511,13 +584,13 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 ```html
 <div container="query">                     <!-- шаг 0.4cqw -->
     <div m="5">margin = 5 × 0.4cqw = 2cqw</div>
-    <p sz="14">font-size = 14 × 0.1cqw = 1.4cqw  (--sz-step = --cq-step/4)</p>
+    <h1>font-size fluid: при 100% ширине = дизайн-px этого брейкпоинта</h1>
 </div>
 ```
 
 **Пример** при ширине 1200px и `--cq-step: 0.4cqw` (0.4cqw = 4.8px):
 - `m="5"` → `5 × 4.8px` = `24px`
-- `sz="14"` → `14 × 1.2px` = `16.8px`
+- `<h1>` (lg, контейнер 1200px 100%) → `≈44px` (как в фикс-режиме)
 
 ### Режим по брейкпоинтам: `query` / `static`
 
@@ -598,11 +671,11 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 > **Голый `container` больше НЕ создаёт container-query контекст** (только лэйаут + `max-width`). Для сырых `cqw`/`cqh` нужен `query`/`static` на предке.
 
-> **`font-size` и брейкпоинты.** Сырой `font-size: 3cqw` **не выключается** токеном `static` (он зависит от `container-type`, а не от имени `query-ctx`). Чтобы шрифт переключался fluid↔fixed по брейкпоинтам — используй `[sz]` (он на `--sz-step`, откатывается к фикс px там, где источник `static`):
+> **`font-size` и брейкпоинты.** Сырой `font-size: 3cqw` **не выключается** токеном `static` (он зависит от `container-type`, а не от имени `query-ctx`). Штатный шрифт (`h1`–`p`, `tx`, `--fs-*`) переключается fluid↔fixed автоматически, потому что идёт через `--font-size` ← `--cq-fs` (правило `@container`): под `query` — калиброванный cqw, под `static` — фикс px. Для своего кода используй эти токены, а не сырой `cqw`:
 
 ```html
 <div container="query lg-static">
-    <h2 sz="24">fluid до lg, фикс 24px от lg — автоматически</h2>
+    <h2>fluid до lg, фикс px от lg — автоматически (через --cq-fs)</h2>
     <h2 style="font-size: 6cqw">останется fluid и на lg (static не влияет на сырой cqw)</h2>
 </div>
 ```
@@ -1045,7 +1118,8 @@ html {
 
 | Атрибут       | Описание                              | Пример                            |
 |---------------|---------------------------------------|-----------------------------------|
-| `fs`          | Размер шрифта                         | `fs="h2"`                         |
+| `tx`          | Размер шрифта (именованный токен)     | `tx="h2"`, `tx="p"`               |
+| `fs`          | Групповой множитель размера (±шаги 5%)| `fs="2"`, `fs="d2 lg-4"`          |
 | `fw`          | Толщина шрифта                        | `fw="light"`, `fw="extrabold"`    |
 | `m`           | margin-top + margin-bottom            | `m="4"`, `m="4 lg-8"`            |
 | `mt`          | margin-top                            | `mt="6"`, `mt="3 lg-6"`          |
@@ -1062,7 +1136,6 @@ html {
 | `fluid`       | fit-content размеры                   | `fluid=""`                        |
 | `checkbox`    | Кастомный стилизуемый чекбокс        | атрибут у `span` внутри `label`  |
 | `radio`       | Кастомная стилизуемая радио-кнопка   | атрибут у `span` внутри `label`  |
-| `sz`          | Точечный font-size (множитель)        | `sz="14"`, `sz="12 lg-16"`        |
 | `lc`          | Line-clamp (ограничение строк)        | `lc="3"`, `lc="3 lg-0"`           |
 | `ps`          | position элемента                     | `ps="absolute center"`            |
 | `ov`          | overflow                              | `ov="hidden"`, `ov="scroll y"`    |
@@ -1078,7 +1151,7 @@ html {
 | Свойство          | Тип                    | Initial  | Inherits |
 |-------------------|------------------------|----------|----------|
 | `--space-step`    | `<length>`             | `4px`    | да       |
-| `--sz-step`       | `<length>`             | `1px`    | да       |
+| `--fs-scale`      | `<number>`             | `1`      | да       |
 | `--cq-step`       | `<length>`             | `0.4cqw` | да       |
 | `--grid-columns`  | `<integer>`            | `12`     | нет      |
 | `--col-span`      | `<integer>`            | `12`     | нет      |

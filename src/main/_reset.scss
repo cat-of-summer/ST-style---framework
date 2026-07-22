@@ -20,6 +20,9 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 :where(body) {
@@ -29,6 +32,8 @@
     font-size: var(--font-size);
     font-weight: var(--font-weight);
     line-height: 1;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 :where(main, section, *[container]) {
@@ -103,7 +108,11 @@
 
 :where(li) { list-style: none }
 
-:where(table) { border-collapse: collapse; }
+:where(table) { border-collapse: collapse; border-spacing: 0; }
+
+:where(textarea) { resize: vertical; field-sizing: content; }
+
+:where(:disabled) { cursor: not-allowed; }
 
 :where(meter) { -webkit-appearance: revert; appearance: revert; }
 
@@ -181,6 +190,9 @@
 :where(h1, h2, h3, h4, h5, h6, p) {
     overflow-wrap: break-word
 }
+
+:where(h1, h2, h3, h4, h5, h6) { text-wrap: balance }
+:where(p) { text-wrap: pretty }
 
 :where(h1) { font-size: var(--fs-h1) }
 :where(h2) { font-size: var(--fs-h2) }
