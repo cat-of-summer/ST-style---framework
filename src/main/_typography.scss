@@ -2,10 +2,12 @@
 @use 'config' as cfg;
 
 // [tx] — pick a named font-size token (h1..p and any custom keys in $font-sizes).
-// Routed through --tx so it does not clobber the --font-size base.
-*[tx] { font-size: var(--tx) !important; }
+// --tx-mult is the unitless multiplier (from --fs-<key>); the real font-size
+// multiplies it into --fs, so it scales with ramp / [fs] / query like everything.
+// Bare [tx] → multiplier 1. Custom runtime: `tx style="--tx-mult: var(--fs-p1)"`.
+*[tx] { font-size: calc(var(--tx-mult, 1) * var(--fs)) !important; }
 @each $name, $val in cfg.$font-sizes {
-  *[tx="#{$name}"] { --tx: var(--fs-#{$name}); }
+  *[tx="#{$name}"] { --tx-mult: var(--fs-#{$name}); }
 }
 
 // [fs] — group font-size multiplier (signed steps, $fs-scale-step per step):

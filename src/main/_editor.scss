@@ -8,12 +8,12 @@
 
     * { all: revert }
 
-    h1 { font-size: var(--fs-h1) }
-    h2 { font-size: var(--fs-h2) }
-    h3 { font-size: var(--fs-h3) }
-    h4 { font-size: var(--fs-h4) }
-    h5 { font-size: var(--fs-h5) }
-    h6 { font-size: var(--fs-h6) }
+    h1 { font-size: calc(var(--fs-h1) * var(--fs)) }
+    h2 { font-size: calc(var(--fs-h2) * var(--fs)) }
+    h3 { font-size: calc(var(--fs-h3) * var(--fs)) }
+    h4 { font-size: calc(var(--fs-h4) * var(--fs)) }
+    h5 { font-size: calc(var(--fs-h5) * var(--fs)) }
+    h6 { font-size: calc(var(--fs-h6) * var(--fs)) }
     h1, h2, h3, h4, h5, h6 { margin: 1.6em 0 .8em }
     p { margin: 0 0 1em }
     a { color: blue; text-decoration: underline }

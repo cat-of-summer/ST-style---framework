@@ -11,10 +11,10 @@
 <!-- Рантайм-переменные проекта: кастомные токены размера -->
 <style>
   :root {
-    /* кастомные именованные размеры — вливаются в ramp/scale/cqw автоматически */
-    --fs-p1:   calc(1.1 * var(--fs-p));
-    --fs-lead: calc(1.5 * var(--fs-p));   /* «лид»-абзац */
-    --fs-hero: calc(4.5 * var(--fs));     /* крупный hero-заголовок */
+    /* кастомные токены — БЕЗРАЗМЕРНЫЕ множители --fs (как встроенные --fs-h1 = 3.2) */
+    --fs-p1:   calc(1.1 * var(--fs-p));   /* = 1.32 (×1.1 от p) */
+    --fs-lead: calc(1.5 * var(--fs-p));   /* = 1.8  «лид»-абзац */
+    --fs-hero: 4.5;                        /* крупный hero-заголовок */
   }
 </style>
 
@@ -137,18 +137,21 @@
 <!-- ══════════════════════════ 3. Кастомные токены ══════════════════════════ -->
 <div class="case">
   <h2 tx="h3">3 · Кастомные токены размера</h2>
-  <p class="desc">Заданы в <code class="k">&lt;style&gt;</code> этой страницы:
+  <p class="desc">Токены — <b>безразмерные множители</b> <code class="k">--fs</code> (как встроенный
+    <code class="k">--fs-h1 = 3.2</code>). Заданы в <code class="k">:root</code> страницы:
     <code class="k">--fs-p1 = calc(1.1 × var(--fs-p))</code>,
-    <code class="k">--fs-lead = calc(1.5 × var(--fs-p))</code>,
-    <code class="k">--fs-hero = calc(4.5 × var(--fs))</code>. Применяются рантайм —
-    <code class="k">style="font-size: var(--fs-hero)"</code> — и <b>тоже</b> вливаются в ramp/scale/cqw.</p>
+    <code class="k">--fs-lead = calc(1.5 × var(--fs-p))</code>, <code class="k">--fs-hero = 4.5</code>.
+    Применяются через <code class="k">tx</code> + <code class="k">--tx-mult</code> и <b>вливаются</b> в
+    ramp/scale/cqw (потому что реальный <code class="k">font-size = множитель × --fs</code>
+    считается на самом элементе).</p>
   <div class="demo">
-    <p style="font-size: var(--fs-hero)" fw="bold">Hero (--fs-hero)</p>
-    <p style="font-size: var(--fs-lead)">Лид-абзац (--fs-lead) — крупнее обычного p в 1.5 раза.</p>
-    <p style="font-size: var(--fs-p1)">Слегка увеличенный p1 (--fs-p1, ×1.1).</p>
+    <p tx fw="bold" style="--tx-mult: var(--fs-hero)">Hero (--fs-hero)</p>
+    <p tx style="--tx-mult: var(--fs-lead)">Лид-абзац (--fs-lead) — крупнее обычного p в 1.5 раза.</p>
+    <p tx style="--tx-mult: var(--fs-p1)">Слегка увеличенный p1 (--fs-p1, ×1.1).</p>
   </div>
-  <div class="note">Для частых токенов лучше добавить ключ в карту <code class="k">$font-sizes</code> конфига —
-    тогда появится <code class="k">tx="hero"</code> и т.п. без рантайм-стилей.</div>
+  <div class="note">Для частых токенов добавь ключ в карту <code class="k">$font-sizes</code> конфига —
+    появится <code class="k">tx="hero"</code>. Рантайм-варианты: <code class="k">tx style="--tx-mult: N"</code>
+    или напрямую <code class="k">style="font-size: calc(N * var(--fs))"</code>.</div>
 </div>
 
 <!-- ══════════════════════════ 4. [fs] множитель ══════════════════════════ -->
@@ -339,7 +342,7 @@
       </article>
       <article col="12 md-4" class="demo" style="margin:0">
         <h3 data-px>Карточка 3</h3>
-        <p mt="1" tx="p1">Здесь <code class="k">tx="p1"</code> — кастомный размер, тоже fluid.</p>
+        <p mt="1" tx style="--tx-mult: var(--fs-p1)">Здесь кастомный <code class="k">--fs-p1</code> через <code class="k">--tx-mult</code> — тоже fluid.</p>
       </article>
     </div>
   </section>

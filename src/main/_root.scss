@@ -27,7 +27,6 @@ $n: 0;
 :root {
     font-synthesis: none;
     --fs-scale: 1;
-    --fs: calc(var(--font-size) * var(--fs-scale));
     --font-weight: var(--fw-normal);
 
     --space-step: #{cfg.$space-step};
@@ -38,13 +37,22 @@ $n: 0;
         #{list.nth($pt, 2)}: #{list.nth($pt, 3)};
     }
 
+    // Size tokens are UNITLESS multipliers of --fs (the effective base). Appliers
+    // multiply them into the real `font-size`, e.g. h1 = calc(var(--fs-h1)*var(--fs)).
     @each $name, $val in cfg.$font-sizes {
-        --fs-#{$name}: calc(#{$val} * var(--fs));
+        --fs-#{$name}: #{$val};
     }
     @each $name, $val in cfg.$font-weights {
         --fw-#{$name}: #{$val};
     }
 }
+
+// --fs — effective base = env font-size × group scale. Declared on * so it
+// RE-EVALUATES on every element with that element's own inherited --font-size and
+// --fs-scale. A :root-only `--fs` would freeze at :root's values (custom props
+// inherit their already-substituted computed value), which is why [fs] group
+// scaling and fluid-in-`query` must read a per-element --fs, not a :root one.
+* { --fs: calc(var(--font-size) * var(--fs-scale)); }
 
 // ── Fluid ramp: one clamp() segment per interval, through the anchors ─────
 // --font-size interpolates linearly with 100vw between consecutive anchors and

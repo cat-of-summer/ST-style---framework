@@ -60,7 +60,7 @@
     object-position: center
 }
 
-:where(input, textarea, button) { font-size: var(--fs-p) }
+:where(input, textarea, button) { font-size: calc(var(--fs-p) * var(--fs)) }
 :where(input::placeholder, textarea::placeholder) { font-size: inherit; font-weight: inherit; line-height: inherit; }
 :where(textarea:focus, input:focus, button:focus) { outline: none }
 :where(input, textarea) { -webkit-user-select: auto; }
@@ -96,8 +96,8 @@
     span[checkbox], span[radio] {
         display: inline-block;
         vertical-align: middle;
-        width: var(--fs-p);
-        height: var(--fs-p);
+        width: calc(var(--fs-p) * var(--fs));
+        height: calc(var(--fs-p) * var(--fs));
 
         svg {
             width: 100%;
@@ -194,13 +194,13 @@
 :where(h1, h2, h3, h4, h5, h6) { text-wrap: balance }
 :where(p) { text-wrap: pretty }
 
-:where(h1) { font-size: var(--fs-h1) }
-:where(h2) { font-size: var(--fs-h2) }
-:where(h3) { font-size: var(--fs-h3) }
-:where(h4) { font-size: var(--fs-h4) }
-:where(h5) { font-size: var(--fs-h5) }
-:where(h6) { font-size: var(--fs-h6) }
-:where(p)  { font-size: var(--fs-p) }
+:where(h1) { font-size: calc(var(--fs-h1) * var(--fs)) }
+:where(h2) { font-size: calc(var(--fs-h2) * var(--fs)) }
+:where(h3) { font-size: calc(var(--fs-h3) * var(--fs)) }
+:where(h4) { font-size: calc(var(--fs-h4) * var(--fs)) }
+:where(h5) { font-size: calc(var(--fs-h5) * var(--fs)) }
+:where(h6) { font-size: calc(var(--fs-h6) * var(--fs)) }
+:where(p)  { font-size: calc(var(--fs-p)  * var(--fs)) }
 
 // [container] max-width ladder, from $breakpoints' `container` values. Steps
 // without a `container` value are skipped; below the first one it stays fluid.
