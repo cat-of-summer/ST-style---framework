@@ -200,3 +200,4 @@ package.json
 !index.scss
 .npmrc
 LICENSE
+/examples
