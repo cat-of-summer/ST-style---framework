@@ -3,7 +3,6 @@
 
 ## Папки
 
-- [examples](examples/)
 - [src](src/)
 
 <!-- DOCGEN:END -->
