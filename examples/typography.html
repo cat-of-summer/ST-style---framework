@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ST-style — типографика: кейсы</title>
+<title>ST-style — типографика: tx / fs / fw / lc</title>
 
 <!-- Собранный фреймворк -->
 <link rel="stylesheet" href="../dist/main.min.css">
@@ -20,24 +20,25 @@
 
 <!--
   ═══════════════════════════════════════════════════════════════════════
-  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Дают рамки, подписи, сетку
-  страницы и читаемость. Framework-поведение задаётся исключительно
-  атрибутами (tx, fs, container, fw, lc, m, p, grid).
+  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Рамки, подписи, читаемость.
+  Типографика задаётся ИСКЛЮЧИТЕЛЬНО атрибутами (tx, fs, fw, lc).
+  Отступы, grid и container — в отдельных демо (spacing/grid/container-query).
   ═══════════════════════════════════════════════════════════════════════
 -->
 <style>
-  body { user-select: auto; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+  * { box-sizing: border-box; }
+  body { user-select: auto; margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1.title { margin: .2em 0; }
   .case { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px; margin-bottom: 18px; }
-  .case > h2 { color: #2b3040; border-bottom: 1px solid #eef0f3; padding-bottom: 8px; }
-  .desc { color: #5b616e; }
+  .case > h2 { color: #2b3040; border-bottom: 1px solid #eef0f3; padding-bottom: 8px; margin: 0 0 12px; }
+  .desc { color: #5b616e; margin: 10px 0 0; line-height: 1.5; }
   .desc code, code.k { background: #eef1f5; color: #b0306a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .85em; }
   .demo { border: 1px dashed #cfd6df; border-radius: 8px; padding: 14px; margin-top: 10px; background: #fbfcfd; }
-  .demo--cq { outline: 2px solid #d8a8a8; outline-offset: 2px; position: relative; }
+  pre.code { margin: 12px 0 0; background: #1e222b; color: #e7eaf0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 12.5px/1.55 ui-monospace, "SF Mono", monospace; }
   .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
   .col { flex: 1 1 260px; }
   .tag { display: inline-block; font-family: ui-monospace, monospace; font-size: 11px; color: #6b7280; background: #eef1f5; border-radius: 4px; padding: 2px 6px; margin-bottom: 8px; }
-  .px { font-family: ui-monospace, monospace; font-size: 11px; color: #2563eb; }
   .note { border-left: 3px solid #f0b429; background: #fff8e6; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 10px; color: #5b4b16; font-size: 14px; }
   .demo * { user-select: auto; }
   hr.sep { border: 0; border-top: 1px solid #e3e6ea; margin: 28px 0; }
@@ -46,7 +47,6 @@
   #hud b { color: #7dd3fc; }
   #hud .bp { color: #86efac; font-weight: 700; }
   .demo-btn { border: 1px solid #cbd2db; background: #fff; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
-  .demo-input { border: 1px solid #cbd2db; border-radius: 6px; padding: 6px 8px; display: block; width: 320px; max-width: 100%; }
 </style>
 </head>
 <body>
@@ -60,14 +60,15 @@
 
 <div class="wrap">
 
-<h1 tx="h1">Типографика ST-style — кейсы и поведение</h1>
-<p class="desc" tx="p1">Все размеры ниже управляются <b>только</b> атрибутами фреймворка. Меняй ширину окна —
-в шапке видно активный брейкпоинт, размер <code class="k">--font-size</code> и вычисленный размер
-образцового <code class="k">h1</code>. Блоки с красной рамкой — <b>container-query</b> контексты.</p>
+<h1 class="title" tx="h1">Типографика — <code class="k">tx · fs · fw · lc</code></h1>
+<p class="desc">Все размеры управляются <b>только</b> атрибутами. Меняй ширину окна — в шапке видно
+  активный брейкпоинт, <code class="k">--font-size</code> и вычисленный размер образцового
+  <code class="k">h1</code>. Fluid-масштабирование от <b>ширины контейнера</b> вынесено в отдельное
+  демо — <a href="container-query.html">container-query</a>; отступы — в
+  <a href="spacing.html">spacing</a>.</p>
 
 <div class="note">
-  Модель: <code class="k">--font-size</code> — база (fluid-<code class="k">clamp()</code> ramp по якорям
-  снаружи / калиброванный <code class="k">cqw</code> внутри <code class="k">query</code>);
+  Модель: <code class="k">--font-size</code> — база (fluid-<code class="k">clamp()</code> ramp по якорям);
   <code class="k">--fs-scale</code> — групповой множитель <code class="k">[fs]</code> (наследуется);
   <code class="k">--fs = --font-size × --fs-scale</code>; токены
   <code class="k">--fs-h1 = calc(3.2 × --fs)</code> и т.д.
@@ -78,11 +79,12 @@
 <!-- ══════════════════════════ 1. RAMP ══════════════════════════ -->
 <div class="case">
   <h2 tx="h3">1 · Глобальный ramp <code class="k">--font-size</code> (fluid clamp)</h2>
-  <p class="desc">Якоря на каждом брейкпоинте (<code class="k">--font-size-xs…--font-size-xl</code>,
-    по умолчанию <code class="k">10px + 0.75px × n</code>), между ними — <b>плавная</b> интерполяция
-    через <code class="k">clamp()</code> (без скачков на границах). Вся типографика — множители
-    <code class="k">--fs</code>, поэтому растёт вместе. <b>Тяни ширину окна</b> — h1 в шапке меняется
-    непрерывно, а не ступенями.</p>
+  <p class="desc" style="margin-top:0">Якоря на каждом брейкпоинте
+    (<code class="k">--font-size-xs…--font-size-xl</code>, по умолчанию
+    <code class="k">10px + 0.75px × n</code>), между ними — <b>плавная</b> интерполяция через
+    <code class="k">clamp()</code> (без скачков). Вся типографика — множители
+    <code class="k">--fs</code>, поэтому растёт вместе. <b>Тяни ширину окна</b> — h1 в шапке
+    меняется непрерывно, а не ступенями.</p>
   <div class="demo">
     <h1>H1 — заголовок первого уровня</h1>
     <h2>H2 — заголовок</h2>
@@ -90,20 +92,22 @@
     <h4>H4</h4>
     <h5>H5</h5>
     <h6>H6</h6>
-    <p>p — базовый абзац. На мобиле ~12px, на десктопе ~18px. Ничего, кроме
-      <code class="k">--font-size</code>, менять не нужно: отступы, grid и контейнер не затронуты.</p>
+    <p>p — базовый абзац. На мобиле ~12px, на десктопе ~18px.</p>
   </div>
-  <div class="note">Отступы (<code class="k">m/p/gap</code>) в ramp <b>не</b> участвуют — они на своей
-    <code class="k">--space-step</code> шкале и масштабируются отдельно (через container-query).</div>
+  <pre class="code"><code>&lt;!-- ничего задавать не нужно: родные теги уже берут --fs-* --&gt;
+&lt;h1&gt;Заголовок&lt;/h1&gt;
+&lt;p&gt;Абзац&lt;/p&gt;</code></pre>
+  <p class="desc">Отступы (<code class="k">m/p/gap</code>) в ramp <b>не</b> участвуют — они на своей
+    <code class="k">--space-step</code> шкале.</p>
 </div>
 
 <!-- ══════════════════════════ 1b. Якоря из UI ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">1b · Якоря ramp из значений UI</h2>
-  <p class="desc">Каждому брейкпоинту — своя переменная-якорь. Копируешь фактические размеры из макета
-    и присваиваешь их <b>на <code class="k">:root</code></b> (ramp считается там). В самих точках
-    значение точное, между ними — fluid.</p>
-  <pre class="demo" style="overflow:auto"><code>/* project root.css */
+  <h2 tx="h3">1b · Якоря ramp из значений макета</h2>
+  <p class="desc" style="margin-top:0">Копируешь фактические размеры из макета и присваиваешь их
+    <b>на <code class="k">:root</code></b> (ramp считается там). В самих точках значение точное,
+    между ними — fluid.</p>
+  <pre class="code"><code>/* project root.css */
 :root {
   --font-size-base: 14px;   /* &lt;360px  */
   --font-size-md:   16px;   /* ≥768px  — вставил из макета */
@@ -113,17 +117,14 @@
 }</code></pre>
   <p class="desc">Живой тумблер (ставит эти якоря на <code class="k">:root</code> всей страницы):
     <button class="demo-btn" id="anchors-toggle">включить якоря из UI</button></p>
-  <div class="note">Якоря задаются на <code class="k">:root</code> (глобально) — это дизайн-решение уровня
-    темы, а не поддерева. В самих брейкпоинтах значения точные; наклон между ними печётся из конфига
-    (<code class="k">$font-sizes-bp</code> / <code class="k">$fs-step</code>). Для точной параллели
-    внутри <code class="k">query</code> задавай якоря в конфиге — там берётся cqw-калибровка.</div>
+  <div class="note">Якоря задаются на <code class="k">:root</code> — это дизайн-решение уровня темы.
+    В самих брейкпоинтах значения точные; наклон между ними печётся из конфига
+    (<code class="k">$font-sizes-bp</code> / <code class="k">$fs-step</code>).</div>
 </div>
 
 <!-- ══════════════════════════ 2. [tx] ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">2 · <code class="k">[tx]</code> — именованный размер на любом элементе</h2>
-  <p class="desc">Ставит <code class="k">font-size</code> из токена <code class="k">--fs-*</code>
-    (с <code class="k">!important</code>) на <b>любой</b> тег — семантика не меняется.</p>
+  <h2 tx="h3">2 · <code class="k">tx</code> — именованный размер на любом элементе</h2>
   <div class="demo">
     <span tx="h1">span tx="h1"</span><br>
     <span tx="h3">span tx="h3"</span> ·
@@ -132,33 +133,39 @@
     <div tx="h2">div, но выглядит как H2 (<code class="k">tx="h2"</code>)</div>
     <button class="demo-btn" tx="h4">button tx="h4"</button>
   </div>
+  <pre class="code"><code>&lt;p tx="h2"&gt;Крупный текст&lt;/p&gt;
+&lt;span tx="h5"&gt;Маленький заголовок&lt;/span&gt;
+&lt;div tx="p"&gt;Обычный текст&lt;/div&gt;
+&lt;button tx="h4"&gt;Кнопка&lt;/button&gt;</code></pre>
+  <p class="desc">Ставит <code class="k">font-size</code> из токена <code class="k">--fs-*</code>
+    (с <code class="k">!important</code>) на <b>любой</b> тег — семантика не меняется. Значения
+    <code class="k">h1…h6</code>, <code class="k">p</code> и кастомные ключи из <code class="k">$font-sizes</code>.</p>
 </div>
 
 <!-- ══════════════════════════ 3. Кастомные токены ══════════════════════════ -->
 <div class="case">
   <h2 tx="h3">3 · Кастомные токены размера</h2>
-  <p class="desc">Токены — <b>безразмерные множители</b> <code class="k">--fs</code> (как встроенный
-    <code class="k">--fs-h1 = 3.2</code>). Заданы в <code class="k">:root</code> страницы:
-    <code class="k">--fs-p1 = calc(1.1 × var(--fs-p))</code>,
-    <code class="k">--fs-lead = calc(1.5 × var(--fs-p))</code>, <code class="k">--fs-hero = 4.5</code>.
-    Применяются через <code class="k">tx</code> + <code class="k">--tx-mult</code> и <b>вливаются</b> в
-    ramp/scale/cqw (потому что реальный <code class="k">font-size = множитель × --fs</code>
-    считается на самом элементе).</p>
   <div class="demo">
     <p tx fw="bold" style="--tx-mult: var(--fs-hero)">Hero (--fs-hero)</p>
     <p tx style="--tx-mult: var(--fs-lead)">Лид-абзац (--fs-lead) — крупнее обычного p в 1.5 раза.</p>
     <p tx style="--tx-mult: var(--fs-p1)">Слегка увеличенный p1 (--fs-p1, ×1.1).</p>
   </div>
-  <div class="note">Для частых токенов добавь ключ в карту <code class="k">$font-sizes</code> конфига —
-    появится <code class="k">tx="hero"</code>. Рантайм-варианты: <code class="k">tx style="--tx-mult: N"</code>
-    или напрямую <code class="k">style="font-size: calc(N * var(--fs))"</code>.</div>
+  <pre class="code"><code>/* объявляем безразмерные множители --fs */
+:root { --fs-p1: calc(1.1 * var(--fs-p)); }
+
+&lt;!-- применяем через --tx-mult --&gt;
+&lt;p tx style="--tx-mult: var(--fs-p1)"&gt;p1&lt;/p&gt;
+&lt;!-- эквивалент напрямую --&gt;
+&lt;p style="font-size: calc(var(--fs-p1) * var(--fs))"&gt;p1&lt;/p&gt;</code></pre>
+  <p class="desc">Токены — <b>безразмерные множители</b> <code class="k">--fs</code>. Применяй через
+    реальный <code class="k">font-size</code> (<code class="k">… × var(--fs)</code>) — тогда токен
+    fluid. <code class="k">style="font-size: var(--fs-p1)"</code> <b>не</b> сработает: это множитель,
+    не длина. Для частых токенов — ключ в карту <code class="k">$font-sizes</code>.</p>
 </div>
 
 <!-- ══════════════════════════ 4. [fs] множитель ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">4 · <code class="k">[fs]</code> — групповой множитель (знаковые шаги 5%)</h2>
-  <p class="desc"><code class="k">fs="N"</code> → ×(1 + N·0.05); <code class="k">fs="dN"</code> → ×(1 − N·0.05);
-    <code class="k">fs="0"</code> — нейтрально. Наследуется всем поддеревом; потомок переопределяет.</p>
+  <h2 tx="h3">4 · <code class="k">fs</code> — групповой множитель (знаковые шаги 5%)</h2>
   <div class="demo row">
     <div class="col"><span class="tag">fs="d4" → ×0.80</span><div fs="d4"><h3>Заголовок</h3><p>абзац</p></div></div>
     <div class="col"><span class="tag">fs="0" → ×1.00</span><div fs="0"><h3>Заголовок</h3><p>абзац</p></div></div>
@@ -175,12 +182,20 @@
       <div fs="0"><p>вложенный <code class="k">fs="0"</code> → сброс к ×1.00</p></div>
     </section>
   </div>
+  <pre class="code"><code>&lt;section fs="2"&gt;        &lt;!-- вся группа ×1.10 --&gt;
+    &lt;h2&gt;заголовок ×1.10&lt;/h2&gt;
+    &lt;p&gt;текст ×1.10&lt;/p&gt;
+    &lt;p fs="d1"&gt;этот абзац ×0.95 (переопределил)&lt;/p&gt;
+&lt;/section&gt;</code></pre>
+  <p class="desc"><code class="k">fs="N"</code> → ×(1 + N·0.05); <code class="k">fs="dN"</code> →
+    ×(1 − N·0.05); <code class="k">fs="0"</code> — нейтрально. Наследуется всем поддеревом через
+    <code class="k">--fs-scale</code>; потомок переопределяет (абсолютно, не накопительно).</p>
 </div>
 
 <!-- ══════════════════════════ 5. [fs] по брейкпоинтам ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">5 · <code class="k">[fs]</code> по брейкпоинтам</h2>
-  <p class="desc">Mobile-first, больший брейкпоинт выигрывает. <b>Тяни ширину</b> — множитель меняется.</p>
+  <h2 tx="h3">5 · <code class="k">fs</code> по брейкпоинтам</h2>
+  <p class="desc" style="margin-top:0">Mobile-first, больший брейкпоинт выигрывает. <b>Тяни ширину</b> — множитель меняется.</p>
   <div class="demo">
     <span class="tag">fs="d2 lg-4"</span>
     <p fs="d2 lg-4">×0.90 на xs–lp, затем ×1.20 с lg (≥1280px).</p>
@@ -189,14 +204,15 @@
     <span class="tag">fs="0 sm-2 lg-4 xl-d2"</span>
     <p fs="0 sm-2 lg-4 xl-d2">×1.00 → ×1.10 (sm) → ×1.20 (lg) → ×0.90 (xl).</p>
   </div>
+  <pre class="code"><code>&lt;div fs="2 lg-4"&gt;   &lt;!-- ×1.10 на xs–lp, ×1.20 на lg+ --&gt;
+&lt;div fs="d1 md-0"&gt;  &lt;!-- ×0.95 → ×1.00 с md --&gt;</code></pre>
+  <p class="desc">Доступно <code class="k">1..10</code> вверх (<code class="k">N</code>) и вниз
+    (<code class="k">dN</code>) для каждого брейкпоинта. Масштаб касается только шрифта (не отступов).</p>
 </div>
 
 <!-- ══════════════════════════ 6. fs на обёртке vs на элементе ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">6 · <code class="k">[fs]</code>: обёртка vs. сам элемент</h2>
-  <p class="desc">На элементе с собственным размером (тег <code class="k">p/h*</code> или <code class="k">tx</code>)
-    множитель <b>сохраняет</b> базовый размер и домножает его. На «голом» <code class="k">div/span</code>
-    берётся базовый размер шрифта × множитель.</p>
+  <h2 tx="h3">6 · <code class="k">fs</code>: обёртка vs. сам элемент</h2>
   <div class="demo row">
     <div class="col">
       <span class="tag">&lt;p fs="4"&gt;</span>
@@ -211,97 +227,20 @@
       <h3 tx="h3" fs="4">tx закрепляет h3, fs домножает → h3 × 1.20</h3>
     </div>
   </div>
-  <div class="note">Правило: <code class="k">fs</code> удобнее ставить на <b>контейнер-группу</b>. Прямо на
-    текстовый элемент — тоже работает и сохраняет его размер.</div>
+  <pre class="code"><code>&lt;p fs="4"&gt;размер p × 1.20&lt;/p&gt;         &lt;!-- токен p сохраняется --&gt;
+&lt;div fs="4"&gt;базовый размер × 1.20&lt;/div&gt; &lt;!-- голый div --&gt;
+&lt;h3 tx="h3" fs="4"&gt;h3 × 1.20&lt;/h3&gt;</code></pre>
+  <div class="note">Правило: <code class="k">fs</code> удобнее ставить на <b>контейнер-группу</b>. На
+    элементе с собственным размером (тег <code class="k">p/h*</code> или <code class="k">tx</code>)
+    множитель <b>сохраняет</b> базовый размер; на «голом» <code class="k">div/span</code> берётся
+    базовый размер × множитель.</div>
 </div>
 
 <hr class="sep">
 
-<!-- ══════════════════════════ 7. container query fluid ══════════════════════════ -->
+<!-- ══════════════════════════ 7. fw ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">7 · <code class="k">container="query"</code> — fluid-типографика</h2>
-  <p class="desc">Внутри источника <code class="k">font-size</code> становится <code class="k">cqw</code>,
-    калиброванным так, что <b>при 100% ширине контейнера</b> px = дизайн-режиму этого брейкпоинта.
-    Два контейнера разной ширины на одном экране → разный размер шрифта (следит за <b>своей</b> шириной).</p>
-  <div class="row">
-    <div class="col" style="flex:0 0 auto">
-      <span class="tag">container="query", width: 320px</span>
-      <div class="demo demo--cq" container="query" style="width:320px">
-        <h1 data-px>H1 fluid</h1>
-        <p>p fluid — оба масштабируются от ширины 320px</p>
-      </div>
-    </div>
-    <div class="col" style="flex:0 0 auto">
-      <span class="tag">container="query", width: 560px</span>
-      <div class="demo demo--cq" container="query" style="width:560px">
-        <h1 data-px>H1 fluid</h1>
-        <p>тот же h1, но крупнее — контейнер шире</p>
-      </div>
-    </div>
-  </div>
-  <div class="note">Сузь окно так, чтобы контейнер стал уже своей «дизайн-ширины» — h1 плавно уменьшится
-    (значение в скобках у h1 показывает вычисленный размер).</div>
-</div>
-
-<!-- ══════════════════════════ 8. query lg-static ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">8 · <code class="k">container="query lg-static"</code> — заморозка на lg</h2>
-  <p class="desc">Fluid до lg, затем шрифт (и отступы) «замерзают» в px. Полезно, чтобы на широких
-    экранах текст не рос бесконечно.</p>
-  <div class="demo demo--cq" container="query lg-static" style="width:100%">
-    <h1 data-px>H1: fluid до 1280px, фикс px от lg</h1>
-    <p>Раздвинь окно за 1280px — размер перестанет меняться.</p>
-  </div>
-</div>
-
-<!-- ══════════════════════════ 9. static md-query ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">9 · <code class="k">container="static md-query"</code> — наоборот</h2>
-  <p class="desc">Фикс px на мобиле, fluid от md (≥768px). Ниже md шрифт стабильный, выше — тянется за шириной.</p>
-  <div class="demo demo--cq" container="static md-query" style="width:100%">
-    <h1 data-px>H1: фикс до md, fluid от md</h1>
-    <p>До 768px — стабильно; после — масштабируется с контейнером.</p>
-  </div>
-</div>
-
-<!-- ══════════════════════════ 10. вложенные источники ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">10 · Вложенные <code class="k">query</code>-источники</h2>
-  <p class="desc">Каждый источник считает cqw от <b>своей</b> ширины — независимо.</p>
-  <div class="demo demo--cq" container="query" style="width:100%">
-    <h2 data-px>Внешний источник (100% ширины)</h2>
-    <div class="demo demo--cq" container="query" style="width:50%; margin-top:10px">
-      <h2 data-px>Внутренний источник (50% ширины) — заметно мельче</h2>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════ 11. fs внутри query ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">11 · <code class="k">[fs]</code>-множитель + <code class="k">query</code></h2>
-  <p class="desc">Групповой множитель — «константа для группы» — работает и внутри fluid-контейнера:
-    домножает уже отмасштабированный размер.</p>
-  <div class="row">
-    <div class="col" style="flex:0 0 auto">
-      <span class="tag">query, width 420px</span>
-      <div class="demo demo--cq" container="query" style="width:420px">
-        <h2 data-px>обычный</h2>
-      </div>
-    </div>
-    <div class="col" style="flex:0 0 auto">
-      <span class="tag">query + fs="6" (×1.30), width 420px</span>
-      <div class="demo demo--cq" container="query" style="width:420px" fs="6">
-        <h2 data-px>fluid × 1.30</h2>
-      </div>
-    </div>
-  </div>
-</div>
-
-<hr class="sep">
-
-<!-- ══════════════════════════ 12. fw ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">12 · <code class="k">[fw]</code> — вес шрифта</h2>
+  <h2 tx="h3">7 · <code class="k">fw</code> — вес шрифта</h2>
   <div class="demo">
     <p tx="h4" fw="thin">thin (100)</p>
     <p tx="h4" fw="light">light (300)</p>
@@ -310,12 +249,17 @@
     <p tx="h4" fw="bold">bold (700)</p>
     <p tx="h4" fw="black">black (900)</p>
   </div>
+  <pre class="code"><code>&lt;h3 fw="light"&gt;Лёгкий заголовок&lt;/h3&gt;
+&lt;span fw="extrabold"&gt;Жирный текст&lt;/span&gt;
+&lt;p fw="normal"&gt;Обычный текст&lt;/p&gt;</code></pre>
+  <p class="desc">Устанавливает <code class="k">font-weight</code> с <code class="k">!important</code>
+    на любой элемент. Значения: <code class="k">thin · extralight · light · normal · medium ·
+    semibold · bold · extrabold · black</code> (100…900).</p>
 </div>
 
-<!-- ══════════════════════════ 13. lc ══════════════════════════ -->
+<!-- ══════════════════════════ 8. lc ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">13 · <code class="k">[lc]</code> — ограничение строк (line-clamp)</h2>
-  <p class="desc">Обрезает текст многоточием; поддерживает брейкпоинты (<code class="k">0</code> = выключить).</p>
+  <h2 tx="h3">8 · <code class="k">lc</code> — ограничение строк (line-clamp)</h2>
   <div class="demo row">
     <div class="col"><span class="tag">lc="2"</span>
       <p lc="2">Длинный текст, который будет обрезан после второй строки многоточием. Здесь много слов, чтобы гарантированно получить перенос и увидеть обрезку в действии на любой ширине колонки.</p>
@@ -324,35 +268,16 @@
       <p lc="3 lg-0">3 строки на мобиле/планшете, а на lg (≥1280px) ограничение снимается и текст показывается целиком. Здесь тоже добавлено достаточно слов для нескольких строк переноса и наглядности.</p>
     </div>
   </div>
+  <pre class="code"><code>&lt;p lc="2"&gt;обрезать после 2 строк&lt;/p&gt;
+&lt;p lc="3 lg-0"&gt;3 строки, на lg+ ограничение снято (0)&lt;/p&gt;
+&lt;p lc="4 md-0 lg-10"&gt;4 → выкл → 10&lt;/p&gt;</code></pre>
+  <p class="desc">Обрезает текст многоточием; поддерживает брейкпоинты. Числа <b>1–10</b>,
+    <code class="k">0</code> = выключить.</p>
 </div>
 
-<!-- ══════════════════════════ 14. Реальный паттерн секции ══════════════════════════ -->
+<!-- ══════════════════════════ 9. Reset-типографика ══════════════════════════ -->
 <div class="case">
-  <h2 tx="h3">14 · Реальный паттерн: <code class="k">section › container="query" › grid</code></h2>
-  <p class="desc">Карточки: типографика и отступы масштабируются с шириной секции; на десктопе — 3 в ряд.</p>
-  <section container="query lg-static" style="width:100%">
-    <div grid="gap-4">
-      <article col="12 md-4" class="demo" style="margin:0">
-        <h3 data-px>Карточка 1</h3>
-        <p mt="1" fs="0">Заголовок и текст fluid до lg. Отступы (<code class="k">mt</code>) — тоже в cqw.</p>
-      </article>
-      <article col="12 md-4" class="demo" style="margin:0">
-        <h3 data-px>Карточка 2</h3>
-        <p mt="1">Ширь окно — весь блок «дышит» пропорционально ширине секции.</p>
-      </article>
-      <article col="12 md-4" class="demo" style="margin:0">
-        <h3 data-px>Карточка 3</h3>
-        <p mt="1" tx style="--tx-mult: var(--fs-p1)">Здесь кастомный <code class="k">--fs-p1</code> через <code class="k">--tx-mult</code> — тоже fluid.</p>
-      </article>
-    </div>
-  </section>
-</div>
-
-<hr class="sep">
-
-<!-- ══════════════════════════ 15. Reset-фишки ══════════════════════════ -->
-<div class="case">
-  <h2 tx="h3">15 · Новые reset-правила</h2>
+  <h2 tx="h3">9 · Reset-типографика (автоматически)</h2>
   <div class="demo">
     <p class="tag">text-wrap: balance (заголовки) — ровные строки</p>
     <h2>Достаточно длинный заголовок, чтобы увидеть балансировку переносов по строкам</h2>
@@ -360,20 +285,21 @@
     <p class="tag" style="margin-top:14px">text-wrap: pretty (p) — нет висячих строк</p>
     <p>Абзац с включённым pretty: последняя строка не остаётся с одним «висячим» словом, а перенос распределяется аккуратнее по всему блоку текста.</p>
 
-    <p class="tag" style="margin-top:14px">:disabled → cursor: not-allowed</p>
-    <button class="demo-btn" disabled>Заблокированная кнопка</button>
-
-    <p class="tag" style="margin-top:14px">textarea: field-sizing: content (авто-рост) + resize: vertical</p>
-    <textarea class="demo-input" placeholder="Печатай несколько строк — поле само растёт по контенту…"></textarea>
-
     <p class="tag" style="margin-top:14px">hyphens: auto (нужен lang на &lt;html&gt;)</p>
     <p style="width:180px; border:1px solid #e3e6ea; padding:6px">Переносослияниепереносослияние — узкая колонка демонстрирует переносы по слогам.</p>
   </div>
+  <pre class="code"><code>&lt;!-- применяется автоматически reset'ом, без атрибутов --&gt;
+&lt;h2&gt;...&lt;/h2&gt;  /* text-wrap: balance */
+&lt;p&gt;...&lt;/p&gt;    /* text-wrap: pretty; hyphens: auto */
+&lt;html lang="ru"&gt; &lt;!-- нужен для hyphens --&gt;</code></pre>
+  <p class="desc">Эти правила из CSS Reset применяются к <code class="k">h1–h6</code> и
+    <code class="k">p</code> без атрибутов. Полный список reset — в
+    <a href="../docs/src/main/index.scss.md">документации</a>.</p>
 </div>
 
 </div><!-- /wrap -->
 
-<!-- ═══════════ Демо-скрипт (не часть фреймворка): статус вьюпорта и живые px ═══════════ -->
+<!-- ═══════════ Демо-скрипт (не часть фреймворка): статус вьюпорта ═══════════ -->
 <script>
   const BPS = [['xl',1920],['dt',1536],['lg',1280],['lp',1024],['md',768],['sm',576],['xs',360]];
   function activeBp(w){ for (const [n,min] of BPS) if (w >= min) return n + ' (≥' + min + ')'; return '— (<360, база)'; }
@@ -385,12 +311,6 @@
     $('#hud-fs').textContent = getComputedStyle(document.documentElement).fontSize;
     const h1 = document.querySelector('.case .demo h1');
     if (h1) $('#hud-h1').textContent = getComputedStyle(h1).fontSize;
-    document.querySelectorAll('[data-px]').forEach(el => {
-      const px = getComputedStyle(el).fontSize;
-      let badge = el.querySelector('.px');
-      if (!badge){ badge = document.createElement('span'); badge.className = 'px'; badge.style.marginLeft = '8px'; el.appendChild(badge); }
-      badge.textContent = '(' + px + ')';
-    });
   }
   update();
   window.addEventListener('resize', update);

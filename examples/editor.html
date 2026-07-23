@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — класс .editor (WYSIWYG-контент)</title>
+
+<!-- Собранный фреймворк -->
+<link rel="stylesheet" href="../dist/main.min.css">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Оформление страницы. Сам
+  .editor — часть фреймворка (main.min.css); демо лишь показывает контраст.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { user-select: auto; margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1.title { font-size: 30px; margin: .2em 0; }
+  .lead { color: #5b616e; max-width: 74ch; line-height: 1.5; }
+  .case { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+  .case > h2 { color: #2b3040; border-bottom: 1px solid #eef0f3; padding-bottom: 8px; margin: 0 0 12px; font-size: 19px; }
+  .desc { color: #5b616e; margin: 10px 0 0; line-height: 1.5; }
+  .desc code, code.k { background: #eef1f5; color: #b0306a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .85em; }
+  .demo { border: 1px dashed #cfd6df; border-radius: 8px; padding: 14px; margin-top: 10px; background: #fff; }
+  .note { border-left: 3px solid #f0b429; background: #fff8e6; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 10px; color: #5b4b16; font-size: 14px; }
+  pre.code { margin: 12px 0 0; background: #1e222b; color: #e7eaf0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 12.5px/1.55 ui-monospace, "SF Mono", monospace; }
+  hr.sep { border: 0; border-top: 1px solid #e3e6ea; margin: 28px 0; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .cols { grid-template-columns: 1fr; } }
+  .panel h3 { margin: 0 0 6px; font-size: 13px; font-family: ui-monospace, monospace; }
+  .panel .frame { border: 1px solid #e3e6ea; border-radius: 8px; padding: 14px; height: 360px; overflow: auto; background: #fff; }
+  .bad h3 { color: #b0306a; } .good h3 { color: #15803d; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<h1 class="title" tx="h1">Класс <code class="k">.editor</code></h1>
+<p class="lead">CSS Reset фреймворка обнуляет отступы, маркеры списков, стили ссылок — чтобы вёрстка
+  начиналась «с чистого листа». Но HTML из CMS/WYSIWYG-редактора это ломает.
+  <code class="k">.editor</code> локально <b>восстанавливает</b> нормальную типографику через
+  <code class="k">* { all: revert }</code> и точечные правила.</p>
+
+<div class="note">Оборачивай в <code class="k">.editor</code> любой контент, сгенерированный
+  редактором (тело статьи, описание товара). Внутри — обычные теги без атрибутов фреймворка.</div>
+
+<hr class="sep">
+
+<!-- ═══════════ до / после ═══════════ -->
+<div class="case">
+  <h2 tx="h3">1 · До и после — один и тот же HTML</h2>
+  <div class="demo">
+    <div class="cols">
+      <div class="panel bad">
+        <h3>✗ без .editor (reset всё сплющил)</h3>
+        <div class="frame">
+          <h2>Заголовок статьи</h2>
+          <p>Первый абзац: отступы обнулены, строки слиплись. <a href="#">ссылка</a> не подчёркнута,
+            <strong>strong</strong> и <em>em</em> потеряли начертание.</p>
+          <ul><li>Пункт списка без маркера</li><li>Второй пункт</li></ul>
+          <blockquote>Цитата без отбивки слева.</blockquote>
+          <table><thead><tr><th>Колонка</th><th>Значение</th></tr></thead>
+            <tbody><tr><td>A</td><td>1</td></tr><tr><td>B</td><td>2</td></tr></tbody></table>
+        </div>
+      </div>
+      <div class="panel good">
+        <h3>✓ с .editor (типографика восстановлена)</h3>
+        <div class="frame">
+          <div class="editor">
+            <h2>Заголовок статьи</h2>
+            <p>Первый абзац: вернулись отступы и межстрочный интервал. <a href="#">ссылка</a> подчёркнута,
+              <strong>strong</strong> жирный, <em>em</em> курсив.</p>
+            <ul><li>Пункт списка с маркером</li><li>Второй пункт</li></ul>
+            <blockquote>Цитата с отбивкой слева.</blockquote>
+            <table><thead><tr><th>Колонка</th><th>Значение</th></tr></thead>
+              <tbody><tr><td>A</td><td>1</td></tr><tr><td>B</td><td>2</td></tr></tbody></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div class="editor"&gt;
+    &lt;h2&gt;Заголовок статьи&lt;/h2&gt;
+    &lt;p&gt;Текст абзаца с &lt;a href="#"&gt;ссылкой&lt;/a&gt; и &lt;strong&gt;акцентом&lt;/strong&gt;.&lt;/p&gt;
+    &lt;ul&gt;&lt;li&gt;Пункт списка&lt;/li&gt;&lt;/ul&gt;
+    &lt;blockquote&gt;Цитата&lt;/blockquote&gt;
+    &lt;table&gt;...&lt;/table&gt;
+&lt;/div&gt;</code></pre>
+  <p class="desc">Внутри <code class="k">.editor</code> сначала <code class="k">* { all: revert }</code>
+    возвращает детям браузерные дефолты, затем правила класса задают отбивки, списки, таблицы.
+    Размеры <code class="k">h1–h6</code> берутся из токенов <code class="k">--fs-*</code>, поэтому
+    масштабируются вместе с ramp.</p>
+</div>
+
+<!-- ═══════════ полный набор тегов ═══════════ -->
+<div class="case">
+  <h2 tx="h3">2 · Полный набор тегов</h2>
+  <div class="demo">
+    <div class="editor">
+      <h1>H1 — заголовок статьи</h1>
+      <h2>H2 — раздел</h2>
+      <h3>H3 — подраздел</h3>
+      <p>Обычный абзац с <a href="#">ссылкой</a>, <strong>жирным</strong>, <em>курсивом</em> и
+        сноской<sup>1</sup>. Межстрочный интервал 1.6, отбивка снизу.</p>
+      <blockquote>Блок-цитата: отступ слева, отделена от текста.</blockquote>
+      <ul><li>Маркированный пункт</li><li>Ещё пункт<ul><li>вложенный</li></ul></li></ul>
+      <ol><li>Нумерованный пункт</li><li>Второй</li></ol>
+      <hr>
+      <p>Строчный <code>code</code> внутри текста и блок:</p>
+      <pre><code>const x = 42;
+console.log(x);</code></pre>
+      <table>
+        <thead><tr><th>Тег</th><th>Что восстанавливается</th></tr></thead>
+        <tbody>
+          <tr><td>p</td><td>margin снизу 1em</td></tr>
+          <tr><td>ul / ol</td><td>маркеры и отступ</td></tr>
+          <tr><td>th / td</td><td>padding и рамки</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="desc">Восстанавливаются: <code class="k">h1–h6</code> (отбивки + размеры из
+    <code class="k">--fs-*</code>), <code class="k">p</code>, <code class="k">a</code> (синяя,
+    подчёркнута), <code class="k">strong/b</code>, <code class="k">em/i</code>,
+    <code class="k">ul/ol/li</code>, <code class="k">blockquote</code>, <code class="k">hr</code>,
+    <code class="k">table/th/td</code>, <code class="k">pre/code</code>,
+    <code class="k">sup/sub</code>, <code class="k">img</code> (<code class="k">max-width:100%</code>),
+    <code class="k">iframe</code> (<code class="k">aspect-ratio:16/9</code>).</p>
+</div>
+
+</div><!-- /wrap -->
+</body>
+</html>

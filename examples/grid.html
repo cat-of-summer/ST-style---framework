@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — grid и col</title>
+
+<!-- Собранный фреймворк -->
+<link rel="stylesheet" href="../dist/main.min.css">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Сетка/раскладка/подписи
+  задаются атрибутами grid, col, gap. Демо-CSS лишь красит ячейки.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { user-select: auto; margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1.title { font-size: 30px; margin: .2em 0; }
+  .lead { color: #5b616e; max-width: 74ch; line-height: 1.5; }
+  .case { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+  .case > h2 { color: #2b3040; border-bottom: 1px solid #eef0f3; padding-bottom: 8px; margin: 0 0 12px; font-size: 19px; }
+  .desc { color: #5b616e; margin: 10px 0 0; line-height: 1.5; }
+  .desc code, code.k { background: #eef1f5; color: #b0306a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .85em; }
+  .demo { border: 1px dashed #cfd6df; border-radius: 8px; padding: 14px; margin-top: 10px; background: #fbfcfd; }
+  .note { border-left: 3px solid #f0b429; background: #fff8e6; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 10px; color: #5b4b16; font-size: 14px; }
+  pre.code { margin: 12px 0 0; background: #1e222b; color: #e7eaf0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 12.5px/1.55 ui-monospace, "SF Mono", monospace; }
+  hr.sep { border: 0; border-top: 1px solid #e3e6ea; margin: 28px 0; }
+
+  #hud { position: sticky; top: 0; z-index: 50; background: #16181d; color: #e7eaf0; font-family: ui-monospace, monospace; font-size: 13px; padding: 8px 16px; display: flex; gap: 18px; flex-wrap: wrap; }
+  #hud b { color: #7dd3fc; } #hud .bp { color: #86efac; font-weight: 700; }
+
+  /* демо-ячейки grid */
+  .cell { background: #6366f1; color: #fff; border-radius: 6px; padding: 12px 8px; text-align: center; font: 600 13px/1.2 ui-monospace, monospace; }
+  .cell.b { background: #ec4899; }
+  .cell.g { background: #14b8a6; }
+  /* фон-подложка сетки, чтобы видеть 12 колонок */
+  .track { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; margin-bottom: 6px; }
+  .track span { height: 8px; background: #e6ebf3; border-radius: 3px; }
+  /* демо-карточка */
+  .card { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 14px; min-height: 90px; }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .card p { margin: 0; color: #5b616e; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span>viewport: <b id="hud-w">–</b></span>
+  <span>брейкпоинт: <span class="bp" id="hud-bp">–</span></span>
+  <span>колонок в ряд зависит от <b>col</b> + ширины</span>
+</div>
+
+<div class="wrap">
+
+<h1 class="title" tx="h1">Grid-система — <code class="k">grid</code> и <code class="k">col</code></h1>
+<p class="lead">12-колоночная CSS Grid через атрибуты. <code class="k">grid</code> на контейнере,
+  <code class="k">col</code> на детях (ширина в колонках + позиция начала). Всё адаптивно,
+  mobile-first. <b>Тяни ширину окна</b> — раскладка перестраивается по брейкпоинтам.</p>
+
+<hr class="sep">
+
+<!-- ═══════════ контейнер grid ═══════════ -->
+<div class="case">
+  <h2 tx="h3">1 · Контейнер <code class="k">grid</code></h2>
+  <div class="demo">
+    <div grid="" style="gap:6px">
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+      <div class="cell" col="1">1</div><div class="cell" col="1">1</div>
+    </div>
+    <p style="margin:12px 0 4px;font:12px ui-monospace,monospace;color:#6b7280">grid="10" — 10 колонок:</p>
+    <div grid="10" style="gap:6px">
+      <div class="cell g" col="1">1</div><div class="cell g" col="1">1</div>
+      <div class="cell g" col="1">1</div><div class="cell g" col="1">1</div>
+      <div class="cell g" col="1">1</div><div class="cell g" col="1">1</div>
+      <div class="cell g" col="1">1</div><div class="cell g" col="1">1</div>
+      <div class="cell g" col="1">1</div><div class="cell g" col="1">1</div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div grid=""&gt;   &lt;!-- 12 колонок (по умолчанию) --&gt;
+&lt;div grid="12"&gt; &lt;!-- то же самое, явно --&gt;
+&lt;div grid="10"&gt; &lt;!-- 10 колонок --&gt;</code></pre>
+  <p class="desc">Применяет <code class="k">display: grid; grid-template-columns: repeat(N, 1fr)</code>.
+    Число колонок — в <code class="k">--grid-columns</code>.</p>
+</div>
+
+<!-- ═══════════ col span ═══════════ -->
+<div class="case">
+  <h2 tx="h3">2 · <code class="k">col</code> — ширина в колонках (span)</h2>
+  <div class="demo">
+    <div class="track"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div grid="" style="gap:6px">
+      <div class="cell" col="12">col="12" (вся ширина)</div>
+      <div class="cell b" col="6">col="6"</div>
+      <div class="cell b" col="6">col="6"</div>
+      <div class="cell g" col="4">col="4"</div>
+      <div class="cell g" col="4">col="4"</div>
+      <div class="cell g" col="4">col="4"</div>
+      <div class="cell" col="3">3</div>
+      <div class="cell" col="3">3</div>
+      <div class="cell" col="3">3</div>
+      <div class="cell" col="3">3</div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div grid=""&gt;
+    &lt;div col="12"&gt;на всю ширину&lt;/div&gt;
+    &lt;div col="6"&gt;6 из 12 (50%)&lt;/div&gt;
+    &lt;div col="4"&gt;4 из 12 (1/3)&lt;/div&gt;
+    &lt;div col="3"&gt;3 из 12 (25%)&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+  <p class="desc">Значения span — <b>1–12</b>. Сумма span в ряду ≤ числу колонок, иначе
+    перенос на следующую строку.</p>
+</div>
+
+<!-- ═══════════ responsive span ═══════════ -->
+<div class="case">
+  <h2 tx="h3">3 · Responsive span — <code class="k">col="12 md-6 lg-4"</code></h2>
+  <p class="desc" style="margin-top:0"><b>Тяни ширину</b>: 1 в ряд на мобиле → 2 на md → 3 на lg.</p>
+  <div class="demo">
+    <div grid="" style="gap:8px">
+      <div class="cell" col="12 md-6 lg-4">A</div>
+      <div class="cell" col="12 md-6 lg-4">B</div>
+      <div class="cell" col="12 md-6 lg-4">C</div>
+      <div class="cell" col="12 md-6 lg-4">D</div>
+      <div class="cell" col="12 md-6 lg-4">E</div>
+      <div class="cell" col="12 md-6 lg-4">F</div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div col="12 lg-3"&gt;    &lt;!-- 12 на мобиле, 3 на lg+ --&gt;
+&lt;div col="12 md-6 lg-4"&gt; &lt;!-- 12 → 6 (md) → 4 (lg) --&gt;</code></pre>
+  <p class="desc">Mobile-first: перечисляешь значения через пробел, больший брейкпоинт выигрывает.</p>
+</div>
+
+<!-- ═══════════ col start ═══════════ -->
+<div class="case">
+  <h2 tx="h3">4 · Позиция начала — <code class="k">start</code></h2>
+  <div class="demo">
+    <div class="track"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div grid="" style="gap:6px">
+      <div class="cell b" col="4 start-1">col="4 start-1"</div>
+      <div class="cell b" col="4 start-9">col="4 start-9"</div>
+      <div class="cell g" col="6 start-4">col="6 start-4" (по центру)</div>
+      <div class="cell" col="3 lg-start-10">col="3 lg-start-10"</div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div col="start-2"&gt;      &lt;!-- начать со 2-й колонки --&gt;
+&lt;div col="4 start-2"&gt;    &lt;!-- span 4, начало со 2-й --&gt;
+&lt;div col="6 start-4"&gt;    &lt;!-- span 6 по центру 12-сетки --&gt;
+&lt;div col="4 lg-start-4"&gt; &lt;!-- start-4 только на lg+ --&gt;</code></pre>
+  <p class="desc">Значения <code class="k">start-1 … start-12</code> для каждого брейкпоинта.
+    Управляет <code class="k">grid-column-start</code> — можно оставлять «пустые» колонки.</p>
+</div>
+
+<!-- ═══════════ gap ═══════════ -->
+<div class="case">
+  <h2 tx="h3">5 · <code class="k">gap</code> — промежутки между ячейками</h2>
+  <div class="demo">
+    <p style="margin:0 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-2" (8px):</p>
+    <div grid="gap-2"><div class="cell" col="4">4</div><div class="cell" col="4">4</div><div class="cell" col="4">4</div></div>
+    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-6" (24px):</p>
+    <div grid="gap-6"><div class="cell" col="4">4</div><div class="cell" col="4">4</div><div class="cell" col="4">4</div></div>
+    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-x-8 gap-y-2" (x:32px, y:8px):</p>
+    <div grid="gap-x-8 gap-y-2"><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div></div>
+  </div>
+  <pre class="code"><code>&lt;div grid="gap-4"&gt;      &lt;!-- промежуток 16px по обеим осям --&gt;
+&lt;div grid="12 gap-x-5"&gt; &lt;!-- только по горизонтали 20px --&gt;
+&lt;div grid="10 gap-y-3"&gt; &lt;!-- только по вертикали 12px --&gt;</code></pre>
+  <p class="desc"><code class="k">gap-*</code> — общий промежуток, <code class="k">gap-x-*</code> /
+    <code class="k">gap-y-*</code> переопределяют одну ось. Значения <b>0–15</b> (× 4px).
+    Тот же <code class="k">gap</code> работает и на flex — см. <a href="display.html">display</a>.</p>
+</div>
+
+<!-- ═══════════ паттерн карточек ═══════════ -->
+<div class="case">
+  <h2 tx="h3">6 · Реальный паттерн: карточки</h2>
+  <p class="desc" style="margin-top:0">Секция с карточками: 1 в ряд на мобиле, 4 на десктопе.
+    <b>Тяни ширину</b>.</p>
+  <div class="demo">
+    <div grid="gap-4">
+      <article class="card" col="12 md-6 lg-3"><h3>Карточка 1</h3><p>col="12 md-6 lg-3"</p></article>
+      <article class="card" col="12 md-6 lg-3"><h3>Карточка 2</h3><p>col="12 md-6 lg-3"</p></article>
+      <article class="card" col="12 md-6 lg-3"><h3>Карточка 3</h3><p>col="12 md-6 lg-3"</p></article>
+      <article class="card" col="12 md-6 lg-3"><h3>Карточка 4</h3><p>col="12 md-6 lg-3"</p></article>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;section mt="6"&gt;
+    &lt;div container&gt;
+        &lt;div class="cards" grid="gap-4"&gt;
+            &lt;article col="12 lg-3" sheen="hover" shadow="hover focus" tabindex="0"&gt;
+                &lt;!-- содержимое карточки --&gt;
+            &lt;/article&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+  <p class="desc">Канонический скелет секции: <code class="k">section › container › grid › col</code>.
+    Чтобы отступы карточек «дышали» с шириной секции — оберни в
+    <code class="k">container="query"</code> (см. <a href="container-query.html">container-query</a>).</p>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- Демо-скрипт: индикатор брейкпоинта (не часть фреймворка) -->
+<script>
+  const BPS = [['xl',1920],['dt',1536],['lg',1280],['lp',1024],['md',768],['sm',576],['xs',360]];
+  function activeBp(w){ for (const [n,min] of BPS) if (w >= min) return n + ' (≥' + min + ')'; return '— (<360, база)'; }
+  function update(){
+    document.getElementById('hud-w').textContent = window.innerWidth + 'px';
+    document.getElementById('hud-bp').textContent = activeBp(window.innerWidth);
+  }
+  update(); window.addEventListener('resize', update);
+</script>
+</body>
+</html>

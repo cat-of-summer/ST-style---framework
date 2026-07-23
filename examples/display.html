@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — display: ds / gap / ps / ov</title>
+
+<!-- Собранный фреймворк -->
+<link rel="stylesheet" href="../dist/main.min.css">
+
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  СТИЛИ ТОЛЬКО ДЛЯ ДЕМО (не часть фреймворка). Поведение задаётся атрибутами
+  ds (display), gap, ps (position), ov (overflow). Демо-CSS — только оформление.
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<style>
+  * { box-sizing: border-box; }
+  body { user-select: auto; margin: 0; font-family: system-ui, "Segoe UI", sans-serif; color: #16181d; background: #f4f5f7; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1.title { font-size: 30px; margin: .2em 0; }
+  .lead { color: #5b616e; max-width: 74ch; line-height: 1.5; }
+  .case { background: #fff; border: 1px solid #e3e6ea; border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+  .case > h2 { color: #2b3040; border-bottom: 1px solid #eef0f3; padding-bottom: 8px; margin: 0 0 12px; font-size: 19px; }
+  .desc { color: #5b616e; margin: 10px 0 0; line-height: 1.5; }
+  .desc code, code.k { background: #eef1f5; color: #b0306a; padding: 1px 5px; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .85em; }
+  .demo { border: 1px dashed #cfd6df; border-radius: 8px; padding: 14px; margin-top: 10px; background: #fbfcfd; }
+  .note { border-left: 3px solid #f0b429; background: #fff8e6; padding: 8px 12px; border-radius: 0 6px 6px 0; margin-top: 10px; color: #5b4b16; font-size: 14px; }
+  pre.code { margin: 12px 0 0; background: #1e222b; color: #e7eaf0; border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 12.5px/1.55 ui-monospace, "SF Mono", monospace; }
+  hr.sep { border: 0; border-top: 1px solid #e3e6ea; margin: 28px 0; }
+  .ruler { font: 11px ui-monospace, monospace; color: #2563eb; display:block; margin-bottom: 6px; }
+
+  #hud { position: sticky; top: 0; z-index: 50; background: #16181d; color: #e7eaf0; font-family: ui-monospace, monospace; font-size: 13px; padding: 8px 16px; display: flex; gap: 18px; flex-wrap: wrap; }
+  #hud b { color: #7dd3fc; } #hud .bp { color: #86efac; font-weight: 700; }
+
+  .box { background: #6366f1; color: #fff; border-radius: 6px; padding: 10px 12px; font: 600 13px/1.2 ui-monospace, monospace; text-align: center; }
+  .box.b { background: #ec4899; } .box.g { background: #14b8a6; }
+  /* сцена для position: относительный контекст */
+  .stage { position: relative; height: 150px; background: repeating-linear-gradient(45deg,#f4f6fb,#f4f6fb 10px,#eaeef7 10px,#eaeef7 20px); border-radius: 8px; border: 1px solid #dbe1ee; }
+  .pin { background: #ec4899; color: #fff; border-radius: 6px; padding: 8px 12px; font: 600 12px ui-monospace, monospace; width: max-content; }
+  .scrollbox { height: 120px; overflow-y: auto; border: 1px solid #dbe1ee; border-radius: 8px; background: #fff; }
+  .scrollbox .filler { padding: 10px; color: #5b616e; font-size: 13px; line-height: 1.6; }
+  /* overflow-демо */
+  .ovbox { width: 220px; height: 90px; border: 1px solid #b9c8ef; border-radius: 6px; background: #eef2fb; }
+  .ovbox .big { width: 360px; padding: 8px; color: #16181d; font: 13px/1.5 ui-monospace, monospace; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <span>viewport: <b id="hud-w">–</b></span>
+  <span>брейкпоинт: <span class="bp" id="hud-bp">–</span></span>
+  <span>меняй ширину — <b>ds</b> по брейкпоинтам переключается</span>
+</div>
+
+<div class="wrap">
+
+<h1 class="title" tx="h1">Display — <code class="k">ds · gap · ps · ov</code></h1>
+<p class="lead">Атрибуты из <code class="k">_display.scss</code>: <code class="k">ds</code> — управление
+  <code class="k">display</code> (показать/скрыть по брейкпоинтам), <code class="k">gap</code> —
+  промежутки в flex/grid, <code class="k">ps</code> — <code class="k">position</code> с центрированием,
+  <code class="k">ov</code> — <code class="k">overflow</code>.</p>
+
+<hr class="sep">
+
+<!-- ═══════════ ds значения ═══════════ -->
+<div class="case">
+  <h2 tx="h3">1 · <code class="k">ds</code> — значения display</h2>
+  <div class="demo">
+    <span class="ruler">ds="flex gap-2" — дети в ряд</span>
+    <div ds="flex gap-2"><div class="box">A</div><div class="box">B</div><div class="box">C</div></div>
+    <span class="ruler" style="margin-top:12px">ds="grid gap-2" (+ grid-template через проектный CSS)</span>
+    <div ds="grid gap-2" style="grid-template-columns:repeat(3,1fr)"><div class="box g">1</div><div class="box g">2</div><div class="box g">3</div></div>
+    <span class="ruler" style="margin-top:12px">ds="inline" — в потоке текста:</span>
+    <p style="margin:0">текст <span class="box" ds="inline" style="display:inline">инлайн-бокс</span> продолжение текста</p>
+  </div>
+  <pre class="code"><code>&lt;div ds="none"&gt;   &lt;!-- display: none --&gt;
+&lt;div ds="block"&gt;  &lt;!-- display: block --&gt;
+&lt;div ds="flex"&gt;   &lt;!-- display: flex --&gt;
+&lt;div ds="grid"&gt;   &lt;!-- display: grid --&gt;
+&lt;div ds="inline"&gt; &lt;!-- display: inline --&gt;</code></pre>
+  <p class="desc">Устанавливает <code class="k">display</code> с <code class="k">!important</code>.
+    Значения: <code class="k">none · block · flex · grid · inline</code>.</p>
+</div>
+
+<!-- ═══════════ ds responsive ═══════════ -->
+<div class="case">
+  <h2 tx="h3">2 · <code class="k">ds</code> по брейкпоинтам (показать/скрыть)</h2>
+  <p class="desc" style="margin-top:0"><b>Тяни ширину окна</b> — блоки появляются/исчезают.</p>
+  <div class="demo">
+    <div class="box"   ds="block lg-none">ds="block lg-none" — виден до lg, скрыт на lg+</div>
+    <div class="box b" ds="none lg-block" style="margin-top:8px">ds="none lg-block" — скрыт до lg, виден на lg+</div>
+    <div class="box g" ds="none md-block lg-none" style="margin-top:8px">ds="none md-block lg-none" — только md–lp</div>
+  </div>
+  <pre class="code"><code>&lt;div ds="none lg-block"&gt;         &lt;!-- скрыт до lg, показан на lg+ --&gt;
+&lt;div ds="block lg-none"&gt;         &lt;!-- показан до lg, скрыт на lg+ --&gt;
+&lt;div ds="none md-flex lg-none"&gt;  &lt;!-- flex только на md–lp --&gt;
+
+&lt;!-- частый паттерн: кнопка только на мобиле --&gt;
+&lt;div ds="block lg-none"&gt;
+    &lt;button class="button"&gt;Забронировать&lt;/button&gt;
+&lt;/div&gt;</code></pre>
+  <p class="desc">Mobile-first, больший брейкпоинт выигрывает. Префиксы
+    <code class="k">xs · sm · md · lp · lg · dt · xl</code>.</p>
+</div>
+
+<!-- ═══════════ gap ═══════════ -->
+<div class="case">
+  <h2 tx="h3">3 · <code class="k">gap</code> — промежутки в flex / grid</h2>
+  <div class="demo">
+    <span class="ruler">ds="flex gap-1" (4px)</span>
+    <div ds="flex gap-1"><div class="box">•</div><div class="box">•</div><div class="box">•</div></div>
+    <span class="ruler" style="margin-top:12px">ds="flex gap-6" (24px)</span>
+    <div ds="flex gap-6"><div class="box">•</div><div class="box">•</div><div class="box">•</div></div>
+    <span class="ruler" style="margin-top:12px">ds="flex gap-x-8 gap-y-2" + перенос</span>
+    <div ds="flex gap-x-8 gap-y-2" style="flex-wrap:wrap"><div class="box b">1</div><div class="box b">2</div><div class="box b">3</div><div class="box b">4</div><div class="box b">5</div><div class="box b">6</div></div>
+  </div>
+  <pre class="code"><code>&lt;div ds="flex gap-4"&gt;         &lt;!-- промежуток 16px --&gt;
+&lt;div ds="none lg-flex gap-4"&gt; &lt;!-- flex + gap только на lg+ --&gt;
+&lt;div ds="grid gap-x-2 gap-y-9"&gt;</code></pre>
+  <p class="desc">Работает и для flex, и для grid. <code class="k">gap-*</code> — обе оси;
+    <code class="k">gap-x-*</code>/<code class="k">gap-y-*</code> — по отдельности. Значения <b>0–15</b>.</p>
+</div>
+
+<hr class="sep">
+
+<!-- ═══════════ ps ═══════════ -->
+<div class="case">
+  <h2 tx="h3">4 · <code class="k">ps</code> — position + центрирование</h2>
+  <div class="demo" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px">
+    <div>
+      <span class="ruler">ps="absolute center"</span>
+      <div class="stage"><div class="pin" ps="absolute center">center</div></div>
+    </div>
+    <div>
+      <span class="ruler">ps="absolute center-x"</span>
+      <div class="stage"><div class="pin" ps="absolute center-x" style="top:10px">center-x</div></div>
+    </div>
+    <div>
+      <span class="ruler">ps="absolute center-y"</span>
+      <div class="stage"><div class="pin" ps="absolute center-y" style="left:10px">center-y</div></div>
+    </div>
+    <div>
+      <span class="ruler">ps="sticky" (скролль ↓)</span>
+      <div class="scrollbox">
+        <div class="pin" ps="sticky" style="top:0">sticky заголовок</div>
+        <div class="filler">Прокрути этот блок — розовая плашка прилипает к верху.
+          Строка. Строка. Строка. Строка. Строка. Строка. Строка. Строка. Строка. Строка.
+          Строка. Строка. Строка. Строка. Строка. Строка.</div>
+      </div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div ps="relative"&gt;
+&lt;div ps="absolute center"&gt;      &lt;!-- по центру по X и Y --&gt;
+&lt;div ps="fixed center-x"&gt;       &lt;!-- прилип к вьюпорту, центр по X --&gt;
+&lt;div ps="sticky center-y"&gt;</code></pre>
+  <p class="desc"><code class="k">center</code> = <code class="k">left/top: 50% + translate(-50%,-50%)</code>.
+    <code class="k">center-x</code>/<code class="k">center-y</code> — по одной оси; можно комбинировать.
+    Центрирование действует только на <code class="k">absolute/fixed/sticky</code>.</p>
+</div>
+
+<!-- ═══════════ ov ═══════════ -->
+<div class="case">
+  <h2 tx="h3">5 · <code class="k">ov</code> — overflow</h2>
+  <div class="demo" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px">
+    <div>
+      <span class="ruler">ov="hidden" — контент обрезан</span>
+      <div class="ovbox" ov="hidden"><div class="big">Широкий контент шире бокса — обрезан без скролла.</div></div>
+    </div>
+    <div>
+      <span class="ruler">ov="scroll x" — гориз. скролл</span>
+      <div class="ovbox" ov="scroll x"><div class="big">Широкий контент шире бокса → появляется горизонтальный скролл. →→→</div></div>
+    </div>
+    <div>
+      <span class="ruler">ov="scroll y" — верт. скролл</span>
+      <div class="ovbox" ov="scroll y"><div class="big" style="width:auto">Строка<br>Строка<br>Строка<br>Строка<br>Строка<br>Строка<br>Строка<br>Строка</div></div>
+    </div>
+  </div>
+  <pre class="code"><code>&lt;div ov="hidden"&gt;   &lt;!-- скрыть по обеим осям --&gt;
+&lt;div ov="scroll x"&gt; &lt;!-- overflow-x: auto --&gt;
+&lt;div ov="scroll y"&gt; &lt;!-- overflow-y: auto --&gt;
+&lt;div ov="x"&gt;        &lt;!-- видимо по X, обрезано по Y --&gt;
+&lt;div ov="y"&gt;        &lt;!-- видимо по Y, обрезано по X --&gt;</code></pre>
+  <p class="desc">Устанавливает <code class="k">overflow-x/y</code> с <code class="k">!important</code>.
+    <code class="k">scroll</code> даёт <code class="k">auto</code> (скролл при необходимости).</p>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- Демо-скрипт: индикатор брейкпоинта (не часть фреймворка) -->
+<script>
+  const BPS = [['xl',1920],['dt',1536],['lg',1280],['lp',1024],['md',768],['sm',576],['xs',360]];
+  function activeBp(w){ for (const [n,min] of BPS) if (w >= min) return n + ' (≥' + min + ')'; return '— (<360, база)'; }
+  function update(){
+    document.getElementById('hud-w').textContent = window.innerWidth + 'px';
+    document.getElementById('hud-bp').textContent = activeBp(window.innerWidth);
+  }
+  update(); window.addEventListener('resize', update);
+</script>
+</body>
+</html>
