@@ -161,18 +161,18 @@
 <div class="case">
   <h2 tx="h3">5 · <code class="k">gap</code> — промежутки между ячейками</h2>
   <div class="demo">
-    <p style="margin:0 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-2" (8px):</p>
+    <p style="margin:0 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-2" (0.8rem):</p>
     <div grid="gap-2"><div class="cell" col="4">4</div><div class="cell" col="4">4</div><div class="cell" col="4">4</div></div>
-    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-6" (24px):</p>
+    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-6" (2.4rem):</p>
     <div grid="gap-6"><div class="cell" col="4">4</div><div class="cell" col="4">4</div><div class="cell" col="4">4</div></div>
-    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-x-8 gap-y-2" (x:32px, y:8px):</p>
+    <p style="margin:14px 0 6px;font:12px ui-monospace,monospace;color:#6b7280">grid="gap-x-8 gap-y-2" (x:3.2rem, y:0.8rem):</p>
     <div grid="gap-x-8 gap-y-2"><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div><div class="cell b" col="6">6</div></div>
   </div>
-  <pre class="code"><code>&lt;div grid="gap-4"&gt;      &lt;!-- промежуток 16px по обеим осям --&gt;
-&lt;div grid="12 gap-x-5"&gt; &lt;!-- только по горизонтали 20px --&gt;
-&lt;div grid="10 gap-y-3"&gt; &lt;!-- только по вертикали 12px --&gt;</code></pre>
+  <pre class="code"><code>&lt;div grid="gap-4"&gt;      &lt;!-- промежуток 1.6rem по обеим осям --&gt;
+&lt;div grid="12 gap-x-5"&gt; &lt;!-- только по горизонтали 2rem --&gt;
+&lt;div grid="10 gap-y-3"&gt; &lt;!-- только по вертикали 1.2rem --&gt;</code></pre>
   <p class="desc"><code class="k">gap-*</code> — общий промежуток, <code class="k">gap-x-*</code> /
-    <code class="k">gap-y-*</code> переопределяют одну ось. Значения <b>0–15</b> (× 4px).
+    <code class="k">gap-y-*</code> переопределяют одну ось. Значения <b>0–15</b> (× 0.4rem).
     Тот же <code class="k">gap</code> работает и на flex — см. <a href="display.html">display</a>.</p>
 </div>
 
@@ -199,8 +199,8 @@
     &lt;/div&gt;
 &lt;/section&gt;</code></pre>
   <p class="desc">Канонический скелет секции: <code class="k">section › container › grid › col</code>.
-    Чтобы отступы карточек «дышали» с шириной секции — оберни в
-    <code class="k">container="query"</code> (см. <a href="container-query.html">container-query</a>).</p>
+    max-width контейнера и все отступы — в <code class="k">rem</code>, поэтому внутри брейкпоинта
+    секция масштабируется целиком (см. <a href="typography.html">typography</a>).</p>
 </div>
 
 </div><!-- /wrap -->

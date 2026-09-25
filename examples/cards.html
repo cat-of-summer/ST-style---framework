@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — масштабирование: страница с карточками</title>
+
+<link rel="stylesheet" href="../dist/main.min.css">
+
+<!--
+  Раскладка, шрифты и отступы — ТОЛЬКО атрибутами фреймворка.
+  Здесь — только цвета, скругления и межстрочный интервал (скругления в rem, чтобы масштабировались вместе со всем).
+-->
+<style>
+  body       { background: #f3f4f8; color: #1d2130; font-family: system-ui, "Segoe UI", sans-serif; line-height: 1.35; }
+  .hero      { background: #1d2130; color: #fff; }
+  .hero p    { color: #b7bdd0; }
+  .hero .btn { background: #6366f1; }
+  .card      { background: #fff; border-radius: 1.2rem; overflow: hidden; box-shadow: 0 .2rem .8rem rgba(29,33,48,.08); }
+  .card p    { color: #5b6275; }
+  .pic-1     { background: linear-gradient(135deg, #6366f1, #ec4899); }
+  .pic-2     { background: linear-gradient(135deg, #0ea5e9, #22c55e); }
+  .pic-3     { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .pic-4     { background: linear-gradient(135deg, #14b8a6, #6366f1); }
+  .pic-5     { background: linear-gradient(135deg, #a855f7, #f43f5e); }
+  .pic-6     { background: linear-gradient(135deg, #84cc16, #0ea5e9); }
+  .pic       { color: rgba(255,255,255,.9); }
+  .btn       { background: #1d2130; color: #fff; border-radius: .8rem; }
+  .tagline   { color: #6366f1; }
+  .foot      { color: #5f6679; }
+</style>
+
+<!-- Линейка: демо-оверлей, НЕ часть страницы. В px, чтобы сам не масштабировался. -->
+<style>
+  #ruler { position: fixed; right: 12px; bottom: 12px; z-index: 100; width: 380px; max-width: calc(100vw - 24px);
+           background: rgba(22,24,29,.94); color: #e7eaf0; font: 12px/1.45 ui-monospace, "SF Mono", monospace;
+           border-radius: 10px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0,0,0,.3); user-select: auto; }
+  #ruler b { color: #7dd3fc; font-weight: 600; }
+  #ruler .bp { color: #86efac; font-weight: 700; }
+  #ruler table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  #ruler th, #ruler td { padding: 2px 4px; text-align: right; border-bottom: 1px solid #2c313c; }
+  #ruler th:first-child, #ruler td:first-child { text-align: left; }
+  #ruler th { color: #8a90a2; font-weight: 400; }
+  #ruler tr.on td { color: #86efac; }
+  #ruler .bar { height: 6px; background: #2c313c; border-radius: 3px; margin: 6px 0 2px; overflow: hidden; }
+  #ruler .bar i { display: block; height: 100%; background: #86efac; }
+  #ruler .muted { color: #8a90a2; }
+  #ruler button { all: revert; font: inherit; font-size: 11px; cursor: pointer; }
+  #ruler.min table, #ruler.min .full { display: none; }
+  [data-outline] .card * { outline: 1px dashed rgba(236,72,153,.6); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ Hero ═══════════ -->
+<section class="hero" pt="12 md-16" pb="12 md-16">
+  <div container grid>
+    <div col="12 md-8">
+      <span class="tagline" tx="p" fw="semibold">ST-style · масштабирование</span>
+      <h1 fw="bold" mt="3">Один брейкпоинт — одна картинка</h1>
+      <p tx="h5" mt="4" lc="3">Тяни ширину окна: внутри брейкпоинта шрифты, отступы, сетка и ширина
+        контейнера растут вместе, пропорции не меняются. На границе брейкпоинта шкала переключается.</p>
+      <div grid mt="6"><span class="btn" grid p="4" tx="h6" fw="semibold" col="12 sm-6"><span col="10 start-2">Смотреть карточки →</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ Карточки ═══════════ -->
+<section pt="10 md-14" pb="14">
+  <div container>
+    <h2 fw="bold">Карточки</h2>
+    <p tx="h6" mt="2" class="foot">1 колонка → 2 (sm) → 3 (lp) → 4 (dt). Gap, паддинги и шрифты — в rem.</p>
+
+    <div grid="gap-5" mt="6" id="cards">
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-1" grid p="10"><span col="10 start-2" tx="h1" fw="bold">01</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Первая карточка</h3>
+            <p mt="2" lc="3">Отступы внутри считаются как N × 0.4rem, поэтому при растяжении окна они растут вместе с текстом.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-2" grid p="10"><span col="10 start-2" tx="h1" fw="bold">02</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Вторая карточка</h3>
+            <p mt="2" lc="3">Горизонтальные поля — колонки сетки (start-2, span 10), тоже пропорциональные.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-3" grid p="10"><span col="10 start-2" tx="h1" fw="bold">03</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Третья карточка</h3>
+            <p mt="2" lc="3">Переносы строк внутри брейкпоинта не меняются: текст и ширина колонки масштабируются вместе.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-4" grid p="10"><span col="10 start-2" tx="h1" fw="bold">04</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Четвёртая карточка</h3>
+            <p mt="2" lc="3">Скругления заданы в rem, поэтому тоже масштабируются.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-5" grid p="10"><span col="10 start-2" tx="h1" fw="bold">05</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Пятая карточка</h3>
+            <p mt="2" lc="3">Ширина контейнера — max-width в rem, от эталонного значения брейкпоинта.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card" col="12 sm-6 lp-4 dt-3">
+        <div class="pic pic-6" grid p="10"><span col="10 start-2" tx="h1" fw="bold">06</span></div>
+        <div grid pt="5" pb="6">
+          <div col="10 start-2">
+            <h3 fw="semibold">Шестая карточка</h3>
+            <p mt="2" lc="3">Ни одного px в разметке — только атрибуты фреймворка.</p>
+            <span class="btn" grid mt="5" p="3" tx="p" fw="semibold"><span col="10 start-2">Подробнее →</span></span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <p tx="h6" mt="10" class="foot">examples/cards.html · раскладка только атрибутами: container, grid, col, m/p, tx, fw, lc.</p>
+  </div>
+</section>
+
+<!-- ═══════════ Линейка (демо-оверлей) ═══════════ -->
+<div id="ruler">
+  <div>viewport <b id="r-w">–</b> · <span class="bp" id="r-bp">–</span>
+    </div>
+  <div style="margin-top:4px"><button id="r-toggle">свернуть</button> <button id="r-outline">рамки</button></div>
+  <div class="full">
+    <div class="bar"><i id="r-bar"></i></div>
+    <div class="muted" id="r-band">–</div>
+    <div style="margin-top:6px">1rem <b id="r-rem">–</b> · масштаб <b id="r-k">–</b> от эталона</div>
+    <div>h1 <b id="r-h1">–</b> · p <b id="r-p">–</b> · container <b id="r-c">–</b></div>
+    <div>gap сетки <b id="r-gap">–</b> · pt карточки <b id="r-pt">–</b> · p картинки <b id="r-pic">–</b></div>
+  </div>
+  <table>
+    <thead><tr><th>bp</th><th>≥min</th><th>эталон</th><th>1rem</th><th>container</th><th>h1</th><th>1rem макс</th></tr></thead>
+    <tbody id="r-table"></tbody>
+  </table>
+</div>
+
+<script>
+  // Дефолтный конфиг фреймворка (src/main/_config.scss): design = min, font = 10px.
+  const BPS = [
+    { n: 'xs', min: 360,  c: 340 },
+    { n: 'sm', min: 576,  c: 540 },
+    { n: 'md', min: 768,  c: 720 },
+    { n: 'lp', min: 1024, c: 960 },
+    { n: 'lg', min: 1280, c: 1200 },
+    { n: 'dt', min: 1536, c: 1320 },
+    { n: 'xl', min: 1920, c: 1600 },
+  ];
+  const FONT = 10, H1 = 3.2;
+  const $ = id => document.getElementById(id);
+  const px = v => Math.round(parseFloat(v) * 10) / 10 + 'px';
+
+  $('r-table').innerHTML = BPS.map((b, k) => { const next = BPS[k + 1]; return (
+    `<tr data-bp="${b.n}"><td>${b.n}</td><td>${b.min}</td><td>${b.min}px</td><td>${FONT}px</td>` +
+    `<td>${b.c}px</td><td>${H1 * FONT}px</td><td>${next ? (FONT * (next.min - 1) / b.min).toFixed(1) + 'px' : 'растёт'}</td></tr>`);}).join('');
+
+  function update() {
+    const w = window.innerWidth;
+    let i = -1; BPS.forEach((b, k) => { if (w >= b.min) i = k; });
+    const bp = BPS[Math.max(i, 0)], next = BPS[i + 1];
+    const cs = el => getComputedStyle(el);
+    const rem = parseFloat(cs(document.documentElement).fontSize);
+
+    $('r-w').textContent = w + 'px';
+    $('r-bp').textContent = i < 0 ? '<360 · шкала xs' : bp.n + ' (≥' + bp.min + ')';
+    $('r-rem').textContent = px(rem);
+    $('r-k').textContent = '×' + (rem / FONT).toFixed(2);
+    const lo = i < 0 ? 0 : bp.min, hi = next ? next.min : Math.max(w, bp.min * 1.5);
+    $('r-bar').style.width = Math.min(100, (w - lo) / (hi - lo) * 100) + '%';
+    $('r-band').textContent = next
+      ? `${bp.n}: ${lo}…${next.min - 1}px → 1rem ${FONT}…${(FONT * (next.min - 1) / bp.min).toFixed(1)}px`
+      : `${bp.n}: ≥${bp.min}px → 1rem растёт дальше`;
+
+    $('r-h1').textContent = px(cs(document.querySelector('h1')).fontSize);
+    $('r-p').textContent  = px(cs(document.querySelector('.card p')).fontSize);
+    $('r-c').textContent  = px(cs(document.querySelector('#cards').parentElement).width);
+    $('r-gap').textContent = px(cs($('cards')).columnGap);
+    $('r-pt').textContent = px(cs(document.querySelector('.card [pt]')).paddingTop);
+    $('r-pic').textContent = px(cs(document.querySelector('.pic')).paddingTop);
+    document.querySelectorAll('#r-table tr').forEach(tr => tr.classList.toggle('on', i >= 0 && tr.dataset.bp === bp.n));
+  }
+  update();
+  window.addEventListener('resize', update);
+
+  if (window.innerWidth < 768) { $('ruler').classList.add('min'); $('r-toggle').textContent = 'развернуть'; }
+  $('r-toggle').onclick = e => { const m = $('ruler').classList.toggle('min'); e.target.textContent = m ? 'развернуть' : 'свернуть'; };
+  $('r-outline').onclick = () => document.body.toggleAttribute('data-outline');
+</script>
+</body>
+</html>

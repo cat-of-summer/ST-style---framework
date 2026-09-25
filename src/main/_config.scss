@@ -9,13 +9,24 @@
 // Those custom properties stay overridable at runtime — config just defines the
 // defaults once. See src/main/_root.scss.
 
+// ── Scaling model ───────────────────────────────────────────────────────────
+// html font-size is set in vw per breakpoint, so that at the breakpoint's
+// `design` width 1rem equals its `font` px. Everything else (font tokens,
+// spacing, gap, [container] max-width) is in rem, so within one breakpoint the
+// whole layout scales proportionally with the viewport and looks identical.
+// At a breakpoint boundary the scale jumps to the next breakpoint's ratio.
+// Below the first / above the last breakpoint the scaling just continues.
+$font-size: 10px !default;   // default `font`: 1rem at the design width
+
 // ── Responsive breakpoints (single source of truth) ─────────────────────────
 // One scale drives every responsive feature. Per breakpoint:
-//   min       — min-width threshold for [sz], [lc], [m]/[p], [col], [ds]
-//               and the [container] max-width.
-//   container — [container] max-width from this breakpoint up. Optional: omit
-//               it and the container stays fluid (100%) at that step. Below the
-//               first `container` value the container is fluid anyway.
+//   min       — min-width threshold for [lc], [m]/[p], [col], [ds], [container]
+//               and the html font-size scale.
+//   design    — mockup width the scale is calibrated to. Optional, default = min.
+//   font      — 1rem in px at the design width. Optional, default = $font-size.
+//   container — [container] max-width in px at the design width (emitted in
+//               rem, so it scales too). Optional: omit it and the container
+//               stays fluid (100%) at that step.
 // Insertion order is preserved in the generated output.
 $breakpoints: (
   xs: (min: 360px,  container: 340px),   // phone
@@ -28,44 +39,21 @@ $breakpoints: (
 ) !default;
 
 // ── Scales (contiguous ranges) ──────────────────────────────────────────────
-$fs-max:    10 !default;  // [fs] scale    1..N up (N) and down (dN) → ±N*$fs-scale-step
 $space-max: 25 !default;  // [m] / [p]     0..N
 $gap-max:   15 !default;  // [ds] / [grid] gap   1..N
 $lc-max:    10 !default;  // [lc]          1..N
-$cq-max:    20 !default;  // [container]    1..N (numeric step tokens)
 
 // ── Typography tokens (emitted as CSS custom properties in :root) ───────────
 // Map key = utility value + custom-property suffix; map value = the default.
 // Drive [tx]/[fw] AND --fs-<name>/--fw-<name>; still overridable at runtime.
-//
-// Typography scaling model (see _root.scss / _typography.scss):
-//   --font-size  base env: fluid clamp ramp (outside) / calibrated cqw (inside `query`)
-//   --fs-scale   group multiplier from [fs], inherited, default 1
-//   --fs         = calc(var(--font-size) * var(--fs-scale))   ← single lever
-//   --fs-<key>   = calc(<value> * var(--fs))                  ← size tokens
-//
-// Ramp is a per-segment fluid clamp() through per-breakpoint ANCHORS:
-//   --font-size-base + one --font-size-<bp> per breakpoint (emitted in :root).
-// Between two consecutive anchors --font-size interpolates linearly with 100vw
-// (slope baked at build time — CSS can't divide length/length), clamped to the
-// pair. Anchors are exact at each breakpoint min-width and can be tuned at
-// runtime via the --font-size-<bp> vars (endpoints stay exact; the between-slope
-// stays as configured). For fluid parity inside `query`, set anchors here (the
-// cqw calibration is baked from these values).
-$font-size: 10px !default;   // → --font-size-base (anchor below the first breakpoint)
-$fs-step:   0.75px !default; // default anchor generator: bp n → $font-size + n*$fs-step
-$font-sizes-bp: () !default; // explicit per-breakpoint anchors from the UI, e.g.
-                             //   (md: 14px, lg: 16px, xl: 18px) — others fall back to
-                             //   the $fs-step ramp. Paste real design values here.
-$fs-scale-step: 0.05 !default; // [fs] step size: fs="N" → 1 + N*step, fs="dN" → 1 - N*step
-$font-sizes: (               // [tx="<key>"] → font-size: var(--fs-<key>); value = ×--fs multiplier
-  h1: 3.2,
-  h2: 2.4,
-  h3: 2,
-  h4: 1.8,
-  h5: 1.6,
-  h6: 1.4,
-  p:  1.2,
+$font-sizes: (               // [tx="<key>"] → font-size: var(--fs-<key>)
+  h1: 3.2rem,
+  h2: 2.4rem,
+  h3: 2rem,
+  h4: 1.8rem,
+  h5: 1.6rem,
+  h6: 1.4rem,
+  p:  1.2rem,
 ) !default;
 $font-weights: (             // [fw="<key>"] → --fw-<key>
   'thin':       100,
@@ -80,8 +68,4 @@ $font-weights: (             // [fw="<key>"] → --fw-<key>
 ) !default;
 
 // ── Spacing ─────────────────────────────────────────────────────────────────
-$space-step: 4px !default;   // base unit → --space-step (--sz-step = /4)
-                             // also reused as the fixed step for `static` (--cq-fixed)
-
-// ── Container query scaling ─────────────────────────────────────────────────
-$cq-unit: 0.4 !default;   // cqw step: bare `query` = $cq-unit cqw; token N → N*$cq-unit cqw
+$space-step: 0.4rem !default;   // base unit → --space-step

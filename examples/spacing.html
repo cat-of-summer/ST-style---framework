@@ -49,7 +49,7 @@
 
 <h1 class="title" tx="h1">Отступы — <code class="k">m · mt · mb · p · pt · pb</code></h1>
 <p class="lead">Вертикальные margin/padding задаются числом-множителем шкалы
-  <code class="k">--space-step</code> (по умолчанию <b>4px</b>). Формула:
+  <code class="k">--space-step</code> (по умолчанию <b>0.4rem</b> — 4px на эталонной ширине брейкпоинта). Формула:
   <code class="k">N × var(--space-step)</code>. Всё ниже управляется <b>только</b> атрибутами.
   <b>Полосатый фон</b> вокруг блока показывает <b>margin</b>, <b>голубая рамка</b> вокруг
   синей плашки — <b>padding</b>.</p>
@@ -67,24 +67,24 @@
 
 <!-- ═══════════ шкала ═══════════ -->
 <div class="case" id="scale">
-  <h2 tx="h3">1 · Шкала <code class="k">N × 4px</code></h2>
+  <h2 tx="h3">1 · Шкала <code class="k">N × 0.4rem</code></h2>
   <div class="demo">
     <div class="mwrap">
-      <div class="slab" mt="0">mt="0" → 0px</div>
-      <div class="slab" mt="1">mt="1" → 4px</div>
-      <div class="slab" mt="2">mt="2" → 8px</div>
-      <div class="slab" mt="4">mt="4" → 16px</div>
-      <div class="slab" mt="6">mt="6" → 24px</div>
-      <div class="slab" mt="10">mt="10" → 40px</div>
+      <div class="slab" mt="0">mt="0" → 0</div>
+      <div class="slab" mt="1">mt="1" → 0.4rem</div>
+      <div class="slab" mt="2">mt="2" → 0.8rem</div>
+      <div class="slab" mt="4">mt="4" → 1.6rem</div>
+      <div class="slab" mt="6">mt="6" → 2.4rem</div>
+      <div class="slab" mt="10">mt="10" → 4rem</div>
     </div>
   </div>
-  <pre class="code"><code>&lt;div mt="1"&gt;4px&lt;/div&gt;
-&lt;div mt="2"&gt;8px&lt;/div&gt;
-&lt;div mt="4"&gt;16px&lt;/div&gt;
-&lt;div mt="6"&gt;24px&lt;/div&gt;
-&lt;div mt="10"&gt;40px&lt;/div&gt;</code></pre>
+  <pre class="code"><code>&lt;div mt="1"&gt;0.4rem&lt;/div&gt;
+&lt;div mt="2"&gt;0.8rem&lt;/div&gt;
+&lt;div mt="4"&gt;1.6rem&lt;/div&gt;
+&lt;div mt="6"&gt;2.4rem&lt;/div&gt;
+&lt;div mt="10"&gt;4rem&lt;/div&gt;</code></pre>
   <p class="desc">Каждый плашка отделена от предыдущей своим <code class="k">margin-top</code>.
-    Полосатый фон между ними — это и есть margin (растёт кратно 4px).</p>
+    Полосатый фон между ними — это и есть margin (растёт кратно 0.4rem).</p>
 </div>
 
 <!-- ═══════════ mt / mb ═══════════ -->
@@ -92,16 +92,16 @@
   <h2 tx="h3">2 · <code class="k">mt</code> / <code class="k">mb</code> — верх / низ</h2>
   <div class="demo row">
     <div class="col">
-      <span class="ruler">mt="6" (24px сверху)</span>
+      <span class="ruler">mt="6" (2.4rem сверху)</span>
       <div class="mwrap"><div class="slab" mt="6">mt="6"</div></div>
     </div>
     <div class="col">
-      <span class="ruler">mb="6" (24px снизу)</span>
+      <span class="ruler">mb="6" (2.4rem снизу)</span>
       <div class="mwrap"><div class="slab" mb="6">mb="6"</div></div>
     </div>
   </div>
-  <pre class="code"><code>&lt;section mt="6"&gt;margin-top: 24px&lt;/section&gt;
-&lt;div mb="12"&gt;margin-bottom: 48px&lt;/div&gt;</code></pre>
+  <pre class="code"><code>&lt;section mt="6"&gt;margin-top: 2.4rem&lt;/section&gt;
+&lt;div mb="12"&gt;margin-bottom: 4.8rem&lt;/div&gt;</code></pre>
   <p class="desc"><code class="k">mt</code> → <code class="k">margin-top</code>,
     <code class="k">mb</code> → <code class="k">margin-bottom</code>. Хранят число в
     <code class="k">--mt</code>/<code class="k">--mb</code>, applier домножает на
@@ -114,11 +114,11 @@
   <div class="demo">
     <div class="mwrap">
       <div class="slab">соседний блок</div>
-      <div class="slab" m="5">m="5" → 20px сверху и снизу</div>
+      <div class="slab" m="5">m="5" → 2rem сверху и снизу</div>
       <div class="slab">соседний блок</div>
     </div>
   </div>
-  <pre class="code"><code>&lt;article m="5"&gt;margin-top: 20px + margin-bottom: 20px&lt;/article&gt;</code></pre>
+  <pre class="code"><code>&lt;article m="5"&gt;margin-top: 2rem + margin-bottom: 2rem&lt;/article&gt;</code></pre>
   <p class="desc"><code class="k">m="N"</code> ставит одинаковый вертикальный margin сверху и
     снизу. Полосатые зоны над и под средней плашкой — оба отступа.</p>
 </div>
@@ -128,21 +128,21 @@
   <h2 tx="h3">4 · <code class="k">p</code> / <code class="k">pt</code> / <code class="k">pb</code> — внутренние</h2>
   <div class="demo row">
     <div class="col">
-      <span class="ruler">p="5" (20px внутри, сверху+снизу)</span>
+      <span class="ruler">p="5" (2rem внутри, сверху+снизу)</span>
       <div class="box" p="5"><div class="inner">контент</div></div>
     </div>
     <div class="col">
-      <span class="ruler">pt="8" (32px только сверху)</span>
+      <span class="ruler">pt="8" (3.2rem только сверху)</span>
       <div class="box" pt="8"><div class="inner">контент</div></div>
     </div>
     <div class="col">
-      <span class="ruler">pb="8" (32px только снизу)</span>
+      <span class="ruler">pb="8" (3.2rem только снизу)</span>
       <div class="box" pb="8"><div class="inner">контент</div></div>
     </div>
   </div>
-  <pre class="code"><code>&lt;button p="5"&gt;padding по вертикали 20px&lt;/button&gt;
-&lt;div pt="4 lg-8"&gt;padding-top 16px → 32px на lg&lt;/div&gt;
-&lt;div pb="4"&gt;padding-bottom 16px&lt;/div&gt;</code></pre>
+  <pre class="code"><code>&lt;button p="5"&gt;padding по вертикали 2rem&lt;/button&gt;
+&lt;div pt="4 lg-8"&gt;padding-top 1.6rem → 3.2rem на lg&lt;/div&gt;
+&lt;div pb="4"&gt;padding-bottom 1.6rem&lt;/div&gt;</code></pre>
   <p class="desc">Голубой фон вокруг синей плашки «контент» — это padding.
     <code class="k">p</code> — сверху и снизу, <code class="k">pt</code>/<code class="k">pb</code> — по отдельности.</p>
 </div>
@@ -155,18 +155,18 @@
   <div class="demo">
     <div class="mwrap">
       <div class="slab">якорь</div>
-      <div class="slab" mt="2 lg-10">mt="2 lg-10" → 8px, а с lg (≥1280px) 40px</div>
+      <div class="slab" mt="2 lg-10">mt="2 lg-10" → 0.8rem, а с lg (≥1280px) 4rem</div>
       <div class="slab">якорь</div>
     </div>
     <div class="mwrap" style="margin-top:14px">
       <div class="slab">якорь</div>
-      <div class="slab" mt="4 md-8 lg-12">mt="4 md-8 lg-12" → 16 → 32 (md) → 48 (lg)</div>
+      <div class="slab" mt="4 md-8 lg-12">mt="4 md-8 lg-12" → 1.6 → 3.2 (md) → 4.8rem (lg)</div>
       <div class="slab">якорь</div>
     </div>
   </div>
-  <pre class="code"><code>&lt;section mt="3 lg-6"&gt;   &lt;!-- 12px везде, 24px на lg+ --&gt;
-&lt;div mb="4 md-8 lg-12"&gt; &lt;!-- 16px → 32px (md) → 48px (lg) --&gt;
-&lt;div mt="xs-3"&gt;        &lt;!-- 12px начиная с ≥360px --&gt;</code></pre>
+  <pre class="code"><code>&lt;section mt="3 lg-6"&gt;   &lt;!-- 1.2rem везде, 2.4rem на lg+ --&gt;
+&lt;div mb="4 md-8 lg-12"&gt; &lt;!-- 1.6rem → 3.2rem (md) → 4.8rem (lg) --&gt;
+&lt;div mt="xs-3"&gt;        &lt;!-- 1.2rem начиная с ≥360px --&gt;</code></pre>
   <p class="desc">Префиксы: <code class="k">xs</code> (≥360) · <code class="k">sm</code> (≥576) ·
     <code class="k">md</code> (≥768) · <code class="k">lp</code> (≥1024) ·
     <code class="k">lg</code> (≥1280) · <code class="k">dt</code> (≥1536) ·
@@ -182,21 +182,20 @@
     перемасштабируется одним значением.</p>
   <div class="demo row">
     <div class="col">
-      <span class="ruler">по умолчанию: 4px → p="5" = 20px</span>
-      <div class="box" p="5"><div class="inner">--space-step: 4px</div></div>
+      <span class="ruler">по умолчанию: 0.4rem → p="5" = 2rem</span>
+      <div class="box" p="5"><div class="inner">--space-step: 0.4rem</div></div>
     </div>
     <div class="col">
-      <span class="ruler">--space-step: 8px → p="5" = 40px</span>
-      <div class="box" p="5" style="--space-step: 8px"><div class="inner">--space-step: 8px</div></div>
+      <span class="ruler">--space-step: 0.8rem → p="5" = 4rem</span>
+      <div class="box" p="5" style="--space-step: 0.8rem"><div class="inner">--space-step: 0.8rem</div></div>
     </div>
   </div>
-  <pre class="code"><code>&lt;div style="--space-step: 8px"&gt;
-    &lt;p p="5"&gt;5 × 8px = 40px&lt;/p&gt;
+  <pre class="code"><code>&lt;div style="--space-step: 0.8rem"&gt;
+    &lt;p p="5"&gt;5 × 0.8rem = 4rem&lt;/p&gt;
 &lt;/div&gt;</code></pre>
-  <div class="note">Именно этот приём использует <code class="k">container="query"</code>: правило
-    <code class="k">@container</code> подменяет <code class="k">--space-step</code> на
-    <code class="k">cqw</code> — и все отступы становятся пропорциональны ширине контейнера.
-    См. демо <a href="container-query.html">container-query</a>.</div>
+  <div class="note">Шаг задан в <code class="k">rem</code>, поэтому отступы масштабируются вместе
+    с <code class="k">html { font-size: …vw }</code>: внутри брейкпоинта пропорции отступов и
+    шрифта не меняются. Подробнее о шкале — в <a href="typography.html">typography</a>.</div>
 </div>
 
 </div><!-- /wrap -->

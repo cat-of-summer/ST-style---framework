@@ -4,41 +4,15 @@
 @use 'config' as cfg;
 
 @property --space-step   { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
-@property --cq-step      { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$cq-unit}cqw; }
-@property --fs-scale     { syntax: "<number>";          inherits: true;  initial-value: 1; }
 @property --grid-columns { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-span     { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-start    { syntax: "<integer> | auto";  inherits: false; initial-value: auto; }
 
-// ── Font-size ramp anchors ──────────────────────────────────────────────
-// Ordered points: (min-width, css-var-name, default-size). Base at 0, then one
-// per breakpoint. Default size = explicit $font-sizes-bp anchor or the $fs-step
-// ramp. The css-var is emitted in :root (runtime-tunable); the default size is
-// used to bake the fluid slope between anchors (see below).
-$points: ((0px, --font-size-base, cfg.$font-size),);
-$n: 0;
-@each $bp, $data in cfg.$breakpoints {
-  $n: $n + 1;
-  $def: cfg.$font-size + $n * cfg.$fs-step;
-  @if map.has-key(cfg.$font-sizes-bp, $bp) { $def: map.get(cfg.$font-sizes-bp, $bp); }
-  $points: list.append($points, (map.get($data, min), --font-size-#{$bp}, $def));
-}
-
 :root {
     font-synthesis: none;
-    --fs-scale: 1;
     --font-weight: var(--fw-normal);
-
     --space-step: #{cfg.$space-step};
-    --cq-fixed: var(--space-step);   // fixed step `static` falls back to (tracks themed base)
 
-    // per-breakpoint anchors (paste real UI values or override in project CSS)
-    @each $pt in $points {
-        #{list.nth($pt, 2)}: #{list.nth($pt, 3)};
-    }
-
-    // Size tokens are UNITLESS multipliers of --fs (the effective base). Appliers
-    // multiply them into the real `font-size`, e.g. h1 = calc(var(--fs-h1)*var(--fs)).
     @each $name, $val in cfg.$font-sizes {
         --fs-#{$name}: #{$val};
     }
@@ -47,40 +21,22 @@ $n: 0;
     }
 }
 
-// --fs — effective base = env font-size × group scale. Declared on * so it
-// RE-EVALUATES on every element with that element's own inherited --font-size and
-// --fs-scale. A :root-only `--fs` would freeze at :root's values (custom props
-// inherit their already-substituted computed value), which is why [fs] group
-// scaling and fluid-in-`query` must read a per-element --fs, not a :root one.
-* { --fs: calc(var(--font-size) * var(--fs-scale)); }
+// ── html font-size scale ────────────────────────────────────────────────
+// Per breakpoint: font-size = font / design * 100vw, so 1rem = `font` px at the
+// `design` width and scales linearly with the viewport inside the breakpoint.
+// Below the first breakpoint the first one's scale applies. Plain `html`
+// (not :where) so the reset's `all: unset` doesn't wipe it.
+@function vw-scale($data) {
+  $design: map.get($data, design) or map.get($data, min);
+  $font:   map.get($data, font) or cfg.$font-size;
+  @return math.div($font, $design) * 100vw;
+}
 
-// ── Fluid ramp: one clamp() segment per interval, through the anchors ─────
-// --font-size interpolates linearly with 100vw between consecutive anchors and
-// is clamped to that pair, so it is continuous (no jumps) and hits each anchor
-// exactly at its breakpoint min-width. Endpoints read the runtime vars; the vw
-// slope is baked from the default sizes (CSS can't divide length by length).
-$len: list.length($points);
-@for $i from 1 through $len {
-    $pt:   list.nth($points, $i);
-    $w:    list.nth($pt, 1);
-    $var:  list.nth($pt, 2);
-    $size: list.nth($pt, 3);
+$first: list.nth(map.values(cfg.$breakpoints), 1);
+html { font-size: vw-scale($first); }
 
-    @if $i < $len {
-        $next:  list.nth($points, $i + 1);
-        $wB:    list.nth($next, 1);
-        $varB:  list.nth($next, 2);
-        $sizeB: list.nth($next, 3);
-        $slope: math.div($sizeB - $size, $wB - $w);   // unitless (px/px)
-        $decl:  clamp(var(#{$var}), calc(var(#{$var}) + #{$slope} * (100vw - #{$w})), var(#{$varB}));
-
-        @if $w == 0px {
-            :root { --font-size: #{$decl}; }
-        } @else {
-            @media (min-width: $w) { :root { --font-size: #{$decl}; } }
-        }
-    } @else {
-        // top anchor: plateau (no upper segment)
-        @media (min-width: $w) { :root { --font-size: var(#{$var}); } }
-    }
+@each $bp, $data in cfg.$breakpoints {
+  @media (min-width: map.get($data, min)) {
+    html { font-size: vw-scale($data); }
+  }
 }

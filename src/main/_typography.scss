@@ -2,37 +2,11 @@
 @use 'config' as cfg;
 
 // [tx] — pick a named font-size token (h1..p and any custom keys in $font-sizes).
-// --tx-mult is the unitless multiplier (from --fs-<key>); the real font-size
-// multiplies it into --fs, so it scales with ramp / [fs] / query like everything.
-// Bare [tx] → multiplier 1. Custom runtime: `tx style="--tx-mult: var(--fs-p1)"`.
-*[tx] { font-size: calc(var(--tx-mult, 1) * var(--fs)) !important; }
+// Tokens are rem, so they scale with the html font-size like everything else.
+// Bare [tx] → 1rem. Custom runtime: `tx style="--tx: 1.5rem"`.
+*[tx] { font-size: var(--tx, 1rem) !important; }
 @each $name, $val in cfg.$font-sizes {
-  *[tx="#{$name}"] { --tx-mult: var(--fs-#{$name}); }
-}
-
-// [fs] — group font-size multiplier (signed steps, $fs-scale-step per step):
-//   fs="2"  → ×1.10   fs="d2" → ×0.90   fs="0" → ×1.00
-//   fs="lg-2" / fs="lg-d2" — per breakpoint (mobile-first, larger wins).
-// --fs-scale is inherited, so every --fs-* token inside the subtree scales; a
-// descendant [fs] overrides (absolute, not compounding).
-//
-// The bare font-size below is wrapped in :where() (0 specificity) and emitted in
-// _typography — BEFORE _reset. So element defaults (:where(h1..p)) and project
-// classes win on the element itself (`<p fs="2">` keeps the p multiplier), while
-// plain text (bare <div>/<span> with [fs]) still picks up the scaled base.
-:where(*[fs]) { font-size: var(--fs); }
-
-@for $v from 0 through cfg.$fs-max {
-  *[fs~="#{$v}"]  { --fs-scale: calc(1 + #{$v} * #{cfg.$fs-scale-step}); }
-  *[fs~="d#{$v}"] { --fs-scale: calc(1 - #{$v} * #{cfg.$fs-scale-step}); }
-}
-@each $bp, $data in cfg.$breakpoints {
-  @media (min-width: map.get($data, min)) {
-    @for $v from 0 through cfg.$fs-max {
-      *[fs~="#{$bp}-#{$v}"]  { --fs-scale: calc(1 + #{$v} * #{cfg.$fs-scale-step}); }
-      *[fs~="#{$bp}-d#{$v}"] { --fs-scale: calc(1 - #{$v} * #{cfg.$fs-scale-step}); }
-    }
-  }
+  *[tx="#{$name}"] { --tx: var(--fs-#{$name}); }
 }
 
 // [lc] — line clamp. The clamp is applied only when no "0" value (base or any

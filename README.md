@@ -10,60 +10,51 @@ Markup uses attributes instead of classes:
 ```html
 <section container>
   <div grid gap-4>
-    <article col="12 md-6" p="4 md-8" tx="p" fs="1 md-2">…</article>
+    <article col="12 md-6" p="4 md-8" tx="p">…</article>
   </div>
 </section>
 <button scale="hover" shadow="hover active">Click</button>
 ```
 
-## Container scaling
+## Масштабирование
 
-`[container]` drives fluid, container-relative spacing. All spacing utilities
-(`[m]`/`[p]`/`[gap]`) are multiples of `--space-step`; inside a scaling **source**
-`--space-step` becomes `cqw`, so the whole subtree scales with the container's
-width. Font-size scales in parallel via `--cq-fs` (calibrated so it matches the
-per-breakpoint design px at 100% container width). Три оси задаются одним
-атрибутом, токены через пробел:
+`font-size` у `html` задаётся в `vw` отдельно на каждом брейкпоинте:
+`font / design × 100vw`. На эталонной ширине `design` получается `1rem = font`
+(по умолчанию `design` = `min` брейкпоинта, `font` = 10px). Шрифты (`--fs-*`),
+отступы (`--space-step` = 0.4rem) и max-width `[container]` заданы в `rem`, поэтому
+внутри брейкпоинта вся раскладка масштабируется пропорционально ширине окна и
+выглядит одинаково: md на 768px и на 1000px — одна и та же картинка, просто крупнее.
+На границе брейкпоинта масштаб скачком переходит к шкале следующего. Ниже первого и
+выше последнего брейкпоинта масштабирование продолжается.
 
-| ось | токены | что делает |
-|-----|--------|-----------|
-| **query / static** | `query`, `static`, `md-query`, `lg-static`, … | per-breakpoint: `query` — элемент становится источником (потомки масштабируются в `cqw`); `static` — фиксированный px. `static` побеждает при конфликте. |
-| **число** | `1`, `md-2`, `lg-5`, … | per-breakpoint cq-step: `N → N * $cq-unit` cqw (build-time `$cq-unit = 0.4cqw`, т.е. `1 → 0.4cqw` = bare `query`, `2 → 0.8cqw`, `5 → 2cqw`). На источнике — шаг для потомков; на голом `[container]` — переопределяет шаг **относительно предка-источника**, сам источником не становясь. |
-| **block** | `block` | глобальный флаг: где `query` активен, источник ещё и по высоте (`container-type: size`, включает `cqh`). Под `static` игнорируется. |
+| ширина | 1rem | h1 (3.2rem) |
+|--------|------|-------------|
+| 768px (md) | 10px | 32px |
+| 1023px (md) | 13.3px | 42.6px |
+| 1024px (lp) | 10px | 32px |
 
-```html
-<!-- cqw до md, фикс px md–lg, крупнее (2cqw) от lg -->
-<section container="query md-static lg-5">
-  <article p="4">…</article>
+Размеры из макета переводятся делением на `font`: 16px → `1.6rem`, 320px → `32rem`.
 
-  <!-- ребёнок: свой шаг 0.8cqw ОТНОСИТЕЛЬНО секции-источника, не новый источник -->
-  <div container="md-2 lg-1"><p p="4">…</p></div>
-</section>
+```scss
+@use '@cat-of-summer/st-style/scss/main/config' with (
+  $breakpoints: (
+    xs: (min: 360px,  design: 375px,  container: 343px),
+    md: (min: 768px,  container: 720px),
+    lg: (min: 1280px, design: 1440px, font: 12px, container: 1320px),
+  ),
+  $font-sizes: (h1: 4rem, h2: 3rem, h3: 2.4rem, h4: 2rem, h5: 1.8rem, h6: 1.6rem, p: 1.4rem),
+);
+@use '@cat-of-summer/st-style/scss/main';
 ```
 
-Голый `[container]` — только лэйаут (ширина/центрирование/max-width-ладдер), **не**
-источник масштабирования; добавь `query`, чтобы включить `cqw`.
+Без пересборки токены переопределяются в CSS (`:root { --fs-h1: 4rem }`), шкала — правилом
+на `html`. `[tx="h1"]` ставит размер токена на любой элемент, свой размер —
+`tx style="--tx: 1.8rem"` или просто `font-size: 1.8rem`.
 
-**Множитель — рантайм.** `--cq-step` — множитель отступов внутри `query`, полный
-аналог `--space-step` (снаружи): правило `@container` подставляет `--cq-step` в
-`--space-step`. Переопредели его в CSS/`style`, чтобы ремасштабировать контейнер:
-
-```html
-<div container="query" style="--cq-step: 0.6cqw">…</div>   <!-- как style="--space-step: …" -->
-```
-
-Токены `query`/число — шорткаты для `--cq-step`. Build-time конфиг
-(`src/main/_config.scss`): `$cq-unit` (cqw в одном числовом шаге), `$cq-max` (верхняя
-граница чисел). Рантайм-переменные: `--cq-step` (множитель) и `--cq-fixed` (фикс-шаг
-для `static`, по умолчанию `= --space-step`).
-
-**Сырой `cqw` вручную.** Если пишешь `font-size: 4cqw` в своём CSS — поставь
-`query` на предке: он задаёт `container-type: inline-size`, и `cqw` резолвится
-относительно него. Но сырой `cqw` **не выключается** токеном `static` (он зависит
-от `container-type`, а не от имени `query-ctx`). Штатный шрифт (`h1`–`p`, `[tx]`,
-`--fs-*`) переключается fluid↔fixed автоматически — он идёт через `--font-size` ←
-`--cq-fs` (под `query` калиброванный cqw, под `static` фикс px). Используй эти
-токены, а не сырой `cqw`.
+> [!warning]
+> Шрифт в `vw` почти не реагирует на масштаб браузера (Ctrl +/−): при зуме меняется
+> ширина вьюпорта в CSS-пикселях, и `1rem` пересчитывается обратно. Это плата за
+> жёсткое масштабирование макета.
 
 ## Development
 
@@ -100,13 +91,14 @@ Each bundle has its own config partial in its folder — `src/main/_config.scss`
 and `src/effects/_config.scss` — since the two bundles share no settings.
 
 For `main`, `$breakpoints` is the single source of truth: one map drives all
-responsive utilities and the `[container]` ladder. Each breakpoint has a `min`
-(the `min-width` threshold) and an optional `container` (the `[container]`
-max-width from that step up; omit it to keep the container fluid there). Other
-`main` knobs are scales (`$fs-max`/`$space-max`/`$gap-max`/`$lc-max`), the fluid
-typography ramp (`$fs-step` default anchors + `$font-sizes-bp` per-breakpoint
-overrides, `$fs-scale-step`) and
-typography tokens. For `effects`, `$durations` is the duration map.
+responsive utilities, the `html` font-size scale and the `[container]` ladder.
+Each breakpoint has a `min` (the `min-width` threshold) and optional `design`
+(mockup width, default = `min`), `font` (1rem at that width, default
+`$font-size` = 10px) and `container` (the `[container]` max-width in px at the
+design width, emitted in rem; omit it to keep the container fluid there). Other
+`main` knobs are scales (`$space-max`/`$gap-max`/`$lc-max`), `$space-step` and
+the typography tokens `$font-sizes`/`$font-weights`. For `effects`, `$durations`
+is the duration map.
 
 Every variable has `!default`, so a consumer overrides it **before** loading the
 relevant bundle:

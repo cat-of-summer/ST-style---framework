@@ -108,14 +108,14 @@
 <div class="case">
   <h2 tx="h3">3 · <code class="k">gap</code> — промежутки в flex / grid</h2>
   <div class="demo">
-    <span class="ruler">ds="flex gap-1" (4px)</span>
+    <span class="ruler">ds="flex gap-1" (0.4rem)</span>
     <div ds="flex gap-1"><div class="box">•</div><div class="box">•</div><div class="box">•</div></div>
-    <span class="ruler" style="margin-top:12px">ds="flex gap-6" (24px)</span>
+    <span class="ruler" style="margin-top:12px">ds="flex gap-6" (2.4rem)</span>
     <div ds="flex gap-6"><div class="box">•</div><div class="box">•</div><div class="box">•</div></div>
     <span class="ruler" style="margin-top:12px">ds="flex gap-x-8 gap-y-2" + перенос</span>
     <div ds="flex gap-x-8 gap-y-2" style="flex-wrap:wrap"><div class="box b">1</div><div class="box b">2</div><div class="box b">3</div><div class="box b">4</div><div class="box b">5</div><div class="box b">6</div></div>
   </div>
-  <pre class="code"><code>&lt;div ds="flex gap-4"&gt;         &lt;!-- промежуток 16px --&gt;
+  <pre class="code"><code>&lt;div ds="flex gap-4"&gt;         &lt;!-- промежуток 1.6rem --&gt;
 &lt;div ds="none lg-flex gap-4"&gt; &lt;!-- flex + gap только на lg+ --&gt;
 &lt;div ds="grid gap-x-2 gap-y-9"&gt;</code></pre>
   <p class="desc">Работает и для flex, и для grid. <code class="k">gap-*</code> — обе оси;
