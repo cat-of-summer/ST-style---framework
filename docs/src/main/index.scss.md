@@ -277,9 +277,10 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 > `all: unset` снимает с элементов форм всё: рамку, фон, курсор у `input`, outline фокуса.
 > Поля и кнопки стилизуются с нуля, фокус возвращается своим правилом `:focus-visible`.
 
-- `html`: `font-size` в `vw` по брейкпоинтам (см. «Масштабирование»), `overflow-x: hidden`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
+- `html`: `font-size` в `vw` по брейкпоинтам (см. «Масштабирование»), `overflow-x: hidden`, `scrollbar-gutter: stable`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
 - `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`, `overflow-wrap: break-word`, `hyphens: auto`
 - ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
+- место под полосу прокрутки зарезервировано всегда (`scrollbar-gutter: stable`): макет не сдвигается, когда полоса появляется или скролл блокируют через `overflow: hidden` на `html`/`body`. Блокировкам, которые ставят `body` в `position: fixed` inline-стилем, reset задаёт `width: auto !important; right: 0`, чтобы `body` не заходил под зарезервированное место. На оверлейных полосах (macOS, мобильные) правило ничего не меняет. Отключить — `html { scrollbar-gutter: auto }`
 - `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`
 - `img`, `iframe`: `width: 100%; height: 100%; object-fit: cover; object-position: center`
 - `input`, `textarea`, `button`: `font-size: var(--fs-p)`, `outline: none` при фокусе

@@ -17,6 +17,7 @@
 
 :where(html) {
     overflow-x: hidden;
+    scrollbar-gutter: stable;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
@@ -33,6 +34,14 @@
     line-height: 1;
     overflow-wrap: break-word;
     hyphens: auto;
+}
+
+// Scroll locks that pin body with inline `position: fixed` stretch it to the
+// viewport; with the stable gutter that pushes content under the gutter.
+body[style*="position: fixed"],
+body[style*="position:fixed"] {
+    width: auto !important;
+    right: 0;
 }
 
 :where(main, section, *[container]) {
