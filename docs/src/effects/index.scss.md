@@ -24,7 +24,7 @@
 import '@cat-of-summer/st-style/effects.css';   // → dist/effects.min.css
 ```
 
-Установка пакета (приватный репо, по токену) — см. корневой `README.md`.
+Установка: `npm install @cat-of-summer/st-style` (публичный npm), см. корневой `README.md`.
 
 ---
 

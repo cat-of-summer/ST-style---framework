@@ -1,3 +1,4 @@
+@use 'sass:list';
 @use 'sass:map';
 @use 'sass:math';
 @use 'config' as cfg;
@@ -15,7 +16,6 @@
 }
 
 :where(html) {
-    width: 100vw;
     overflow-x: hidden;
     scroll-behavior: smooth;
     -webkit-text-size-adjust: none;
@@ -27,7 +27,6 @@
 
 :where(body) {
     user-select: none;
-    width: 100vw;
     overflow-x: hidden;
     font-size: var(--fs-p);
     font-weight: var(--font-weight);
@@ -163,13 +162,11 @@
 
 *[icon] > * { flex: auto }
 
+// Transparent hit area around the icon; size it with --icon-area.
 *[icon]::after {
     content: '';
     position: absolute;
-    top: -1em;
-    left: -1em;
-    right: -1em;
-    bottom: -1em;
+    inset: calc(-1 * var(--icon-area, 1rem));
     pointer-events: all;
     background: rgba(0,0,0,0);
     z-index: 10;
@@ -200,15 +197,36 @@
 :where(h6) { font-size: var(--fs-h6) }
 :where(p)  { font-size: var(--fs-p) }
 
-// [container] max-width ladder, from $breakpoints' `container` values. Given in
-// px at the design width, emitted in rem so it scales with the html font-size.
-// Steps without a `container` value are skipped; below the first one it stays fluid.
+// [container] ladder from $breakpoints: `container` → max-width, `gutter` →
+// horizontal padding. Both in px at the design width, emitted in rem so they
+// scale with the html font-size. Steps without a value keep the previous one;
+// below the first step the container is fluid and takes the first step's gutter.
+// box-sizing is border-box, so the gutter is inside `container`.
+@function to-rem($px, $data) {
+  @return math.div($px, map.get($data, font) or cfg.$font-size) * 1rem;
+}
+
+$first: list.nth(map.values(cfg.$breakpoints), 1);
+$first-gutter: map.get($first, gutter);
+@if $first-gutter {
+  :where(*[container]) {
+    padding-left: to-rem($first-gutter, $first);
+    padding-right: to-rem($first-gutter, $first);
+  }
+}
+
 @each $bp, $data in cfg.$breakpoints {
   $cw: map.get($data, container);
-  @if $cw {
-    $font: map.get($data, font) or cfg.$font-size;
+  $gutter: map.get($data, gutter);
+  @if $cw or $gutter {
     @media (min-width: map.get($data, min)) {
-      :where(*[container]) { max-width: math.div($cw, $font) * 1rem; }
+      :where(*[container]) {
+        @if $cw { max-width: to-rem($cw, $data); }
+        @if $gutter {
+          padding-left: to-rem($gutter, $data);
+          padding-right: to-rem($gutter, $data);
+        }
+      }
     }
   }
 }

@@ -27,6 +27,9 @@ $font-size: 10px !default;   // default `font`: 1rem at the design width
 //   container — [container] max-width in px at the design width (emitted in
 //               rem, so it scales too). Optional: omit it and the container
 //               stays fluid (100%) at that step.
+//   gutter    — [container] horizontal padding in px at the design width
+//               (emitted in rem). Optional: a step without it keeps the previous
+//               step's gutter; the first step's gutter also applies below it.
 // Insertion order is preserved in the generated output.
 $breakpoints: (
   xs: (min: 360px,  container: 340px),   // phone

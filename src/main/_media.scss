@@ -1,0 +1,42 @@
+// Breakpoint helpers for project SCSS. Emits no CSS.
+//
+// Reads the same $breakpoints as the bundle, so configure `config` once and
+// forward both from a project partial, e.g. _st.scss:
+//   @forward '@cat-of-summer/st-style/scss/main/config' with ($breakpoints: (...));
+//   @forward '@cat-of-summer/st-style/scss/main/media';
+// then in any file:
+//   @use 'st';
+//   .card { padding: st.rem(24px); @include st.up(lp) { padding: st.rem(40px, lp); } }
+@use 'sass:map';
+@use 'sass:math';
+@use 'config' as cfg;
+
+// Breakpoint data map by name; fails the build on an unknown name.
+@function bp($name) {
+  @if not map.has-key(cfg.$breakpoints, $name) {
+    @error 'Unknown breakpoint `#{$name}`. Known: #{map.keys(cfg.$breakpoints)}.';
+  }
+  @return map.get(cfg.$breakpoints, $name);
+}
+
+// ≥ min of $name — same threshold as the `<bp>-` attribute prefixes.
+@mixin up($name) {
+  @media (min-width: map.get(bp($name), min)) { @content; }
+}
+
+// Below min of $name.
+@mixin down($name) {
+  @media (max-width: map.get(bp($name), min) - 0.02px) { @content; }
+}
+
+// From min of $from up to (not including) min of $to.
+@mixin between($from, $to) {
+  @media (min-width: map.get(bp($from), min)) and (max-width: map.get(bp($to), min) - 0.02px) { @content; }
+}
+
+// Mockup px → rem. With $name, uses that breakpoint's `font`; otherwise $font-size.
+@function rem($px, $name: null) {
+  $font: cfg.$font-size;
+  @if $name { $font: map.get(bp($name), font) or cfg.$font-size; }
+  @return math.div($px, $font) * 1rem;
+}

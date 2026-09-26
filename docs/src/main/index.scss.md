@@ -16,12 +16,45 @@
 
 ---
 
+## Чек-лист: элемент макета → атрибут
+
+Проходить при сборке **каждого** компонента, до того как писать свой CSS. Если элемент попадает
+в строку таблицы, берётся атрибут, а не своё правило с медиазапросом.
+
+| Элемент макета | Атрибут | Пример |
+|----------------|---------|--------|
+| Кнопка-иконка: крестик, бургер, стрелка, соцсеть, «наверх» | `icon` — зона клика шире иконки | `<button icon aria-label="Закрыть">…</button>` |
+| Одноцветная иконка, цвет из CSS | `mask` + `--mask`, `--color` | `<i icon="square" mask style="--mask: url(x.svg)">` |
+| Показать/скрыть на ступени | `ds` | `ds="none lp-flex"` |
+| Flex/grid-ряд с промежутками | `ds="flex gap-N"`, `grid="gap-N"` | `ds="flex gap-4"` |
+| Колонки | `grid` + `col` | `col="12 md-6 lp-4"` |
+| Вертикальные отступы | `m`, `mt`, `mb`, `p`, `pt`, `pb` | `mt="6 lp-12"` |
+| Обёртка секции, поля по бокам | `container` + `gutter` в `$breakpoints` | `<div container>` |
+| Абсолютное/фиксированное позиционирование, центр | `ps` | `ps="absolute center"` |
+| Обрезка, прокрутка по оси | `ov` | `ov="hidden"`, `ov="scroll y"` |
+| Текст в N строк с многоточием | `lc` | `lc="2 lp-3"` |
+| Размер и вес текста из токенов | `tx`, `fw` | `tx="h3" fw="semibold"` |
+| Кастомный чекбокс/радио | `label` + `checkbox`/`radio` | см. «Формы» |
+| HTML из CMS | `.editor` | `<div class="editor">` |
+| Размер по контенту / во весь родитель | `fluid` / `cover` | `fluid`, `cover` |
+| Медиазапрос в своём SCSS | `st.up()`, `st.down()` | см. «SCSS: брейкпоинты в своих стилях» |
+
+> [!warning] Проверить отдельно
+> - **Зона клика не видна** ни на скриншоте, ни в попиксельном сравнении. Мелкие кнопки
+>   (меньше 24px) без `icon` — ошибка, даже если вёрстка совпала с макетом. Проверять и то, что
+>   спрятано в закрытых модалках и меню.
+> - У `[icon]` `box-sizing: content-box`: явный `width` с `padding` увеличивает кнопку.
+> - Reset снимает с `button`, `input`, `textarea` **всё**, включая outline. Фокус возвращать
+>   самостоятельно (`:focus-visible`).
+
+---
+
 ## Подключение
 
-Репозиторий приватный. Установка через npm по токену (см. корневой `README.md`):
+Пакет опубликован в публичном npm, токен не нужен:
 
 ```bash
-npm install "git+https://<PAT>@github.com/cat-of-summer/css_projects.git#v0.1.0"
+npm install @cat-of-summer/st-style
 ```
 
 ```js
@@ -29,13 +62,14 @@ import '@cat-of-summer/st-style/main.css';      // → dist/main.min.css
 import '@cat-of-summer/st-style/effects.css';   // → dist/effects.min.css
 ```
 
-CDN (jsDelivr `/npm/`) заработает после публикации пакета в публичный npm:
+CDN (jsDelivr), версию подставить нужную:
 
 ```
-https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
+https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@<версия>/dist/main.min.css
 ```
 
-Кастомизация при сборке — `@use '.../scss/main/config' with (...)` (см. `README.md`).
+Кастомизация при сборке — `@use '.../scss/main/config' with (...)`, миксины брейкпоинтов для
+своих SCSS — см. «SCSS: брейкпоинты в своих стилях».
 
 ---
 
@@ -64,6 +98,7 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@0.1.0/dist/main.min.css
 | `design` | нет | `min` | ширина макета, к которой откалибрована шкала |
 | `font` | нет | `$font-size` (10px) | чему равен `1rem` на ширине `design` |
 | `container` | нет | fluid | max-width `[container]` в px на ширине `design` |
+| `gutter` | нет | предыдущая ступень | горизонтальные поля `[container]` в px на ширине `design` |
 
 > **Note:** базовое (безпрефиксное) значение действует на всех ширинах. `m="3 lg-6"` —
 > это «3 везде, 6 на lg+». `m="xs-3"` — 3 начиная с ≥360px. Имена/пороги брейкпоинтов
@@ -119,6 +154,50 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 
 Без пересборки шкалу переопределяют правилом на `html` в проектном CSS
 (`@media (min-width: 768px) { html { font-size: calc(12 / 768 * 100vw) } }`).
+
+---
+
+## SCSS: брейкпоинты в своих стилях
+
+Модуль `scss/main/media` (`src/main/_media.scss`) даёт миксины и функции по той же карте
+`$breakpoints`, что и бандл. CSS он не выводит.
+
+| API | Результат |
+|-----|-----------|
+| `@include up(lp) { … }` | `@media (min-width: <min lp>)` — тот же порог, что у префикса `lp-` |
+| `@include down(md) { … }` | `@media (max-width: <min md> − 0.02px)` |
+| `@include between(md, lp) { … }` | от `min md` до `min lp` не включая |
+| `rem(24px)` | `2.4rem` — px макета делятся на `$font-size` |
+| `rem(24px, lp)` | делятся на `font` ступени `lp` |
+| `bp(lp)` | карта ступени; неизвестное имя останавливает сборку с ошибкой |
+
+Чтобы брейкпоинты задавались в одном месте, конфиг настраивается в проектном partial, а все
+файлы подключают его, а не пакет напрямую:
+
+```scss
+// _st.scss
+@forward '@cat-of-summer/st-style/scss/main/config' with (
+  $breakpoints: (
+    xs: (min: 320px,  design: 380px,  container: 340px,  gutter: 20px),
+    md: (min: 768px,  container: 700px),
+    lp: (min: 1024px, design: 1440px, container: 1200px, gutter: 40px),
+  )
+);
+@forward '@cat-of-summer/st-style/scss/main/media';
+```
+
+```scss
+// global.scss
+@use 'st';
+@use '@cat-of-summer/st-style/scss/main';
+
+// header.scss — компилируется отдельно, но видит те же брейкпоинты
+@use 'st';
+.hbar { height: st.rem(56px); @include st.up(lp) { height: st.rem(80px, lp); } }
+```
+
+Своих миксинов `lp`/`md`/`mob` в проекте не заводить: при смене `$breakpoints` они разойдутся
+с фреймворком.
 
 ---
 
@@ -186,18 +265,21 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 Фреймворк включает полный сброс браузерных стилей:
 
 ```css
-*, *::before, *::after {
+:where(*:not(svg, svg *, img, video, canvas, iframe), *::before, *::after) {
+    all: unset;
+    display: revert;
     box-sizing: border-box;
-    margin: 0; padding: 0; border: 0;
-    font-family: inherit;
-    font-style: inherit;
-    color: inherit;
     vertical-align: middle;
 }
 ```
 
+> [!warning]
+> `all: unset` снимает с элементов форм всё: рамку, фон, курсор у `input`, outline фокуса.
+> Поля и кнопки стилизуются с нуля, фокус возвращается своим правилом `:focus-visible`.
+
 - `html`: `font-size` в `vw` по брейкпоинтам (см. «Масштабирование»), `overflow-x: hidden`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
 - `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`, `overflow-wrap: break-word`, `hyphens: auto`
+- ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
 - `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`
 - `img`, `iframe`: `width: 100%; height: 100%; object-fit: cover; object-position: center`
 - `input`, `textarea`, `button`: `font-size: var(--fs-p)`, `outline: none` при фокусе
@@ -292,11 +374,11 @@ Reset фреймворка делает два «агрессивных» шаг
 
 ## Атрибут `ps` — position элемента
 
-Применяется к **любому** элементу. Устанавливает `position` с `!important`. Значение `centered` делает: `left: 50%; top: 50%; transform: translate(-50%, -50%)`.
+Применяется к **любому** элементу. Устанавливает `position` с `!important`. Значение `center` делает: `left: 50%; top: 50%; transform: translate(-50%, -50%)`.
 
 ```html
 <h3 ps="relative">Лёгкий заголовок</h3>
-<span ps="absolute centered">Жирный текст</span>
+<span ps="absolute center">Жирный текст</span>
 <p ps="fixed">Обычный текст</p>
 ```
 
@@ -379,19 +461,22 @@ ps="fixed center-x center-y"
 Применяется к **любому** элементу. Устанавливает `overflow` с `!important`.
 
 ```html
-<h3 ov="">Лёгкий заголовок</h3>
-<span ov="x">Жирный текст</span>
-<p ov="hidden">Обычный текст</p>
-<p ov="scroll-x">Обычный текст</p>
+<div ov="hidden">…</div>
+<div ov="x">…</div>          <!-- содержимое выходит только по горизонтали -->
+<div ov="scroll x">…</div>   <!-- горизонтальная прокрутка -->
 ```
+
+Ось в значении — та, по которой содержимое остаётся доступным; другая ось обрезается через `clip`.
+В паре с `auto` браузер вычисляет `clip` как `hidden` (так требует спецификация), на вид разницы нет.
 
 | Значение          | overflow                                  |
 |-------------------|-------------------------------------------|
 | `ov=""`            | overflow-x: visible; overflow-y: visible |
-| `ov="x"`           | overflow-x: visible; overflow-y: hidden  |
-| `ov="y"`           | overflow-x: hidden; overflow-y: visible  |
-| `ov="scroll x"`    | overflow-x: auto; overflow-y: hidden     |
-| `ov="scroll y"`    | overflow-x: hidden; overflow-y: auto     |
+| `ov="x"`           | overflow-x: visible; overflow-y: clip    |
+| `ov="y"`           | overflow-x: clip; overflow-y: visible    |
+| `ov="scroll"`      | overflow-x: auto; overflow-y: auto       |
+| `ov="scroll x"`    | overflow-x: auto; overflow-y: clip       |
+| `ov="scroll y"`    | overflow-x: clip; overflow-y: auto       |
 | `ov="hidden"`      | overflow-x: hidden; overflow-y: hidden   |
 
 ---
@@ -520,6 +605,20 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 | ≥1920px (xl)  | 160rem | 1600px |
 
 Базовые стили: `position: relative; width: 100%; margin: auto` (через `:where()` — нулевая специфичность, легко переопределяется проектом).
+
+**Горизонтальные поля** — поле `gutter` ступени в `$breakpoints`, в px на ширине `design`. В CSS
+попадает `padding-left/right` в `rem`. Ступень без `gutter` наследует поля предыдущей, ниже первой
+ступени действуют поля первой. `box-sizing: border-box`, поэтому `container` — внешняя ширина,
+поля входят в неё:
+
+```scss
+$breakpoints: (
+  xs: (min: 320px,  design: 380px,  container: 380px,  gutter: 20px),  // контент 340px
+  lp: (min: 1024px, design: 1440px, container: 1280px, gutter: 40px),  // контент 1200px
+)
+```
+
+В дефолтной карте `gutter` не задан, контейнер без полей.
 
 ### Паттерн вёрстки секции
 
@@ -663,9 +762,15 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 
 ## Атрибут `icon`
 
-Создаёт flex-контейнер для иконок с увеличенной зоной клика.
+Создаёт flex-контейнер для иконок с увеличенной зоной клика. Ставится на **каждую** кнопку,
+видимая часть которой — иконка: крестик модалки, бургер, поиск, стрелки слайдера и пагинации,
+соцсети, «наверх».
 
 ```html
+<button icon aria-label="Закрыть">
+    <svg width="15" height="15">…</svg>
+</button>
+
 <div icon="">
     <svg ...></svg>
 </div>
@@ -682,8 +787,18 @@ mt="xl-0" ... mt="xl-25"                    -- ≥1920px
 - `cursor: pointer`
 - `width: max-content; height: max-content`
 - `box-sizing: content-box`
-- `::after` — расширяет зону клика на `1rem` во все стороны (прозрачный слой, `z-index: 10`)
+- `::after` — расширяет зону клика на `var(--icon-area, 1rem)` во все стороны (прозрачный слой, `z-index: 10`)
 - Дочерние элементы: `flex: auto`
+
+**Размер зоны** — переменная `--icon-area`: `style="--icon-area: 1.5rem"` или правилом в классе.
+Иконка 15×15 с зоной `1rem` на эталоне даёт цель 35×35px.
+
+**С явными размерами.** Класс проекта с той же специфичностью, подключённый после фреймворка,
+перебивает `width/height: max-content`, так что `width: 1.5rem; height: 1.5rem` работает. Но
+`box-sizing` остаётся `content-box`: `padding` добавится к размеру, а не войдёт в него.
+
+Слой `::after` перекрывает соседей на `--icon-area`. Если две иконки стоят ближе, чем
+`2 × --icon-area`, уменьшить переменную, чтобы зоны не накладывались.
 
 **Паттерн для иконки через маску:**
 

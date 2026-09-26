@@ -9,7 +9,7 @@ Markup uses attributes instead of classes:
 
 ```html
 <section container>
-  <div grid gap-4>
+  <div grid="gap-4">
     <article col="12 md-6" p="4 md-8" tx="p">…</article>
   </div>
 </section>
@@ -68,8 +68,8 @@ Source layout:
 
 ```
 src/
-  _config.scss                              # build-time config (shared partial)
   main/      index.scss + _*.scss partials  # → dist/main.min.css
+             _config.scss (build config), _media.scss (SCSS helpers, no CSS)
   effects/   index.scss + _*.scss partials  # → dist/effects.min.css
 ```
 
@@ -94,11 +94,26 @@ For `main`, `$breakpoints` is the single source of truth: one map drives all
 responsive utilities, the `html` font-size scale and the `[container]` ladder.
 Each breakpoint has a `min` (the `min-width` threshold) and optional `design`
 (mockup width, default = `min`), `font` (1rem at that width, default
-`$font-size` = 10px) and `container` (the `[container]` max-width in px at the
-design width, emitted in rem; omit it to keep the container fluid there). Other
+`$font-size` = 10px), `container` (the `[container]` max-width in px at the
+design width, emitted in rem; omit it to keep the container fluid there) and
+`gutter` (the `[container]` horizontal padding in px at the design width; a step
+without it keeps the previous one). Other
 `main` knobs are scales (`$space-max`/`$gap-max`/`$lc-max`), `$space-step` and
 the typography tokens `$font-sizes`/`$font-weights`. For `effects`, `$durations`
 is the duration map.
+
+Project SCSS gets the same breakpoints from `scss/main/media` (`up`, `down`,
+`between`, `rem`). Configure once in a project partial and `@use` it everywhere:
+
+```scss
+// _st.scss
+@forward '@cat-of-summer/st-style/scss/main/config' with ($breakpoints: ( … ));
+@forward '@cat-of-summer/st-style/scss/main/media';
+
+// any file
+@use 'st';
+.card { @include st.up(lp) { padding: st.rem(40px, lp); } }
+```
 
 Every variable has `!default`, so a consumer overrides it **before** loading the
 relevant bundle:
@@ -129,16 +144,16 @@ properties — override `--space-step`, `--fs-h1`, `--td-fast`, … in your own 
 Releases are triggered by **pushing a `v*` tag** (not by ordinary pushes):
 
 ```bash
-git tag v0.3.2
-git push origin v0.3.2
+git tag v1.2.3
+git push origin v1.2.3
 ```
 
-`.github/workflows/release.yml` builds `dist/`, creates a GitHub Release with
-`main.min.css` and `effects.min.css` attached, and — when the environment
-variable `PUBLISH_METHOD=npm` is set — publishes the package to **npm**
-(registry.npmjs.org) and **GitHub Packages**. The published version is derived
-from the tag (`v0.3.2` → `0.3.2`), so the tag is the source of truth. Ordinary
-pushes run only `ci-cd.yml`, which validates that the SCSS compiles.
+`.github/workflows/ci-cd.yml` (reusable workflow from `cat-of-summer/git_toolkit`)
+runs on every push. On a `v*` tag it additionally builds `dist/`, creates a GitHub
+Release with `main.min.css` and `effects.min.css` attached and, with
+`PUBLISH_METHOD=npm`, publishes the package to **npm** (registry.npmjs.org). The
+published version is derived from the tag (`v1.2.3` → `1.2.3`), so the tag is the
+source of truth.
 
 ## A. Use via npm
 
@@ -173,5 +188,5 @@ import '@cat-of-summer/st-style/effects.css';
 К каждому GitHub Release прикреплены скомпилированные файлы:
 
 ```bash
-gh release download v0.3.2 -R cat-of-summer/ST-style---framework
+gh release download v1.2.3 -R cat-of-summer/ST-style---framework
 ```
