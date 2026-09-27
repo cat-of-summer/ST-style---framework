@@ -232,8 +232,11 @@
 <div class="case">
   <h2 tx="h3">8 · Reset-типографика (автоматически)</h2>
   <div class="demo">
-    <p class="tag">text-wrap: balance (заголовки) — ровные строки</p>
-    <h2>Достаточно длинный заголовок, чтобы увидеть балансировку переносов по строкам</h2>
+    <p class="tag">h1–h6 без атрибута — жадный перенос, как в Figma</p>
+    <h2 style="max-width:32rem">Достаточно длинный заголовок, чтобы увидеть балансировку переносов по строкам</h2>
+
+    <p class="tag" style="margin-top:14px">[balance] — строки выровнены по длине</p>
+    <h2 balance style="max-width:32rem">Достаточно длинный заголовок, чтобы увидеть балансировку переносов по строкам</h2>
 
     <p class="tag" style="margin-top:14px">text-wrap: pretty (p) — нет висячих строк</p>
     <p>Абзац с включённым pretty: последняя строка не остаётся с одним «висячим» словом, а перенос распределяется аккуратнее по всему блоку текста.</p>
@@ -242,11 +245,12 @@
     <p style="width:18rem; border:1px solid #e3e6ea; padding:6px">Переносослияниепереносослияние — узкая колонка демонстрирует переносы по слогам.</p>
   </div>
   <pre class="code"><code>&lt;!-- применяется автоматически reset'ом, без атрибутов --&gt;
-&lt;h2&gt;...&lt;/h2&gt;  /* text-wrap: balance */
 &lt;p&gt;...&lt;/p&gt;    /* text-wrap: pretty; hyphens: auto */
-&lt;html lang="ru"&gt; &lt;!-- нужен для hyphens --&gt;</code></pre>
-  <p class="desc">Эти правила из CSS Reset применяются к <code class="k">h1–h6</code> и
-    <code class="k">p</code> без атрибутов. Полный список reset — в
+&lt;html lang="ru"&gt; &lt;!-- нужен для hyphens --&gt;
+&lt;!-- баланс строк — по атрибуту --&gt;
+&lt;h2 balance&gt;...&lt;/h2&gt;  /* text-wrap: balance */</code></pre>
+  <p class="desc">Правила из CSS Reset применяются к <code class="k">p</code> без атрибутов;
+    <code class="k">balance</code> включается вручную на любом элементе. Полный список reset — в
     <a href="../docs/src/main/index.scss.md">документации</a>.</p>
 </div>
 

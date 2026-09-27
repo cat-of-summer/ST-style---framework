@@ -5,7 +5,8 @@
   --grid-columns: 12;
 
   display: grid;
-  grid-template-columns: repeat(var(--grid-columns), 1fr)
+  // minmax(0, 1fr): plain 1fr = minmax(auto, 1fr) grows a track to its min-content.
+  grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr))
 }
 
 *[grid~="10"] { --grid-columns: 10; }

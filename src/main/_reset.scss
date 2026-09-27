@@ -10,6 +10,11 @@
     vertical-align: middle;
 }
 
+// `all: unset; display: revert` beats the UA `[hidden] { display: none }`.
+// 0,2,0 + !important also wins over [ds] (0,1,0 !important). until-found
+// keeps its UA behaviour (content-visibility), display:none would break it.
+[hidden]:not([hidden="until-found"]) { display: none !important; }
+
 :where(svg, svg *, img, video, canvas, iframe) {
     box-sizing: border-box;
     vertical-align: middle;
@@ -151,6 +156,9 @@ body[style*="position:fixed"] {
     height: 100%
 }
 
+// Balanced line lengths. Opt-in: Figma wraps greedily, so headings stay greedy by default.
+*[balance] { text-wrap: balance }
+
 *[icon] {
     display: flex;
     justify-content: center;
@@ -195,7 +203,6 @@ body[style*="position:fixed"] {
     overflow-wrap: break-word
 }
 
-:where(h1, h2, h3, h4, h5, h6) { text-wrap: balance }
 :where(p) { text-wrap: pretty }
 
 :where(h1) { font-size: var(--fs-h1) }

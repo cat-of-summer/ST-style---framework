@@ -86,7 +86,8 @@
   <pre class="code"><code>&lt;div grid=""&gt;   &lt;!-- 12 колонок (по умолчанию) --&gt;
 &lt;div grid="12"&gt; &lt;!-- то же самое, явно --&gt;
 &lt;div grid="10"&gt; &lt;!-- 10 колонок --&gt;</code></pre>
-  <p class="desc">Применяет <code class="k">display: grid; grid-template-columns: repeat(N, 1fr)</code>.
+  <p class="desc">Применяет <code class="k">display: grid; grid-template-columns: repeat(N, minmax(0, 1fr))</code>:
+    колонки не раздуваются по min-content содержимого.
     Число колонок — в <code class="k">--grid-columns</code>.</p>
 </div>
 

@@ -40,3 +40,10 @@
   @if $name { $font: map.get(bp($name), font) or cfg.$font-size; }
   @return math.div($px, $font) * 1rem;
 }
+
+// Grid track that never grows past its share: 1fr = minmax(auto, 1fr) stretches
+// to min-content (nowrap text, long words). fr(2) → minmax(0, 2fr).
+@function fr($n: 1) { @return minmax(0, $n * 1fr); }
+
+// N equal columns without min-content blow-up.
+@mixin cols($n) { grid-template-columns: repeat($n, fr()); }
