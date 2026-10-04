@@ -16,6 +16,12 @@
 // whole layout scales proportionally with the viewport and looks identical.
 // At a breakpoint boundary the scale jumps to the next breakpoint's ratio.
 // Below the first / above the last breakpoint the scaling just continues.
+//
+// $scale: false switches the vw scale off (apps, dashboards): html font-size
+// becomes a fixed percentage per breakpoint (`font` / 16px, 10px → 62.5%), so
+// 1rem still equals `font` px at every breakpoint, but controls no longer grow
+// with the window and browser zoom / user font size are respected.
+$scale: true !default;
 $font-size: 10px !default;   // default `font`: 1rem at the design width
 
 // ── Responsive breakpoints (single source of truth) ─────────────────────────
@@ -72,3 +78,8 @@ $font-weights: (             // [fw="<key>"] → --fw-<key>
 
 // ── Spacing ─────────────────────────────────────────────────────────────────
 $space-step: 0.4rem !default;   // base unit → --space-step
+
+// ── Reset behaviour ─────────────────────────────────────────────────────────
+// body user-select. `auto` (default) emits nothing; `none` forbids text
+// selection site-wide (landings) while inputs and contenteditable stay selectable.
+$user-select: auto !default;

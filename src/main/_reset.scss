@@ -32,7 +32,7 @@
 }
 
 :where(body) {
-    user-select: none;
+    @if cfg.$user-select != auto { user-select: cfg.$user-select; }
     overflow-x: hidden;
     font-size: var(--fs-p);
     font-weight: var(--font-weight);
@@ -73,8 +73,9 @@ body[style*="position:fixed"] {
 
 :where(input, textarea, button) { font-size: var(--fs-p) }
 :where(input::placeholder, textarea::placeholder) { font-size: inherit; font-weight: inherit; line-height: inherit; }
-:where(textarea:focus, input:focus, button:focus) { outline: none }
-:where(input, textarea) { -webkit-user-select: auto; }
+@if cfg.$user-select != auto {
+    :where(input, textarea) { -webkit-user-select: auto; user-select: auto; }
+}
 :where(textarea) { white-space: revert; }
 ::placeholder { color: unset; }
 
@@ -131,7 +132,7 @@ body[style*="position:fixed"] {
     -webkit-user-modify: read-write;
     -moz-user-modify: read-write;
     overflow-wrap: break-word;
-    -webkit-user-select: auto;
+    @if cfg.$user-select != auto { -webkit-user-select: auto; user-select: auto; }
 }
 
 :where(dialog:modal) {
@@ -198,6 +199,14 @@ body[style*="position:fixed"] {
 }
 
 :where(a, button) { cursor: pointer }
+
+// `all: unset` above also wipes the UA focus ring. Bring it back for keyboard
+// focus only (WCAG 2.4.7); mouse focus stays ringless. Specificity 0 — restyle
+// with your own `:focus-visible { outline: … }`.
+:where(:focus-visible) {
+    outline: revert;
+    outline-offset: revert;
+}
 
 :where(h1, h2, h3, h4, h5, h6, p) {
     overflow-wrap: break-word

@@ -54,7 +54,28 @@ Markup uses attributes instead of classes:
 > [!warning]
 > Шрифт в `vw` почти не реагирует на масштаб браузера (Ctrl +/−): при зуме меняется
 > ширина вьюпорта в CSS-пикселях, и `1rem` пересчитывается обратно. Это плата за
-> жёсткое масштабирование макета.
+> жёсткое масштабирование макета. При `$scale: false` (ниже) этого эффекта нет.
+
+### Без масштабирования (`$scale: false`)
+
+Для приложений и админок, где кнопки и поля не должны расти вместе с окном,
+масштабирование выключается флагом:
+
+```scss
+@use '@cat-of-summer/st-style/scss/main/config' with ($scale: false);
+@use '@cat-of-summer/st-style/scss/main';
+```
+
+Тогда `html { font-size }` на каждом брейкпоинте — фиксированный процент от
+браузерных 16px: `font / 16px × 100%` (10px → `62.5%`). `1rem` по-прежнему равен
+`font`, так что токены, `rem()` и `[container]` считаются так же, но учитываются
+зум и размер шрифта, выбранный пользователем в браузере.
+
+С готовым `main.css` то же самое делается без пересборки — правилом в своём CSS:
+
+```css
+html { font-size: 62.5% }
+```
 
 ## Development
 
@@ -98,9 +119,11 @@ Each breakpoint has a `min` (the `min-width` threshold) and optional `design`
 design width, emitted in rem; omit it to keep the container fluid there) and
 `gutter` (the `[container]` horizontal padding in px at the design width; a step
 without it keeps the previous one). Other
-`main` knobs are scales (`$space-max`/`$gap-max`/`$lc-max`), `$space-step` and
-the typography tokens `$font-sizes`/`$font-weights`. For `effects`, `$durations`
-is the duration map.
+`main` knobs are scales (`$space-max`/`$gap-max`/`$lc-max`), `$space-step`,
+the typography tokens `$font-sizes`/`$font-weights`, `$scale` (`true` — vw scale,
+`false` — fixed rem, see «Без масштабирования») and `$user-select` (`auto` by
+default; `none` forbids text selection on `body`, inputs and contenteditable stay
+selectable). For `effects`, `$durations` is the duration map.
 
 Project SCSS gets the same breakpoints from `scss/main/media` (`up`, `down`,
 `between`, `rem`). Configure once in a project partial and `@use` it everywhere:
@@ -138,6 +161,66 @@ relevant bundle:
 
 Runtime theming (colours, step sizes, durations) is done with CSS custom
 properties — override `--space-step`, `--fs-h1`, `--td-fast`, … in your own CSS.
+
+## Фокус
+
+Reset снимает со всех элементов стили браузера (`all: unset`), но кольцо фокуса
+возвращает для фокуса с клавиатуры: `:where(:focus-visible) { outline: revert }`.
+При клике мышью рамки нет. Специфичность нулевая, поэтому своё кольцо задаётся
+обычным правилом:
+
+```css
+:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+```
+
+Убирать кольцо целиком нельзя: с клавиатуры станет не видно, где фокус (WCAG 2.4.7).
+
+## Тёмная тема
+
+Цветов и тем во фреймворке нет, это задача проекта. Каркас переключения: системная
+тема по умолчанию, явный выбор пользователя в `data-theme` на `<html>`, который
+хранится в куке.
+
+```css
+:root {
+  color-scheme: light dark;
+  --bg: #fff;
+  --fg: #16181d;
+}
+/* Системная тёмная, если пользователь не выбрал светлую явно */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #16181d; --fg: #e7eaf0; }
+}
+/* Явный выбор */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; --bg: #16181d; --fg: #e7eaf0; }
+
+body { background: var(--bg); color: var(--fg); }
+```
+
+Переключатель (`theme` = `light` / `dark` / `auto`):
+
+```js
+function setTheme(theme) {
+  const root = document.documentElement;
+  if (theme === 'auto') root.removeAttribute('data-theme');
+  else root.dataset.theme = theme;
+  document.cookie = `theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
+}
+```
+
+Чтобы страница не мигала светлой темой при загрузке, `data-theme` должен стоять до
+первой отрисовки. Лучше всего — проставить его на сервере из куки при рендере
+`<html>`. Если сервера нет — инлайн-скрипт в `<head>` до подключения CSS:
+
+```html
+<script>
+  const t = document.cookie.match(/(?:^|; )theme=(light|dark)/);
+  if (t) document.documentElement.dataset.theme = t[1];
+</script>
+```
+
+Кука, а не `localStorage`, — как раз для того, чтобы тему видел сервер.
 
 ## Releasing
 

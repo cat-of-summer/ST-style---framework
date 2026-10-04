@@ -26,17 +26,27 @@
 // `design` width and scales linearly with the viewport inside the breakpoint.
 // Below the first breakpoint the first one's scale applies. Plain `html`
 // (not :where) so the reset's `all: unset` doesn't wipe it.
-@function vw-scale($data) {
+// With $scale: false it is a fixed percentage of the browser default (16px),
+// so 1rem = `font` px regardless of the viewport.
+@function html-font($data) {
+  $font: map.get($data, font) or cfg.$font-size;
+  @if not cfg.$scale { @return math.div($font, 16px) * 100%; }
   $design: map.get($data, design) or map.get($data, min);
-  $font:   map.get($data, font) or cfg.$font-size;
   @return math.div($font, $design) * 100vw;
 }
 
+// Steps whose value equals the previous one are skipped: the first breakpoint
+// (it repeats the base rule) and, with $scale: false, steps with an unchanged `font`.
 $first: list.nth(map.values(cfg.$breakpoints), 1);
-html { font-size: vw-scale($first); }
+$prev: html-font($first);
+html { font-size: $prev; }
 
 @each $bp, $data in cfg.$breakpoints {
-  @media (min-width: map.get($data, min)) {
-    html { font-size: vw-scale($data); }
+  $size: html-font($data);
+  @if $size != $prev {
+    @media (min-width: map.get($data, min)) {
+      html { font-size: $size; }
+    }
   }
+  $prev: $size;
 }
