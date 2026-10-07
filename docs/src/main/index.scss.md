@@ -99,6 +99,30 @@ https://cdn.jsdelivr.net/npm/@cat-of-summer/st-style@<версия>/dist/main.mi
 Кастомизация при сборке — `@use '.../scss/main/config' with (...)`, миксины брейкпоинтов для
 своих SCSS — см. «SCSS-хелперы: брейкпоинты и сетки».
 
+### Проверка CSS-переменных
+
+Ссылка на необъявленную переменную (`var(--bgColor-attention-emphasis)` при опечатке или
+переименовании токена) проходит молча: свойство становится невалидным и сбрасывается. Пакет
+ставит CLI `st-style-check-vars`, который находит такие ссылки в собранном CSS:
+
+```bash
+npx st-style-check-vars --strict dist/ node_modules/@cat-of-summer/st-style/dist/
+# dist/assets/app.css:1:5821  --bgColor-attention-emphasis is not defined
+```
+
+- Проверяются `var(--x)` **без** fallback, в том числе вложенные в fallback (`var(--y, var(--x))`).
+  `var(--x, …)` не помечается.
+- Объявления (`--x: …`, `@property --x`) собираются со **всех** переданных файлов и каталогов
+  разом, поэтому CSS фреймворка передаётся вместе с проектным.
+- `--strict` — код выхода 1 при находках (CI, `postbuild`, шаг после purge). Без него — только
+  предупреждения.
+- `--ignore <префикс>` (повторяемый) — пропустить переменные, которые задаются из JS или
+  inline-стилем: `--ignore --js-`.
+
+Из Node — та же проверка функцией:
+`import { findUndefinedVars } from '@cat-of-summer/st-style/check-vars'`, на входе
+`[{ file, css }]`. Сборка самого фреймворка (`npm run build`) прогоняет её по своему `dist/`.
+
 ---
 
 ## Брейкпоинты
@@ -305,7 +329,6 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
     all: unset;
     display: revert;
     box-sizing: border-box;
-    vertical-align: middle;
 }
 ```
 
@@ -317,9 +340,10 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 - `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`, `overflow-wrap: break-word`, `hyphens: auto`
 - ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
 - место под полосу прокрутки зарезервировано всегда (`scrollbar-gutter: stable`): макет не сдвигается, когда полоса появляется или скролл блокируют через `overflow: hidden` на `html`/`body`. Блокировкам, которые ставят `body` в `position: fixed` inline-стилем, reset задаёт `width: auto !important; right: 0`, чтобы `body` не заходил под зарезервированное место. На оверлейных полосах (macOS, мобильные) правило ничего не меняет. Отключить — `html { scrollbar-gutter: auto }`
+- `vertical-align: middle` — только у медиа (`svg`, `img`, `video`, `canvas`, `iframe`), полей (`input`, `select`, `textarea`, `button`, `meter`, `progress`), `span[checkbox|radio]` и `[icon~="inline"]`. Строчный текст (`mark`, `code`, `a`, `span`) стоит на `baseline`: с `middle` строчный элемент другого размера проседал ниже строки на 1–2px
 - `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`
 - `img`, `iframe`: `width: 100%; height: 100%; object-fit: cover; object-position: center`
-- `input`, `textarea`, `button`: `font-size: var(--fs-p)`, `outline: none` при фокусе
+- `input`, `textarea`, `button`: `font-size: var(--fs-p)`; outline фокуса снят `all: unset` и возвращён только для `:focus-visible`
 - `textarea`: `resize: vertical; field-sizing: content`
 - `table`: `border-collapse: collapse; border-spacing: 0`
 - `li`: `list-style: none`
@@ -362,7 +386,8 @@ Reset фреймворка делает два «агрессивных» шаг
 
 | Что пропало | Почему | Как вернуть |
 |-------------|---------|-------------|
-| Outline фокуса у ссылок, кнопок, полей | `all: unset`, `outline: none` на `:focus` | своё правило `:focus-visible { outline: … }` |
+| Outline фокуса мышью у ссылок, кнопок, полей | `all: unset`; для клавиатуры возвращён через `:where(:focus-visible)` | свой стиль — правило `:focus-visible { outline: … }` |
+| `vertical-align: middle` у строчного текста | намеренно: `mark`, `code`, `a` проседали ниже строки | `vertical-align: middle` на нужном элементе |
 | Рамка, фон, `appearance` у `input`, `button`, `select` | `all: unset` | стилизовать с нуля или `appearance: revert` |
 | Маркеры списков | `li { list-style: none }` | `li { list-style: revert }` — `.editor` маркеры тоже не возвращает |
 | Отступы и жирность у `h1–h6`, `p`, `ul`, `blockquote` | `all: unset` | `m`/`p`, `fw`, свой CSS; для CMS-контента — `.editor` |
@@ -846,6 +871,7 @@ min-content (в отличие от голого `1fr`). Длинное слов
 - `box-sizing: content-box`
 - `::after` — расширяет зону клика на `var(--icon-area, 1rem)` во все стороны (прозрачный слой, `z-index: 10`)
 - Дочерние элементы: `flex: auto`
+- `icon="inline"`: `display: inline-flex; vertical-align: middle` — иконка в строке текста центрируется по нему
 
 **Размер зоны** — переменная `--icon-area`: `style="--icon-area: 1.5rem"` или правилом в классе.
 Иконка 15×15 с зоной `1rem` на эталоне даёт цель 35×35px.

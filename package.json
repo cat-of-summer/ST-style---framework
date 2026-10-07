@@ -10,19 +10,25 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "scripts/check-vars.mjs"
   ],
+  "bin": {
+    "st-style-check-vars": "scripts/check-vars.mjs"
+  },
   "main": "dist/main.min.css",
   "style": "dist/main.min.css",
   "sass": "src/main/index.scss",
   "exports": {
     "./main.css": "./dist/main.min.css",
     "./effects.css": "./dist/effects.min.css",
+    "./check-vars": "./scripts/check-vars.mjs",
     "./scss/*": "./src/*"
   },
   "scripts": {
     "build": "node scripts/build.mjs",
     "watch": "node scripts/build.mjs --watch",
+    "check:vars": "node scripts/check-vars.mjs --strict dist",
     "prepare": "node scripts/build.mjs",
     "prepack": "node scripts/build.mjs"
   },

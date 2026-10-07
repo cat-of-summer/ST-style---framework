@@ -7,7 +7,6 @@
     all: unset;
     display: revert;
     box-sizing: border-box;
-    vertical-align: middle;
 }
 
 // `all: unset; display: revert` beats the UA `[hidden] { display: none }`.
@@ -19,6 +18,10 @@
     box-sizing: border-box;
     vertical-align: middle;
 }
+
+// Inline text stays on baseline (the unset value): middle would drop a
+// smaller inline (mark, code, a) below the line. Only boxes get centred.
+:where(input, select, textarea, button, meter, progress) { vertical-align: middle; }
 
 :where(html) {
     overflow-x: hidden;
@@ -176,7 +179,10 @@ body[style*="position:fixed"] {
     aspect-ratio: 1 / 1;
 }
 
-*[icon~="inline"] { display: inline-flex }
+*[icon~="inline"] {
+    display: inline-flex;
+    vertical-align: middle;
+}
 
 *[icon] > * { flex: auto }
 

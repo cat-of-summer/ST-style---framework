@@ -7,8 +7,9 @@
 // is picked up automatically — no changes here needed.
 
 import { compile } from 'sass';
-import { readdirSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
+import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
+import { findUndefinedVars } from './check-vars.mjs';
 
 const SRC = 'src';
 const OUT = 'dist';
@@ -39,6 +40,11 @@ function buildAll() {
   for (const { name, entry } of bundles) {
     writeFileSync(`${OUT}/${name}.min.css`, compile(entry, { style: 'compressed' }).css);
     console.log(`built ${name}.min.css`);
+  }
+  // Warn only: a typo in a var() name must not break watch mode.
+  const css = bundles.map(({ name }) => ({ file: `${OUT}/${name}.min.css`, css: readFileSync(`${OUT}/${name}.min.css`, 'utf8') }));
+  for (const { file, line, column, name } of findUndefinedVars(css)) {
+    console.warn(`${file}:${line}:${column}  ${name} is not defined`);
   }
 }
 

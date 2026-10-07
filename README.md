@@ -83,6 +83,7 @@ html { font-size: 62.5% }
 npm install      # installs sass, builds dist/ via the prepare script
 npm run build    # compile src/ → dist/*.min.css
 npm run watch    # rebuild on change
+npm run check:vars  # fail on var(--x) with no --x declared in dist/ (also: npx st-style-check-vars)
 ```
 
 Source layout:
