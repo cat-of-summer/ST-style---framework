@@ -202,9 +202,7 @@ Reset снимает со всех элементов стили браузер�
 body { background: var(--bg); color: var(--fg); }
 ```
 
-Переключатель и скрипт против вспышки уже есть в st-script — модуль `theme`
-(`Theme.toggle()`, `Theme.set()`, событие `theme:change`, `Theme.script()` для `<head>`).
-Без него — вручную (`theme` = `light` / `dark` / `auto`):
+Переключатель (`theme` = `light` / `dark` / `auto`):
 
 ```js
 function setTheme(theme) {
