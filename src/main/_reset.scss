@@ -9,10 +9,21 @@
     box-sizing: border-box;
 }
 
-// `all: unset; display: revert` beats the UA `[hidden] { display: none }`.
-// 0,2,0 + !important also wins over [ds] (0,1,0 !important). until-found
-// keeps its UA behaviour (content-visibility), display:none would break it.
-[hidden]:not([hidden="until-found"]) { display: none !important; }
+[hidden]:not([hidden~="off"]):not([hidden~="visually"]) {
+    display: none !important;
+}
+
+[hidden~="visually"]:not(:focus-within) {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
 
 :where(svg, svg *, img, video, canvas, iframe) {
     box-sizing: border-box;
@@ -39,9 +50,9 @@
     overflow-x: hidden;
     font-size: var(--fs-p);
     font-weight: var(--font-weight);
-    line-height: 1;
+    line-height: cfg.$line-height;
     overflow-wrap: break-word;
-    hyphens: auto;
+    hyphens: cfg.$hyphens;
 }
 
 // Scroll locks that pin body with inline `position: fixed` stretch it to the
@@ -131,6 +142,14 @@ body[style*="position:fixed"] {
 
 :where(meter) { -webkit-appearance: revert; appearance: revert; }
 
+// `all: unset` leaves a bare checkbox, radio or range with no box at all.
+// Native look is back at specificity 0: a custom control sets appearance: none.
+:where(input:is([type="checkbox"], [type="radio"], [type="range"])) {
+    -webkit-appearance: auto;
+    appearance: auto;
+}
+:where(input:is([type="checkbox"], [type="radio"])) { cursor: pointer; }
+
 :where([contenteditable]:not([contenteditable="false"])) {
     -webkit-user-modify: read-write;
     -moz-user-modify: read-write;
@@ -196,7 +215,9 @@ body[style*="position:fixed"] {
     z-index: 10;
 }
 
-*[mask] {
+// Not on form fields: st-script Mask uses the same attribute for input masks.
+// :where keeps the specificity at 0,1,0.
+*[mask]:where(:not(input, textarea, select)) {
     --mask: '';
     --color: #000;
 
@@ -260,4 +281,15 @@ $first-gutter: map.get($first, gutter);
       }
     }
   }
+}
+
+@if cfg.$reduced-motion {
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 1ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 1ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
 }

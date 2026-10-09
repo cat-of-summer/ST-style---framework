@@ -122,9 +122,12 @@ design width, emitted in rem; omit it to keep the container fluid there) and
 without it keeps the previous one). Other
 `main` knobs are scales (`$space-max`/`$gap-max`/`$lc-max`), `$space-step`,
 the typography tokens `$font-sizes`/`$font-weights`, `$scale` (`true` — vw scale,
-`false` — fixed rem, see «Без масштабирования») and `$user-select` (`auto` by
+`false` — fixed rem, see «Без масштабирования»), `$user-select` (`auto` by
 default; `none` forbids text selection on `body`, inputs and contenteditable stay
-selectable). For `effects`, `$durations` is the duration map.
+selectable), `$line-height` and `$hyphens` for `body` (`1` and `auto` by default;
+apps usually set `1.5` and `manual`) and `$reduced-motion` (`false` by default;
+`true` cuts every animation and transition to 1ms under
+`prefers-reduced-motion: reduce`). For `effects`, `$durations` is the duration map.
 
 Project SCSS gets the same breakpoints from `scss/main/media` (`up`, `down`,
 `between`, `rem`). Configure once in a project partial and `@use` it everywhere:
@@ -199,7 +202,9 @@ Reset снимает со всех элементов стили браузер�
 body { background: var(--bg); color: var(--fg); }
 ```
 
-Переключатель (`theme` = `light` / `dark` / `auto`):
+Переключатель и скрипт против вспышки уже есть в st-script — модуль `theme`
+(`Theme.toggle()`, `Theme.set()`, событие `theme:change`, `Theme.script()` для `<head>`).
+Без него — вручную (`theme` = `light` / `dark` / `auto`):
 
 ```js
 function setTheme(theme) {

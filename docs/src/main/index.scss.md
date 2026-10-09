@@ -74,6 +74,7 @@
 | `fluid` | `fit-content` по обеим осям | размер по содержимому | `fluid` |
 | `cover` | `100%` по обеим осям | растянуть на весь родитель | `cover` |
 | `checkbox`, `radio` | стилизуемый чекбокс/радио | `span` внутри `label` с нативным `input` | см. «Формы» |
+| `sr-only` | скрыть с экрана, оставить скринридеру | подпись кнопки-иконки, live-регион; `sr-only="focusable"` — ссылка «К содержимому», видна при фокусе | `<span sr-only>Закрыть</span>` |
 
 ---
 
@@ -337,7 +338,7 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 > Поля и кнопки стилизуются с нуля, фокус возвращается своим правилом `:focus-visible`.
 
 - `html`: `font-size` в `vw` по брейкпоинтам (см. «Масштабирование»), `overflow-x: hidden`, `scrollbar-gutter: stable`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
-- `body`: `user-select: none`, `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height: 1`, `overflow-wrap: break-word`, `hyphens: auto`
+- `body`: `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height` из `$line-height` (по умолчанию `1`), `overflow-wrap: break-word`, `hyphens` из `$hyphens` (по умолчанию `auto`); `user-select` — только при `$user-select: none`
 - ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
 - место под полосу прокрутки зарезервировано всегда (`scrollbar-gutter: stable`): макет не сдвигается, когда полоса появляется или скролл блокируют через `overflow: hidden` на `html`/`body`. Блокировкам, которые ставят `body` в `position: fixed` inline-стилем, reset задаёт `width: auto !important; right: 0`, чтобы `body` не заходил под зарезервированное место. На оверлейных полосах (macOS, мобильные) правило ничего не меняет. Отключить — `html { scrollbar-gutter: auto }`
 - `vertical-align: middle` — только у медиа (`svg`, `img`, `video`, `canvas`, `iframe`), полей (`input`, `select`, `textarea`, `button`, `meter`, `progress`), `span[checkbox|radio]` и `[icon~="inline"]`. Строчный текст (`mark`, `code`, `a`, `span`) стоит на `baseline`: с `middle` строчный элемент другого размера проседал ниже строки на 1–2px
@@ -348,6 +349,8 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 - `table`: `border-collapse: collapse; border-spacing: 0`
 - `li`: `list-style: none`
 - `:disabled`: `cursor: not-allowed`
+- `input` типов `checkbox`, `radio`, `range`: `appearance: auto` — нативный вид возвращён (без него `all: unset` оставляет пустое место); у `checkbox` и `radio` ещё `cursor: pointer`. Свой контрол — `appearance: none` на поле
+- при `$reduced-motion: true` и `prefers-reduced-motion: reduce` все анимации и переходы сокращаются до 1ms
 - `h1–h6`,`p`: `font-weight: inherit; overflow-wrap: break-word`
 - `p`: `text-wrap: pretty`. Заголовки переносятся жадно, как в Figma; баланс строк включается атрибутом `balance`
 - `h1–p`: размеры из `--fs-*` переменных
@@ -356,8 +359,8 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 
 ### Кросс-браузерные правки
 
-Reset фреймворка делает два «агрессивных» шага — `user-select: none` на `body` и
-`display: block` на медиа (`picture/video/canvas/svg`). Чтобы они не ломали штатное
+Reset фреймворка делает «агрессивные» шаги — `display: block` на медиа
+(`picture/video/canvas/svg`), а при `$user-select: none` ещё и `user-select: none` на `body`. Чтобы они не ломали штатное
 поведение, добавлены точечные восстановления:
 
 - **`html { text-size-adjust: none }`** — отключает раздувание шрифта в landscape на
@@ -388,11 +391,11 @@ Reset фреймворка делает два «агрессивных» шаг
 |-------------|---------|-------------|
 | Outline фокуса мышью у ссылок, кнопок, полей | `all: unset`; для клавиатуры возвращён через `:where(:focus-visible)` | свой стиль — правило `:focus-visible { outline: … }` |
 | `vertical-align: middle` у строчного текста | намеренно: `mark`, `code`, `a` проседали ниже строки | `vertical-align: middle` на нужном элементе |
-| Рамка, фон, `appearance` у `input`, `button`, `select` | `all: unset` | стилизовать с нуля или `appearance: revert` |
+| Рамка, фон, `appearance` у `input`, `button`, `select` | `all: unset` | стилизовать с нуля или `appearance: revert`. У `checkbox`, `radio`, `range` нативный вид уже возвращён |
 | Маркеры списков | `li { list-style: none }` | `li { list-style: revert }` — `.editor` маркеры тоже не возвращает |
 | Отступы и жирность у `h1–h6`, `p`, `ul`, `blockquote` | `all: unset` | `m`/`p`, `fw`, свой CSS; для CMS-контента — `.editor` |
 | Подчёркивание и цвет ссылок | `all: unset` | `text-decoration: underline`, свой цвет |
-| Выделение текста мышью | `body { user-select: none }` | `user-select: text` на нужном блоке |
+| Выделение текста мышью | `body { user-select: none }` при `$user-select: none` | `user-select: text` на нужном блоке |
 | Баланс строк заголовков | не включён намеренно | атрибут `balance` |
 | Скрытие по `hidden` | `display: revert` перебивает UA | уже возвращено правилом `[hidden]` выше, ничего делать не нужно |
 
@@ -905,13 +908,15 @@ CSS-маска для монохромных SVG/PNG иконок. Позвол�
 
 **Как работает:**
 ```css
-*[mask] {
+*[mask]:where(:not(input, textarea, select)) {
     mask: var(--mask) no-repeat center / contain;
     background-color: var(--color);  /* цвет иконки */
 }
 ```
 
 Переменные: `--mask` (URL), `--color` (цвет, по умолчанию `#000`).
+
+На полях формы (`input`, `textarea`, `select`) утилита не действует: этот же атрибут ставит маска ввода st-script (`<input mask="+7 (999) 999-99-99">`).
 
 > **Паттерн**: сам элемент становится цветной заливкой, «вырезанной» по форме маски. Цвет задаётся через CSS-класс (`.color_violet`, `.color_orange`) или напрямую через `--color`.
 

@@ -83,3 +83,11 @@ $space-step: 0.4rem !default;   // base unit → --space-step
 // body user-select. `auto` (default) emits nothing; `none` forbids text
 // selection site-wide (landings) while inputs and contenteditable stay selectable.
 $user-select: auto !default;
+// body line-height and hyphens. Text sites usually keep 1 / auto and set line
+// height per text style; apps set the body rhythm here (1.5, manual).
+$line-height: 1 !default;
+$hyphens: auto !default;
+// true — under prefers-reduced-motion: reduce, every animation and transition
+// is cut to 1ms site-wide (not only the effects bundle). Opt-in: the rule is
+// !important and overrides project motion as well.
+$reduced-motion: false !default;
