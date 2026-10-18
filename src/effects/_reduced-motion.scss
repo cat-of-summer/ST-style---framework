@@ -4,4 +4,12 @@
         animation: none !important;
         transition: none !important
     }
+
+    // The text is shown at once: without the animation width stays 0 and hides it.
+    // The caret stays, but does not blink.
+    *[typing-text] {
+        animation: none !important;
+        width: auto !important;
+    }
+    *[typing-text]::after { animation: none !important }
 }

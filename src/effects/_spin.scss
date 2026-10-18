@@ -1,12 +1,12 @@
+@use 'fn';
+
 @keyframes spin { to { transform: rotate(360deg) } }
 
 *[spin] {
-    --transition-duration: var(--td-slow);
-    --spin-duration: var(--transition-duration);
     --spin-iteration-count: var(--iteration-count);
     --spin-name: spin;
 
-    animation: var(--spin-name) var(--spin-duration) linear var(--spin-iteration-count);
+    animation: var(--spin-name) fn.duration(spin, var(--td-slow)) linear var(--spin-iteration-count);
 }
 
 *[spin~="infinite"] { --spin-iteration-count: infinite }

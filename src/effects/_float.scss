@@ -1,23 +1,24 @@
+@use 'fn';
+
+$range: var(--float-range, 6px);
+
 @keyframes floatY {
     0%, 100% { transform: translateY(0) }
-    25%      { transform: translateY(var(--float-range)) }
-    75%      { transform: translateY(calc(-1 * var(--float-range))) }
+    25%      { transform: translateY($range) }
+    75%      { transform: translateY(calc(-1 * #{$range})) }
 }
 
 @keyframes floatX {
     0%, 100% { transform: translateX(0) }
-    25%      { transform: translateX(var(--float-range)) }
-    75%      { transform: translateX(calc(-1 * var(--float-range))) }
+    25%      { transform: translateX($range) }
+    75%      { transform: translateX(calc(-1 * #{$range})) }
 }
 
 *[float] {
-    --transition-duration: var(--td-slow);
-    --float-duration: var(--transition-duration);
     --float-iteration-count: var(--iteration-count);
-    --float-range: 6px;
     --float-name: floatY;
 
-    animation: var(--float-name) var(--float-duration) ease-in-out var(--float-iteration-count);
+    animation: var(--float-name) fn.duration(float, var(--td-slow)) ease-in-out var(--float-iteration-count);
 }
 
 *[float~="horizontal"] { --float-name: floatX }

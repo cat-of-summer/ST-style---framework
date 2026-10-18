@@ -41,6 +41,21 @@
   @return math.div($px, $font) * 1rem;
 }
 
+// Vertical padding for a [trim] label that keeps its mockup height: the trimmed
+// half-leading comes back as equal padding, so the box is line-height + 2 × $pad
+// with the letters centred. $edge: cap or ex, as in [trim] / [trim="ex"].
+// Without text-box support the label keeps plain $pad and looks untrimmed.
+// .tag { @include st.trim-pad(st.rem(3px)); }
+@mixin trim-pad($pad: 0px, $edge: cap) {
+  @if $edge != cap and $edge != ex { @error 'trim-pad: $edge is cap or ex, got `#{$edge}`.'; }
+  $letters: 1cap;
+  @if $edge == ex { $letters: 1ex; }
+  padding-block: $pad;
+  @supports (text-box: trim-both #{$edge} alphabetic) {
+    padding-block: calc((1lh - $letters) / 2 + $pad);
+  }
+}
+
 // Grid track that never grows past its share: 1fr = minmax(auto, 1fr) stretches
 // to min-content (nowrap text, long words). fr(2) → minmax(0, 2fr).
 @function fr($n: 1) { @return minmax(0, $n * 1fr); }

@@ -1,18 +1,19 @@
+@use 'fn';
+
+$angle: var(--wobble-angle, 10deg);
+
 @keyframes wobble {
     0%,
     100% { transform: rotate(0deg) }
-    25% { transform: rotate(var(--wobble-angle)) }
-    75% { transform: rotate(calc(-1 * var(--wobble-angle))) }
+    25% { transform: rotate($angle) }
+    75% { transform: rotate(calc(-1 * #{$angle})) }
 }
 
 *[wobble] {
-    --transition-duration: var(--td-fast);
-    --wobble-duration: var(--transition-duration);
-    --wobble-angle: 10deg;
     --wobble-iteration-count: var(--iteration-count);
     --wobble-name: wobble;
 
-    animation: var(--wobble-name) var(--wobble-duration) ease-in-out var(--wobble-iteration-count)
+    animation: var(--wobble-name) fn.duration(wobble, var(--td-fast)) ease-in-out var(--wobble-iteration-count)
 }
 
 *[wobble~="infinite"] { --wobble-iteration-count: infinite }

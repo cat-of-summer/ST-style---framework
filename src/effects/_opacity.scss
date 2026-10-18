@@ -1,3 +1,5 @@
+@use 'fn';
+
 @keyframes _opacity {
     0% { opacity: 1 }
     50% { opacity: 0 }
@@ -5,12 +7,10 @@
 }
 
 *[opacity] {
-    --transition-duration: var(--td-slow);
-    --opacity-duration: var(--transition-duration);
     --opacity-iteration-count: var(--iteration-count);
     --opacity-name: _opacity;
 
-    animation: var(--opacity-name) var(--opacity-duration) linear var(--opacity-iteration-count)
+    animation: var(--opacity-name) fn.duration(opacity, var(--td-slow)) linear var(--opacity-iteration-count)
 }
 
 *[opacity~="infinite"] { --opacity-iteration-count: infinite }

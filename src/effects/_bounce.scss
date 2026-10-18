@@ -1,22 +1,21 @@
+@use 'fn';
+
 @keyframes bounce {
   0%, 100% {
         transform: translateY(0);
         animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
   }
   50% {
-        transform: translateY(calc(-1 * var(--bounce-height)));
+        transform: translateY(calc(-1 * var(--bounce-height, 30px)));
         animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
 }
 
 *[bounce] {
-    --transition-duration: var(--td-medium);
-    --bounce-duration: var(--transition-duration);
-    --bounce-height: 30px;
     --bounce-iteration-count: var(--iteration-count);
     --bounce-name: bounce;
 
-    animation: var(--bounce-name) var(--bounce-duration) ease-in-out var(--bounce-iteration-count)
+    animation: var(--bounce-name) fn.duration(bounce, var(--td-medium)) ease-in-out var(--bounce-iteration-count)
 }
 
 *[bounce~="infinite"] { --bounce-iteration-count: infinite }

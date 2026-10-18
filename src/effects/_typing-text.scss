@@ -1,24 +1,19 @@
+@use 'fn';
+
 @keyframes typing-text {
     from { width: 0 }
     to { width: 100% }
 }
 
 *[typing-text] {
-    --transition-duration: 3s;
-    --typing-duration: var(--transition-duration);
-    --typing-steps: 24;
-    --typing-chars: 10;
-    --typing-color: #000;
-    --typing-width: 2px;
-
     position: relative !important;
     display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     width: 0;
-    min-width: calc(var(--typing-chars) * 1ch);
+    min-width: calc(var(--typing-chars, 10) * 1ch);
     max-width: max-content;
-    animation: typing-text var(--typing-duration) steps(var(--typing-steps), end) forwards;
+    animation: typing-text fn.duration(typing, 3s) steps(var(--typing-steps, 24), end) forwards;
 }
 
 *[typing-text]::after {
@@ -28,8 +23,8 @@
     top: 0;
     bottom: 0;
     display: inline-block;
-    width: var(--typing-width);
-    background: var(--typing-color);
+    width: var(--typing-width, 2px);
+    background: var(--typing-color, #000);
 
     animation: blink 1s step-end infinite;
 }

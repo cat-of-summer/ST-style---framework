@@ -1,9 +1,3 @@
-*,
-*::before,
-*::after {
-    transition: inherit;
-}
-
 *[scale], *[rotate], *[raise], *[pulse], *[wobble], *[heartbeat], *[jello],
 *[bounce], *[spin], *[float], *[vibrate], *[skew], *[tada], *[swing] { will-change: transform }
 *[blink], *[opacity]                                        { will-change: opacity }

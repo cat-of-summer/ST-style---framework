@@ -1,0 +1,77 @@
+// [card] — clickable card: one hover for every card of the project.
+//
+//   <article card>
+//     <a card-link href="…">Title</a>     ← its ::after stretches over the whole card
+//     <button card-action>…</button>      ← stays clickable above the underlay
+//   </article>
+//
+// The card publishes its current palette as --card-bg-now / --card-line-now /
+// --card-accent-now. Children read it (a nested [cut], [card-action], project
+// rules), so the active state reaches them without a :hover rule per block.
+// Inputs — --card-bg, --card-line, --card-accent and their *-active pairs — are
+// set on the card or on any ancestor; nothing is declared for them here.
+
+@mixin palette($state: null) {
+    @each $name, $fallback in (bg: transparent, line: transparent, accent: currentColor) {
+        @if $state {
+            --card-#{$name}-now: var(--card-#{$name}-#{$state}, var(--card-#{$name}, #{$fallback}));
+        } @else {
+            --card-#{$name}-now: var(--card-#{$name}, #{$fallback});
+        }
+    }
+}
+
+*[card] {
+    @include palette;
+
+    transition-property: background-color, border-color;
+    transition-duration: var(--card-duration, .3s);
+    transition-timing-function: var(--card-ease, ease);
+}
+
+// Hover only where there is a pointer that hovers: on touch :hover sticks after a tap.
+@media (hover: hover) {
+    *[card]:hover { @include palette(active); }
+}
+
+*[card]:is(:focus-visible, :has(:focus-visible), [state~="active"]) { @include palette(active); }
+
+// Specificity 0: a project class repositions the card or its controls without !important.
+:where(*[card]) {
+    position: relative;
+    isolation: isolate;
+}
+
+// The card paints itself unless the shape is drawn by [cut] — on the card or on a child __bg.
+:where(*[card]:not([cut], :has([cut]))) {
+    background-color: var(--card-bg-now);
+    border-color: var(--card-line-now);
+}
+
+// The link stays static so its ::after is laid out against the card, not the link.
+:where(*[card] [card-link]) { position: static; }
+
+// An empty link (aria-label instead of text) has no box to draw a focus ring on: the card draws it.
+:where(*[card]:has([card-link]:empty:focus-visible)) {
+    outline: 2px solid;
+    outline-offset: 2px;
+}
+
+*[card] [card-link]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+:where(*[card] :is(a, button, label, input, select, textarea, [card-action]):not([card-link])) {
+    position: relative;
+    z-index: 1;
+}
+
+*[card] [card-action] {
+    color: var(--card-accent-now);
+    transition-property: color, background-color, border-color;
+    transition-duration: var(--card-duration, .3s);
+    transition-timing-function: var(--card-ease, ease);
+}

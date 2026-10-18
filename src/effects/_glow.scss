@@ -1,12 +1,9 @@
-*[glow] {
-    --transition-duration: var(--td-medium);
-    --glow-duration: var(--transition-duration);
-    --glow-color: rgba(0, 150, 255, 0.7);
-    --glow-size: 16px;
+@use 'fn';
 
-    transition-duration: var(--glow-duration);
-}
+$glow: 0 0 var(--glow-size, 16px) var(--glow-color, rgba(0, 150, 255, 0.7));
 
-*[glow~="hover"]:hover { box-shadow: 0 0 var(--glow-size) var(--glow-color) }
-*[glow~="active"]:active { box-shadow: 0 0 var(--glow-size) var(--glow-color) }
-*[glow~="focus"]:focus { box-shadow: 0 0 var(--glow-size) var(--glow-color) }
+*[glow] { transition-duration: fn.duration(glow, var(--td-medium)) }
+
+*[glow~="hover"]:hover { box-shadow: $glow }
+*[glow~="active"]:active { box-shadow: $glow }
+*[glow~="focus"]:focus { box-shadow: $glow }

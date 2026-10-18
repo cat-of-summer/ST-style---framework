@@ -1,10 +1,15 @@
 @use 'config' as cfg;
 
-// [td] — transition-duration override, [infinite] — iteration count.
-*[td], *[td]::before, *[td]::after { transition-duration: var(--transition-duration) !important }
+// [td] — duration override for the element and its pseudo-elements: transitions
+// and the effects' own animations (they read --td first, see _fn.scss).
+// --td is registered non-inheriting (_root.scss), so [td] never reaches the
+// descendants; pseudo-elements take it explicitly.
+*[td]::before, *[td]::after { --td: inherit }
+*[td], *[td]::before, *[td]::after { transition-duration: var(--td) !important }
 @each $name, $val in cfg.$durations {
-  *[td="#{$name}"] { --transition-duration: var(--td-#{$name}); }
+  *[td="#{$name}"] { --td: var(--td-#{$name}); }
 }
-*[td="none"] { --transition-duration: none }
+*[td="none"] { --td: 0s }
 
+// [infinite] — iteration count of every effect on the element and inside it.
 *[infinite] { --iteration-count: infinite; }

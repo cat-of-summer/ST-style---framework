@@ -1,7 +1,9 @@
 @use 'config' as cfg;
 
+// No initial value: unset on an element, var(--td, …) takes the fallback.
+@property --td { syntax: "*"; inherits: false; }
+
 :root {
-    --transition-duration: var(--td-rapid);
     --iteration-count: 1;
 
     @each $name, $val in cfg.$durations {

@@ -1,3 +1,5 @@
+@use 'fn';
+
 @keyframes jello {
     0%   { transform: scale3d(1,1,1); }
     30%  { transform: scale3d(1.25,0.85,1); }
@@ -7,12 +9,10 @@
 }
 
 *[jello] {
-    --transition-duration: var(--td-medium);
-    --jello-duration: var(--transition-duration);
     --jello-iteration-count: var(--iteration-count);
     --jello-name: jello;
 
-    animation: var(--jello-name) var(--jello-duration) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count);
+    animation: var(--jello-name) fn.duration(jello, var(--td-medium)) cubic-bezier(.2,.7,.2,1) var(--jello-iteration-count);
 }
 
 *[jello~="infinite"] { --jello-iteration-count: infinite }

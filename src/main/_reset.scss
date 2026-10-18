@@ -78,14 +78,24 @@ body[style*="position:fixed"] {
     line-height: 0
 }
 
-:where(img, iframe) {
+// Height follows the image: a percentage height needs a parent of definite
+// height, otherwise it is ignored or circular (grid track, aspect-ratio,
+// absolute box). cover crops only once both sides are set: aspect-ratio or [cover].
+:where(img) {
     width: 100%;
-    height: 100%;
+    height: auto;
     object-fit: cover;
     object-position: center
 }
 
+:where(iframe) {
+    width: 100%;
+    height: 100%;
+}
+
 :where(input, textarea, button) { font-size: var(--fs-p) }
+// UA centring of button labels, wiped by `all: unset` (text-align is inherited).
+:where(button, input:is([type="button"], [type="submit"], [type="reset"])) { text-align: center }
 :where(input::placeholder, textarea::placeholder) { font-size: inherit; font-weight: inherit; line-height: inherit; }
 @if cfg.$user-select != auto {
     :where(input, textarea) { -webkit-user-select: auto; user-select: auto; }
@@ -182,6 +192,17 @@ body[style*="position:fixed"] {
 // Balanced line lengths. Opt-in: Figma wraps greedily, so headings stay greedy by default.
 *[balance] { text-wrap: balance }
 
+// Line box trimmed to the cap height (ex: x-height) and the baseline, so the
+// padding is measured from the letters: caps sit in the centre of a label.
+// The box loses the half-leading; keep the mockup height with @include st.trim-pad().
+// No effect with [lc].
+*[trim] { text-box: trim-both cap alphabetic }
+*[trim="ex"] { text-box: trim-both ex alphabetic }
+
+// Fades the content, not the element: opacity on a box with backdrop-filter
+// fades its blurred backdrop too. Bare text nodes need a wrapper.
+*[dim] > * { opacity: var(--dim, 0.5) }
+
 *[icon] {
     display: flex;
     justify-content: center;
@@ -216,13 +237,11 @@ body[style*="position:fixed"] {
 }
 
 // Not on form fields: st-script Mask uses the same attribute for input masks.
-// :where keeps the specificity at 0,1,0.
+// :where keeps the specificity at 0,1,0. --mask and --color are not declared
+// here, so a parent (:hover, theme) can set them.
 *[mask]:where(:not(input, textarea, select)) {
-    --mask: '';
-    --color: #000;
-
-    mask: var(--mask) no-repeat center / contain;
-    background-color: var(--color);
+    mask: var(--mask, none) no-repeat center / contain;
+    background-color: var(--color, #000);
 }
 
 :where(a, button) { cursor: pointer }

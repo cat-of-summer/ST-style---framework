@@ -2,7 +2,7 @@
 
 Attribute-driven CSS utility framework. Authored in SCSS, shipped as compiled CSS.
 
-- **`main`** — layout/typography/spacing/grid/display utilities + reset.
+- **`main`** — layout/typography/spacing/grid/display utilities + reset, link cards (`card`) and cut-corner shapes (`cut`, drawn by st-script `Cut`).
 - **`effects`** — hover/animation effects (`scale`, `pulse`, `float`, `ripple`, …).
 
 Markup uses attributes instead of classes:
@@ -130,7 +130,7 @@ apps usually set `1.5` and `manual`) and `$reduced-motion` (`false` by default;
 `prefers-reduced-motion: reduce`). For `effects`, `$durations` is the duration map.
 
 Project SCSS gets the same breakpoints from `scss/main/media` (`up`, `down`,
-`between`, `rem`). Configure once in a project partial and `@use` it everywhere:
+`between`, `rem`; plus `cols`, `fr` and `trim-pad`). Configure once in a project partial and `@use` it everywhere:
 
 ```scss
 // _st.scss
@@ -164,7 +164,11 @@ relevant bundle:
 ```
 
 Runtime theming (colours, step sizes, durations) is done with CSS custom
-properties — override `--space-step`, `--fs-h1`, `--td-fast`, … in your own CSS.
+properties - override `--space-step`, `--fs-h1`, `--td-fast`, … in your own CSS.
+Utility and effect knobs (`--color`, `--glow-color`, `--underline-offset`, …) are
+never declared on the element: defaults are `var()` fallbacks, so a value set on
+`:root` or on a parent (`.card:hover { --glow-color: … }`) reaches it by plain
+inheritance.
 
 ## Фокус
 

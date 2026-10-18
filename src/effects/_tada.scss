@@ -1,3 +1,5 @@
+@use 'fn';
+
 @keyframes tada {
     0%   { transform: scale3d(1, 1, 1) }
     10%, 20% { transform: scale3d(.9, .9, .9) rotate3d(0, 0, 1, -3deg) }
@@ -7,12 +9,10 @@
 }
 
 *[tada] {
-    --transition-duration: var(--td-slow);
-    --tada-duration: var(--transition-duration);
     --tada-iteration-count: var(--iteration-count);
     --tada-name: tada;
 
-    animation: var(--tada-name) var(--tada-duration) ease-in-out var(--tada-iteration-count)
+    animation: var(--tada-name) fn.duration(tada, var(--td-slow)) ease-in-out var(--tada-iteration-count)
 }
 
 *[tada~="infinite"] { --tada-iteration-count: infinite }

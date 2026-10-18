@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ST-style — регрессии reset и наследования переменных</title>
+
+<link rel="stylesheet" href="../dist/main.min.css">
+<link rel="stylesheet" href="../dist/effects.min.css">
+
+<!--
+  Кейсы, на которых ломались reset и переопределение переменных.
+  Каждый блок подписан ожидаемым результатом.
+-->
+<style>
+  body     { background: #f3f4f8; color: #1d2130; font-family: system-ui, "Segoe UI", sans-serif; line-height: 1.35; }
+  .case    { background: #fff; border-radius: 1.2rem; }
+  .note    { color: #5b6275; }
+
+  /* 1. Декоративная картинка absolute в низком блоке */
+  .lib     { height: 10.9rem; overflow: hidden; background: #1d2130; }
+  .lib__bg { position: absolute; right: 0; top: 0; width: 26rem; }
+
+  /* 2. Фото-отчёт: figure в сетке, квадратная картинка */
+  .report img { aspect-ratio: 1; }
+
+  /* 3. Кнопка во всю ширину карточки без своего text-align */
+  .event__btn { width: 100%; background: #6366f1; color: #fff; border-radius: .8rem; }
+
+  /* 4. Родитель темизирует эффекты и mask потомка */
+  .theme:hover { --glow-color: #f43f5e; --glow-size: 24px; --color: #f43f5e; --underline-color: #f43f5e; }
+  .icon    { width: 3.2rem; height: 3.2rem; --mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='5'/%3E%3C/svg%3E"); }
+
+  /* 5. Глобальная настройка через :root */
+  :root    { --shadow-hover-color: rgba(99, 102, 241, .6); }
+
+  /* 7. Тег капсом 10/16, поля 3/10 */
+  .tag     { font-size: 1rem; line-height: 1.6rem; text-transform: uppercase; padding: .3rem 1rem; background: #1d2130; color: #fff; border-radius: .4rem; }
+  /* то, что даёт @include st.trim-pad(.3rem) */
+  @supports (text-box: trim-both cap alphabetic) { .tag--keep { padding-block: calc((1lh - 1cap) / 2 + .3rem); } }
+
+  /* 8. Стеклянная плашка */
+  .glass-bg { background: linear-gradient(135deg, #6366f1, #ec4899); }
+  .glass   { background: rgba(255, 255, 255, .2); backdrop-filter: blur(12px); color: #fff; border-radius: .8rem; }
+  .glass--opacity { opacity: .5; }
+</style>
+</head>
+<body>
+<main>
+<section container p="y-8">
+  <div grid="gap-4">
+
+    <article col="12" class="case" p="4">
+      <h2 tx="h4" mb="2">1. absolute-фон не режется по высоте блока</h2>
+      <p class="note" mb="2">Ожидание: круг 26rem виден целиком справа сверху и обрезан только overflow блока, а не полоской высотой 10.9rem.</p>
+      <div class="lib">
+        <img class="lib__bg" id="lib-bg" alt="" width="535" height="535"
+          src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='535' height='535'%3E%3Ccircle cx='267' cy='267' r='260' fill='%236366f1'/%3E%3C/svg%3E">
+      </div>
+    </article>
+
+    <article col="12" class="case" p="4">
+      <h2 tx="h4" mb="2">2. figure + figcaption в сетке</h2>
+      <p class="note" mb="2">Ожидание: подпись под картинкой, строки сетки не наезжают друг на друга.</p>
+      <div grid="gap-2" class="report">
+        <figure col="6" id="fig-1">
+          <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%230ea5e9'/%3E%3C/svg%3E">
+          <figcaption mt="1">Подпись первой фотографии в две строки на мобильном</figcaption>
+        </figure>
+        <figure col="6">
+          <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2322c55e'/%3E%3C/svg%3E">
+          <figcaption mt="1">Подпись второй</figcaption>
+        </figure>
+        <figure col="6" id="fig-3">
+          <img alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23f59e0b'/%3E%3C/svg%3E">
+          <figcaption mt="1">Третья</figcaption>
+        </figure>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">3. Кнопка во всю ширину</h2>
+      <p class="note" mb="2">Ожидание: текст по центру.</p>
+      <button class="event__btn" id="event-btn" p="3">Регистрация</button>
+    </article>
+
+    <article col="12 md-6" class="case theme" p="4" id="theme">
+      <h2 tx="h4" mb="2">4. :hover родителя красит потомков</h2>
+      <p class="note" mb="2">Ожидание при наведении на карточку: розовое свечение, иконка и подчёркивание.</p>
+      <div ds="flex gap-4">
+        <span glow="hover" id="glow-child" p="2">glow</span>
+        <span class="icon" mask="" id="mask-child"></span>
+        <span underline="" id="underline-child">underline</span>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">5. :root задаёт тень</h2>
+      <p class="note" mb="2">Ожидание: фиолетовая тень при наведении.</p>
+      <div shadow="hover" id="shadow-root" p="3">наведи</div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4" td="5s" id="td-parent">
+      <h2 tx="h4" mb="2">6. td не протекает в потомков</h2>
+      <p class="note" mb="2">Ожидание: у дочернего scale своя длительность 0.55s, у td-родителя 5s.</p>
+      <div scale="hover" id="td-child" p="3">scale</div>
+      <div raise="hover" id="raise" p="3">raise плавно</div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">7. Капс в плашке</h2>
+      <p class="note" mb="2">Ожидание: с trim капс ровно по центру; у второй плашки высота та же, что без trim (поле из st.trim-pad).</p>
+      <div ds="flex gap-2" style="align-items: flex-start">
+        <span class="tag" id="tag-plain">без trim</span>
+        <span class="tag" trim="" id="tag-trim">trim</span>
+        <span class="tag tag--keep" trim="" id="tag-keep">trim + trim-pad</span>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case glass-bg" p="4">
+      <h2 tx="h4" mb="2">8. Приглушённое стекло</h2>
+      <div ds="flex gap-2">
+        <div class="glass" p="3">обычное</div>
+        <div class="glass glass--opacity" p="3" id="glass-opacity"><span>opacity</span></div>
+        <div class="glass" dim="" p="3" id="glass-dim"><span>dim</span></div>
+      </div>
+    </article>
+
+  </div>
+</section>
+</main>
+</body>
+</html>

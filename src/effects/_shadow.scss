@@ -1,22 +1,15 @@
-*[shadow] {
-    --transition-duration: var(--td-medium);
-    --shadow-duration: var(--transition-duration);
+@use 'fn';
 
-    --shadow-hover-offset: 5px;
-    --shadow-hover-offsetX: var(--shadow-hover-offset);
-    --shadow-hover-offsetY: var(--shadow-hover-offset);
-    --shadow-hover-blur: 10px;
-    --shadow-hover-color: rgba(0, 0, 0, 0.2);
+$hover-offset: var(--shadow-hover-offset, 5px);
+$active-offset: var(--shadow-active-offset, 2px);
 
-    --shadow-active-offset: 2px;
-    --shadow-active-offsetX: var(--shadow-hover-offset);
-    --shadow-active-offsetY: var(--shadow-hover-offset);
-    --shadow-active-blur: 8px;
-    --shadow-active-color: rgba(0, 0, 0, 0.3);
+$hover: var(--shadow-hover-offsetX, #{$hover-offset}) var(--shadow-hover-offsetY, #{$hover-offset})
+    var(--shadow-hover-blur, 10px) var(--shadow-hover-color, rgba(0, 0, 0, 0.2));
+$active: var(--shadow-active-offsetX, #{$active-offset}) var(--shadow-active-offsetY, #{$active-offset})
+    var(--shadow-active-blur, 8px) var(--shadow-active-color, rgba(0, 0, 0, 0.3));
 
-    transition-duration: var(--shadow-duration);
-}
+*[shadow] { transition-duration: fn.duration(shadow, var(--td-medium)) }
 
-*[shadow~="hover"]:hover { box-shadow: var(--shadow-hover-offsetX) var(--shadow-hover-offsetY) var(--shadow-hover-blur) var(--shadow-hover-color) }
-*[shadow~="active"]:active { box-shadow: var(--shadow-active-offsetX) var(--shadow-active-offsetY) var(--shadow-active-blur) var(--shadow-active-color) }
-*[shadow~="focus"]:focus { box-shadow: var(--shadow-active-offsetX) var(--shadow-active-offsetY) var(--shadow-active-blur) var(--shadow-active-color) }
+*[shadow~="hover"]:hover { box-shadow: $hover }
+*[shadow~="active"]:active { box-shadow: $active }
+*[shadow~="focus"]:focus { box-shadow: $active }

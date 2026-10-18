@@ -1,22 +1,21 @@
+@use 'fn';
+
+$x: var(--vibrate-x, 2px);
+$y: var(--vibrate-y, 1px);
+$r: var(--vibrate-rotate, 0.5deg);
+
 @keyframes vibrate {
     0%   { transform: translate(0, 0) rotate(0); }
-    10%  { transform: translate(var(--vibrate-x), var(--vibrate-y)) rotate(var(--vibrate-rotate)); }
-    30%  { transform: translate(calc(var(--vibrate-x) * -1), var(--vibrate-y)) rotate(calc(var(--vibrate-rotate) * -1)); }
-    50%  { transform: translate(var(--vibrate-x), calc(var(--vibrate-y) * -1)) rotate(var(--vibrate-rotate)); }
-    70%  { transform: translate(calc(var(--vibrate-x) * -1), calc(var(--vibrate-y) * -1)) rotate(calc(var(--vibrate-rotate) * -1)); }
-    90%  { transform: translate(var(--vibrate-x), var(--vibrate-y)) rotate(var(--vibrate-rotate)); }
+    10%  { transform: translate($x, $y) rotate($r); }
+    30%  { transform: translate(calc(#{$x} * -1), $y) rotate(calc(#{$r} * -1)); }
+    50%  { transform: translate($x, calc(#{$y} * -1)) rotate($r); }
+    70%  { transform: translate(calc(#{$x} * -1), calc(#{$y} * -1)) rotate(calc(#{$r} * -1)); }
+    90%  { transform: translate($x, $y) rotate($r); }
     100% { transform: translate(0, 0) rotate(0); }
 }
 
 *[vibrate] {
-    --transition-duration: var(--td-fast);
-    --vibrate-duration: var(--transition-duration);
-    --vibrate-iteration-count: infinite;
-    --vibrate-x: 2px;
-    --vibrate-y: 1px;
-    --vibrate-rotate: 0.5deg;
-
-    animation: vibrate var(--vibrate-duration) linear var(--vibrate-iteration-count);
+    animation: vibrate fn.duration(vibrate, var(--td-fast)) linear var(--vibrate-iteration-count, infinite);
     animation-play-state: paused
 }
 

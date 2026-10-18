@@ -1,9 +1,10 @@
-*[raise] {
-    --transition-duration: var(--td-medium);
-    --raise-hover: 0.5em;
-    --raise-active: 1em;
-}
+@use 'fn';
 
-*[raise~="hover"]:hover { transform: translateY(calc(-1 * var(--raise-hover))) }
-*[raise~="active"]:active { transform: translateY(calc(-1 * var(--raise-active))) }
-*[raise~="focus"]:focus { transform: translateY(calc(-1 * var(--raise-active))) }
+$hover: 0.5em;
+$active: 1em;
+
+*[raise] { transition-duration: fn.duration(raise, var(--td-medium)) }
+
+*[raise~="hover"]:hover { transform: translateY(calc(-1 * var(--raise-hover, #{$hover}))) }
+*[raise~="active"]:active { transform: translateY(calc(-1 * var(--raise-active, #{$active}))) }
+*[raise~="focus"]:focus { transform: translateY(calc(-1 * var(--raise-active, #{$active}))) }

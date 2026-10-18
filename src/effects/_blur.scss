@@ -1,9 +1,8 @@
-*[blur] {
-    --transition-duration: var(--td-slow);
-    --blur-duration: var(--transition-duration);
-    --blur-amount: 5px;
+@use 'fn';
 
-    filter: blur(var(--blur-amount))
+*[blur] {
+    filter: blur(var(--blur-amount, 5px));
+    transition-duration: fn.duration(blur, var(--td-slow));
 }
 
 *[blur]:hover, *[blur]:active, *[blur]:focus {

@@ -1,12 +1,10 @@
-*[skew] {
-    --transition-duration: var(--td-medium);
-    --skew-duration: var(--transition-duration);
-    --skew-hover: 10deg;
-    --skew-active: -10deg;
+@use 'fn';
 
-    transition-duration: var(--skew-duration);
-}
+$hover: 10deg;
+$active: -10deg;
 
-*[skew~="hover"]:hover { transform: skewX(var(--skew-hover)) }
-*[skew~="active"]:active { transform: skewX(var(--skew-active)) }
-*[skew~="focus"]:focus { transform: skewX(var(--skew-active)) }
+*[skew] { transition-duration: fn.duration(skew, var(--td-medium)) }
+
+*[skew~="hover"]:hover { transform: skewX(var(--skew-hover, #{$hover})) }
+*[skew~="active"]:active { transform: skewX(var(--skew-active, #{$active})) }
+*[skew~="focus"]:focus { transform: skewX(var(--skew-active, #{$active})) }

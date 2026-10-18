@@ -1,14 +1,14 @@
+@use 'fn';
+
 @keyframes blink {
     50% { opacity: 0 }
 }
 
 *[blink] {
-    --transition-duration: 1s;
-    --blink-duration: var(--transition-duration);
     --blink-iteration-count: var(--iteration-count);
     --blink-name: blink;
 
-    animation: var(--blink-name) var(--blink-duration) step-end var(--blink-iteration-count)
+    animation: var(--blink-name) fn.duration(blink, 1s) step-end var(--blink-iteration-count)
 }
 
 *[blink~="infinite"] { --blink-iteration-count: infinite }

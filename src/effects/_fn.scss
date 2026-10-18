@@ -1,0 +1,12 @@
+// Helpers for the effect partials. Emits no CSS.
+//
+// Tunable values (--glow-color, --scale-hover, --<effect>-duration, …) are
+// never declared by the bundle: they are read as var(--x, default), so a value
+// set anywhere up the tree (:root, .card:hover, inline style) reaches the
+// element by plain inheritance.
+
+// Duration of an effect: the element's own [td] (--td does not inherit), then
+// --<name>-duration from anywhere up the tree, then the effect's default.
+@function duration($name, $default) {
+    @return var(--td, var(--#{$name}-duration, #{$default}));
+}
