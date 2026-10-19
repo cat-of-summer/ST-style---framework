@@ -2,7 +2,7 @@
 
 Attribute-driven CSS utility framework. Authored in SCSS, shipped as compiled CSS.
 
-- **`main`** — layout/typography/spacing/grid/display utilities + reset, link cards (`card`) and cut-corner shapes (`cut`, drawn by st-script `Cut`).
+- **`main`** - layout/typography/spacing/grid/display utilities + reset and Figma shapes with fixed-size corners (`shape`, drawn by st-script `Shape`).
 - **`effects`** — hover/animation effects (`scale`, `pulse`, `float`, `ripple`, …).
 
 Markup uses attributes instead of classes:
@@ -15,6 +15,20 @@ Markup uses attributes instead of classes:
 </section>
 <button scale="hover" shadow="hover active">Click</button>
 ```
+
+## Документация
+
+Документация лежит в пакете и совпадает с установленной версией:
+
+| Файл в `node_modules/@cat-of-summer/st-style/` | Что там |
+|---|---|
+| `docs/src/main/index.scss.md` | бандл `main`: чек-лист "элемент макета → атрибут", **диагностика "симптом → причина → решение"**, справочник атрибутов, reset, SCSS-хелперы |
+| `docs/src/effects/index.scss.md` | бандл `effects`: эффекты наведения и анимации |
+| `src/main/_config.scss` | все настройки сборки с комментариями |
+
+Перед тем как писать свой CSS к компоненту, пройти чек-лист: большинство элементов макета
+закрываются атрибутом. Если после подключения или обновления что-то съехало - сначала
+"Диагностика".
 
 ## Масштабирование
 
@@ -173,13 +187,16 @@ inheritance.
 ## Фокус
 
 Reset снимает со всех элементов стили браузера (`all: unset`), но кольцо фокуса
-возвращает для фокуса с клавиатуры: `:where(:focus-visible) { outline: revert }`.
-При клике мышью рамки нет. Специфичность нулевая, поэтому своё кольцо задаётся
-обычным правилом:
+возвращает для фокуса с клавиатуры, при клике мышью рамки нет. Пока токены не заданы,
+рамка браузерная; рамка проекта задаётся токенами, без своего правила `:focus-visible`:
 
 ```css
-:focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+:root { --focus-ring: 2px solid #6366f1; --focus-offset: 2px; }
 ```
+
+Токены наследуются: `.dark { --focus-ring: 2px solid #fff }` перекрашивает рамку в секции.
+Специфичность правила нулевая, поэтому особая рамка отдельного элемента - обычным
+`.btn:focus-visible { outline: … }`.
 
 Убирать кольцо целиком нельзя: с клавиатуры станет не видно, где фокус (WCAG 2.4.7).
 

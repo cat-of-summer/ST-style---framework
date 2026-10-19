@@ -43,6 +43,23 @@
   .glass-bg { background: linear-gradient(135deg, #6366f1, #ec4899); }
   .glass   { background: rgba(255, 255, 255, .2); backdrop-filter: blur(12px); color: #fff; border-radius: .8rem; }
   .glass--opacity { opacity: .5; }
+
+  /* 9. Иконка в absolute-боксе у края: svg { max-width: 100% } от ширины бокса */
+  .line    { position: relative; height: 4rem; background: linear-gradient(#1d2130, #1d2130) center / 100% 2px no-repeat; }
+  .line__end { position: absolute; left: 99.92%; top: 50%; transform: translateY(-50%); }
+  .line__end svg { width: 3rem; height: 3rem; }
+  .line__end--fixed { width: max-content; }
+
+  /* 10. Рамка фокуса из токенов */
+  .focus-themed { --focus-ring: 2px solid #f43f5e; --focus-offset: 3px; }
+  .btn     { background: #6366f1; color: #fff; border-radius: .8rem; }
+
+  /* 11-12. trim и display; плашка 22px с обводкой 1px: trim-pad((22 - 2 - 16) / 2 = 2px) */
+  .tag--flex  { display: inline-flex; }
+  .tag--block { display: inline-block; }
+  .tag--h22   { display: inline-block; border: 1px solid #6366f1; padding-block: .2rem; }
+  /* то, что даёт @include st.trim-pad(.2rem) */
+  @supports (text-box: trim-both cap alphabetic) { .tag--h22 { padding-block: calc((1lh - 1cap) / 2 + .2rem); } }
 </style>
 </head>
 <body>
@@ -123,6 +140,43 @@
         <div class="glass" p="3">обычное</div>
         <div class="glass glass--opacity" p="3" id="glass-opacity"><span>opacity</span></div>
         <div class="glass" dim="" p="3" id="glass-dim"><span>dim</span></div>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">9. Иконка у края в absolute-боксе</h2>
+      <p class="note" mb="2">Ожидание: верхняя иконка сжата до ~1px (так работает max-width: 100% у svg), нижняя 30px - боксу дан width: max-content.</p>
+      <div class="line">
+        <div class="line__end" id="edge-shrunk"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#6366f1"/></svg></div>
+      </div>
+      <div class="line">
+        <div class="line__end line__end--fixed" id="edge-fixed"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#6366f1"/></svg></div>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">10. Рамка фокуса</h2>
+      <p class="note" mb="2">Ожидание (Tab): у первой кнопки браузерная рамка, у второй - 2px #f43f5e с отступом 3px из токенов --focus-ring / --focus-offset.</p>
+      <div ds="flex gap-4">
+        <button class="btn" type="button" p="2" id="focus-ua">браузерная</button>
+        <span class="focus-themed"><button class="btn" type="button" p="2" id="focus-token">из токенов</button></span>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">11. trim и display</h2>
+      <p class="note" mb="2">Ожидание: на inline-flex обрезки нет (высота как без trim), на inline-block - есть.</p>
+      <div ds="flex gap-2" style="align-items: flex-start">
+        <span class="tag tag--flex" trim="" id="tag-flex">inline-flex</span>
+        <span class="tag tag--block" trim="" id="tag-block">inline-block</span>
+      </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">12. Плашка 22px с обводкой</h2>
+      <p class="note" mb="2">Ожидание: высота ровно 22px (2.2rem) и с поддержкой text-box, и без неё; с поддержкой капс по центру.</p>
+      <div ds="flex gap-2" style="align-items: flex-start">
+        <span class="tag tag--h22" trim="" id="tag-h22">новинка</span>
       </div>
     </article>
 

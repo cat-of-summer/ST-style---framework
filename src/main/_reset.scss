@@ -195,7 +195,9 @@ body[style*="position:fixed"] {
 // Line box trimmed to the cap height (ex: x-height) and the baseline, so the
 // padding is measured from the letters: caps sit in the centre of a label.
 // The box loses the half-leading; keep the mockup height with @include st.trim-pad().
-// No effect with [lc].
+// No effect with [lc] or on a flex / inline-flex box ([icon], ds="flex"): its text
+// sits in an anonymous flex item, and text-box-trim is not inherited. Labels are
+// inline-block.
 *[trim] { text-box: trim-both cap alphabetic }
 *[trim="ex"] { text-box: trim-both ex alphabetic }
 
@@ -247,11 +249,12 @@ body[style*="position:fixed"] {
 :where(a, button) { cursor: pointer }
 
 // `all: unset` above also wipes the UA focus ring. Bring it back for keyboard
-// focus only (WCAG 2.4.7); mouse focus stays ringless. Specificity 0 — restyle
-// with your own `:focus-visible { outline: … }`.
+// focus only (WCAG 2.4.7); mouse focus stays ringless. Project ring without a
+// rule of its own: `:root { --focus-ring: 2px solid #6366f1; --focus-offset: 2px }`.
+// Unset tokens fall back to `revert`, i.e. the UA ring.
 :where(:focus-visible) {
-    outline: revert;
-    outline-offset: revert;
+    outline: var(--focus-ring, revert);
+    outline-offset: var(--focus-offset, revert);
 }
 
 :where(h1, h2, h3, h4, h5, h6, p) {

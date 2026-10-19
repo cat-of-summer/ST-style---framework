@@ -1,19 +1,20 @@
-// [cut] — shape with cut corners. st-script Cut draws it: prepends
-// <svg class="cut-shape"><path/></svg> for background and stroke and clips the
+// [shape] — shape from a Figma path: corners keep their size, straight edges
+// stretch. st-script Shape draws it: prepends
+// <svg class="shape-layer"><path/></svg> for background and stroke and clips the
 // element with the same path.
 //
-// Colours have no defaults on [cut] itself — they fall back at the point of use.
+// Colours have no defaults on [shape] itself — they fall back at the point of use.
 // A declaration here would shadow the parent: with the shape on a child __bg (so
-// overflowing images are not clipped) the parent's :hover { --cut-bg } would never
-// reach it. Inside a [card] the shape follows the card palette by itself.
+// overflowing images are not clipped) the parent's :hover { --shape-bg } would
+// never reach it.
 
 // Specificity 0: a project class may make the element absolute (a __bg layer).
-:where(*[cut]) {
+:where(*[shape]) {
     position: relative;
     isolation: isolate;
 }
 
-*[cut] > .cut-shape {
+*[shape] > .shape-layer {
     position: absolute;
     inset: 0;
     z-index: -1;
@@ -25,11 +26,11 @@
 }
 
 // The element is clipped by the same path, so only the inner half of the stroke shows.
-*[cut] > .cut-shape path {
-    fill: var(--cut-bg, var(--card-bg-now, transparent));
-    stroke: var(--cut-line, var(--card-line-now, transparent));
-    stroke-width: var(--cut-width, 2px);
+*[shape] > .shape-layer path {
+    fill: var(--shape-bg, transparent);
+    stroke: var(--shape-line, transparent);
+    stroke-width: var(--shape-width, 2px);
     transition-property: fill, stroke;
-    transition-duration: var(--cut-duration, var(--card-duration, .3s));
-    transition-timing-function: var(--cut-ease, var(--card-ease, ease));
+    transition-duration: var(--shape-duration, .3s);
+    transition-timing-function: var(--shape-ease, ease);
 }

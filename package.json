@@ -11,6 +11,7 @@
   "files": [
     "src",
     "dist",
+    "docs/**/*.md",
     "scripts/check-vars.mjs"
   ],
   "bin": {
