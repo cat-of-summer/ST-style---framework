@@ -51,10 +51,12 @@
 // The link stays static so its ::after is laid out against the card, not the link.
 :where(*[card] [card-link]) { position: static; }
 
-// An empty link (aria-label instead of text) has no box to draw a focus ring on: the card draws it.
-:where(*[card]:has([card-link]:empty:focus-visible)) {
-    outline: 2px solid;
-    outline-offset: 2px;
+// An empty link (aria-label instead of text) is the underlay itself: out of the flow, so a flex or
+// grid card gets no extra item (and no extra gap), and its own focus ring outlines the whole card.
+*[card] [card-link]:empty {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
 }
 
 *[card] [card-link]::after {
