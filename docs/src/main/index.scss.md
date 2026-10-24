@@ -159,8 +159,12 @@ npx st-style-check-vars --strict dist/ node_modules/@cat-of-summer/st-style/dist
 # dist/assets/app.css:1:5821  --bgColor-attention-emphasis is not defined
 ```
 
-- Проверяются `var(--x)` **без** fallback, в том числе вложенные в fallback (`var(--y, var(--x))`).
-  `var(--x, …)` не помечается.
+- Проверяются `var(--x)` **без** fallback. `var(--x, …)` не помечается.
+- Вложенный в fallback `var(--y, var(--x))` помечается, только если не объявлена и `--y`: иначе цепочка
+  разрешается раньше. Так цепочки токенов kit (`var(--fgColor-default, var(--color-fg-default))` в Primer,
+  старое имя - запасным) не шумят. Если не объявлено всё звено, сообщение называет обе переменные:
+  `--x is not defined (fallback of --y, not defined either)`. Скобки разбираются с учётом вложенности
+  (`var(--y, calc(var(--x) * 2))`).
 - Объявления (`--x: …`, `@property --x`) собираются со **всех** переданных файлов и каталогов
   разом, поэтому CSS фреймворка передаётся вместе с проектным.
 - `--strict` — код выхода 1 при находках (CI, `postbuild`, шаг после purge). Без него — только
