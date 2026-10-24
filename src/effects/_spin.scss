@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes spin { to { transform: rotate(360deg) } }
 
 *[spin] {
@@ -12,3 +14,5 @@
 *[spin~="infinite"] { --spin-iteration-count: infinite }
 *[spin~="hover"], *[spin~="active"], *[spin~="focus"] { --spin-name: none }
 *[spin~="hover"]:hover, *[spin~="active"]:active, *[spin~="focus"]:focus { --spin-name: spin }
+
+}

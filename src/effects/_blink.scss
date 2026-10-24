@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes blink {
     50% { opacity: 0 }
 }
@@ -14,3 +16,5 @@
 *[blink~="infinite"] { --blink-iteration-count: infinite }
 *[blink~="hover"], *[blink~="active"], *[blink~="focus"] { --blink-name: none }
 *[blink~="hover"]:hover, *[blink~="active"]:active, *[blink~="focus"]:focus { --blink-name: blink }
+
+}

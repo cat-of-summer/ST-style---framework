@@ -1,4 +1,7 @@
 @use 'config' as cfg;
+@use 'fn';
+
+@include fn.scoped {
 
 // [td] — duration override for the element and its pseudo-elements: transitions
 // and the effects' own animations (they read --td first, see _fn.scss).
@@ -13,3 +16,5 @@
 
 // [infinite] — iteration count of every effect on the element and inside it.
 *[infinite] { --iteration-count: infinite; }
+
+}

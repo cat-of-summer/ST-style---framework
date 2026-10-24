@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 *[blur] {
     filter: blur(var(--blur-amount, 5px));
     transition-duration: fn.duration(blur, var(--td-slow));
@@ -7,4 +9,6 @@
 
 *[blur]:hover, *[blur]:active, *[blur]:focus {
     filter: blur(0)
+}
+
 }

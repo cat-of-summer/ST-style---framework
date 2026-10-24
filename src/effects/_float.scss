@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $range: var(--float-range, 6px);
 
 @keyframes floatY {
@@ -26,3 +28,5 @@ $range: var(--float-range, 6px);
 *[float~="hover"], *[float~="active"], *[float~="focus"] { --float-name: none }
 *[float~="hover"]:hover, *[float~="active"]:active, *[float~="focus"]:focus { --float-name: floatY }
 *[float~="horizontal"][float~="hover"]:hover, *[float~="horizontal"][float~="active"]:active, *[float~="horizontal"][float~="focus"]:focus { --float-name: floatX }
+
+}

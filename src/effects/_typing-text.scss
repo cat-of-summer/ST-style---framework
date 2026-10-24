@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes typing-text {
     from { width: 0 }
     to { width: 100% }
@@ -35,4 +37,6 @@
 
 *[typing-text~="hover"]:hover, *[typing-text~="active"]:active, *[typing-text~="focus"]:focus {
     animation-play-state: running;
+}
+
 }

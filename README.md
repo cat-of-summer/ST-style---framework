@@ -30,6 +30,10 @@ Markup uses attributes instead of classes:
 закрываются атрибутом. Если после подключения или обновления что-то съехало - сначала
 "Диагностика".
 
+Вместе со сторонним UI kit (Primer, Bootstrap) st-style подключается **до** kit, со шкалой под его rem
+(`$scale: false`, `$font-size: 16px`) - раздел "Сторонний UI kit" в `docs/src/main/index.scss.md`. Для страниц
+внутри чужого интерфейса (админка CMS, виджет) - `$scope`, раздел "Встраивание в чужую страницу".
+
 ## Масштабирование
 
 `font-size` у `html` задаётся в `vw` отдельно на каждом брейкпоинте:
@@ -139,9 +143,12 @@ the typography tokens `$font-sizes`/`$font-weights`, `$scale` (`true` — vw sca
 `false` — fixed rem, see «Без масштабирования»), `$user-select` (`auto` by
 default; `none` forbids text selection on `body`, inputs and contenteditable stay
 selectable), `$line-height` and `$hyphens` for `body` (`1` and `auto` by default;
-apps usually set `1.5` and `manual`) and `$reduced-motion` (`false` by default;
+apps usually set `1.5` and `manual`), `$reduced-motion` (`false` by default;
 `true` cuts every animation and transition to 1ms under
-`prefers-reduced-motion: reduce`). For `effects`, `$durations` is the duration map.
+`prefers-reduced-motion: reduce`) and `$scope` (`null` by default; a selector such as
+`'.st-ui'` keeps the reset, attributes and tokens inside that root and leaves `html`
+alone, requires `$scale: false`). For `effects`, `$durations` is the duration map and
+`$scope` the same root as in `main`.
 
 Project SCSS gets the same breakpoints from `scss/main/media` (`up`, `down`,
 `between`, `rem`; plus `cols`, `fr` and `trim-pad`). Configure once in a project partial and `@use` it everywhere:

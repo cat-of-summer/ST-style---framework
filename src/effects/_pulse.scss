@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes pulse {
     0%, 100% { transform: scale(1) }
     50% { transform: scale(var(--pulse-scale, 1.03)) }
@@ -15,3 +17,5 @@
 *[pulse~="infinite"] { --pulse-iteration-count: infinite }
 *[pulse~="hover"], *[pulse~="active"], *[pulse~="focus"] { --pulse-name: none }
 *[pulse~="hover"]:hover, *[pulse~="active"]:active, *[pulse~="focus"]:focus { --pulse-name: pulse }
+
+}

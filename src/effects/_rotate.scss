@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $hover: 3deg;
 $active: -3deg;
 
@@ -8,3 +10,5 @@ $active: -3deg;
 *[rotate~="hover"]:hover { transform: rotate(var(--rotate-hover, #{$hover})) }
 *[rotate~="active"]:active { transform: rotate(var(--rotate-active, #{$active})) }
 *[rotate~="focus"]:focus { transform: rotate(var(--rotate-active, #{$active})) }
+
+}

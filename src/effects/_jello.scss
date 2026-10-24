@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes jello {
     0%   { transform: scale3d(1,1,1); }
     30%  { transform: scale3d(1.25,0.85,1); }
@@ -18,3 +20,5 @@
 *[jello~="infinite"] { --jello-iteration-count: infinite }
 *[jello~="hover"], *[jello~="active"], *[jello~="focus"] { --jello-name: none }
 *[jello~="hover"]:hover, *[jello~="active"]:active, *[jello~="focus"]:focus { --jello-name: jello }
+
+}

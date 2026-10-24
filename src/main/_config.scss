@@ -24,6 +24,14 @@
 $scale: true !default;
 $font-size: 10px !default;   // default `font`: 1rem at the design width
 
+// ── Embedding into a foreign page ───────────────────────────────────────────
+// $scope: '.st-ui' puts the reset, the attributes and the tokens under
+// :where(.st-ui) (specificity unchanged) and the body rules on .st-ui itself;
+// html is left alone. rem then means the host's root size: requires
+// $scale: false and $font-size = that size (usually 16px). Use the same value
+// in the effects config.
+$scope: null !default;
+
 // ── Responsive breakpoints (single source of truth) ─────────────────────────
 // One scale drives every responsive feature. Per breakpoint:
 //   min       — min-width threshold for [lc], [m]/[p], [col], [ds], [container]

@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 *[grayscale] {
     filter: grayscale(var(--grayscale-amount, 100%));
     transition-duration: fn.duration(grayscale, var(--td-medium));
@@ -7,4 +9,6 @@
 
 *[grayscale]:hover, *[grayscale]:active, *[grayscale]:focus {
     filter: grayscale(0)
+}
+
 }

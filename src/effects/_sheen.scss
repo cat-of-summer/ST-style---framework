@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes sheen {
     0% { left: -150% }
     100% { left: 150% }
@@ -30,3 +32,5 @@
 *[sheen~="infinite"] { --sheen-iteration-count: infinite }
 *[sheen~="hover"], *[sheen~="active"], *[sheen~="focus"] { --sheen-name: none }
 *[sheen~="hover"]:hover, *[sheen~="active"]:active, *[sheen~="focus"]:focus { --sheen-name: sheen }
+
+}

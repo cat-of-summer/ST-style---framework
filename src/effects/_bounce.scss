@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes bounce {
   0%, 100% {
         transform: translateY(0);
@@ -21,3 +23,5 @@
 *[bounce~="infinite"] { --bounce-iteration-count: infinite }
 *[bounce~="hover"], *[bounce~="active"], *[bounce~="focus"] { --bounce-name: none }
 *[bounce~="hover"]:hover, *[bounce~="active"]:active, *[bounce~="focus"]:focus { --bounce-name: bounce }
+
+}

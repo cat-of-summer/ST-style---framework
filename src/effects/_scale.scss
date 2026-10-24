@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $hover: 1.05;
 $active: 0.95;
 
@@ -8,3 +10,5 @@ $active: 0.95;
 *[scale~="hover"]:hover { transform: scale(var(--scale-hover, #{$hover})) }
 *[scale~="active"]:active { transform: scale(var(--scale-active, #{$active})) }
 *[scale~="focus"]:focus { transform: scale(var(--scale-active, #{$active})) }
+
+}

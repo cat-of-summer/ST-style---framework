@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $angle: var(--wobble-angle, 10deg);
 
 @keyframes wobble {
@@ -19,3 +21,5 @@ $angle: var(--wobble-angle, 10deg);
 *[wobble~="infinite"] { --wobble-iteration-count: infinite }
 *[wobble~="hover"], *[wobble~="active"], *[wobble~="focus"] { --wobble-name: none }
 *[wobble~="hover"]:hover, *[wobble~="active"]:active, *[wobble~="focus"]:focus { --wobble-name: wobble }
+
+}

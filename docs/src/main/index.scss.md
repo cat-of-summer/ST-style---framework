@@ -65,12 +65,33 @@
 | Симптом | Причина | Решение |
 |---------|---------|---------|
 | Картинка схлопнулась до нуля или не заполняет бокс по высоте | `img { height: auto }`: высоту родителя reset не берёт | `cover` на `img` или `height: 100%` в своём CSS. Картинке под `object-fit` высоту задаёт она сама, а не контейнер |
-| Иконка в `absolute`-боксе у края (`left: 99%`) сжалась до 1px | `svg { max-width: 100% }`, а ширина бокса без `width` считается по содержимому и у края почти нулевая | ширина боксу (`width: max-content` или явная) либо `max-width: none` на `svg` |
+| Иконка в `absolute`-боксе у края (`left: 99%`) сжалась до 1px | у `svg` без атрибута `width` - `max-width: 100%`, а ширина бокса без `width` считается по содержимому и у края почти нулевая | атрибут `width` на `svg`, ширина боксу (`width: max-content` или явная) либо `max-width: none` на `svg` |
+| Иконка в колонке `min-content` (иконка баннера, тоста) схлопнулась до 0x0 | до 1.4: `svg { max-width: 100% }` у всех `svg`, а процентный `max-width` обнуляет минимальную ширину заменяемого элемента | с 1.4 у `svg` с атрибутом `width` ограничения нет. Иконке без атрибута - `width` на `svg` или `max-width: none` |
+| Логотип `<svg width="…">` вылез из узкой колонки после обновления на 1.4 | `max-width: 100%` теперь только у `svg` без атрибута `width` | `max-width: 100%` на этом `svg` в своём CSS или убрать атрибут `width`, оставив `viewBox` |
+| `textarea` с `rows` перестал расти по тексту после обновления на 1.4 | `field-sizing: content` теперь только у `textarea` без `rows`: он отменяет высоту из `rows` | нужен рост по тексту - убрать `rows`; нужна высота `rows` - ничего не делать |
+| `textarea rows="8"` в одну строку | до 1.4: `field-sizing: content` у всех `textarea` | с 1.4 исправлено; на старой версии - `field-sizing: fixed` на поле |
+| UI kit (Primer, Bootstrap) после подключения мельче в 1.6 раза | `html { font-size: 62.5% }`: по умолчанию `1rem = 10px`, а kit рассчитан на `1rem = 16px` | `$scale: false` и `$font-size: 16px` ("Сторонний UI kit") |
+| Атрибут `fs="…"` ничего не меняет | такого атрибута нет | размер шрифта - `tx`, вес - `fw`, обрезка строк - `lc` |
+| Непонятно, какое правило дало элементу размер | - | "Почему у элемента такой размер" ниже |
 | Браузерная рамка фокуса не в цветах проекта | reset возвращает UA-рамку для `:focus-visible` | `:root { --focus-ring: 2px solid …; --focus-offset: 2px }` ("CSS Reset → Фокус") |
 | Капс в плашке или кнопке сидит выше центра | над прописными остаётся место под выносные элементы шрифта | атрибут `trim`, высоту макета - `@include st.trim-pad()` ("Атрибут `trim`") |
 | `trim` ничего не меняет | плашка `flex`/`inline-flex` (`[icon]`, `ds="flex"`) или на ней `lc` | плашке `display: inline-block`; во flex-элементе `trim` ставится на `span` с текстом |
 | Тексты сдвинулись на 2–8px после обновления на 1.2 | строчные элементы стоят на `baseline`, а не на `middle` | ожидаемо: так ближе к макету, править не нужно |
 | Пропали отступы, маркеры, подчёркивания | `all: unset` | "CSS Reset → Что снимает reset и как вернуть" |
+
+### Почему у элемента такой размер
+
+Отдельного инструмента нет: какое правило победило, браузер показывает сам.
+
+1. DevTools -> элемент -> вкладка **Computed** -> свойство (`height`, `max-width`, `field-sizing`) -> раскрыть:
+   видно правило-победитель с файлом и строкой и перебитые правила под ним.
+2. Правила reset узнаются по селектору `:where(…)`: их специфичность 0, любой класс kit или проекта их
+   перебивает. Если победил `:where(…)` - у элемента нет своего правила на это свойство.
+3. Размер из `width`/`height` не объясняет картину - смотреть `max-width`, `min-width`, `field-sizing`, `display`
+   и размер родителя: у сетки по содержимому (`min-content`, `auto`) и у `absolute` без ширины размер считается
+   от содержимого.
+
+Агенту со стендом layout - `matched_rules` (все правила элемента с источником) и `computed_styles` по селектору.
 
 ---
 
@@ -150,6 +171,126 @@ npx st-style-check-vars --strict dist/ node_modules/@cat-of-summer/st-style/dist
 Из Node — та же проверка функцией:
 `import { findUndefinedVars } from '@cat-of-summer/st-style/check-vars'`, на входе
 `[{ file, css }]`. Сборка самого фреймворка (`npm run build`) прогоняет её по своему `dist/`.
+
+---
+
+## Сторонний UI kit (Primer, Bootstrap)
+
+Сетка, отступы и типографика - атрибутами st-style, компоненты - классами kit.
+
+### Порядок подключения
+
+st-style **до** kit: `main.min.css`, `effects.min.css`, затем CSS kit, затем свой CSS.
+
+- Reset написан на `:where()`, его специфичность 0. Правило kit с тегом или классом (`h1`, `p`, `label`,
+  `.Button`) побеждает его при любом порядке: базовые отступы и веса заголовков приходят из kit.
+- Порядок решает, когда у правила kit тоже нулевая специфичность (`*`, `::before`, `:where(…)`): подключённый
+  позже st-style стёр бы его `all: unset`.
+- Атрибут st-style (`[p]`, `[mt]` - 0,1,0) и класс kit (0,1,0) на **одном** элементе спорят за одно свойство -
+  побеждает подключённый позже, то есть kit. Атрибут ставить на обёртку компонента или переопределять своим правилом.
+
+Если порядок не гарантирован (CSS-in-JS вставляет стили kit в `<head>` во время работы), st-style кладётся в
+каскадный слой: всё неслоёное (kit, проект) побеждает его независимо от порядка.
+
+```css
+@import url('@cat-of-summer/st-style/main.css') layer(st-style);
+```
+
+```scss
+@use 'sass:meta';
+@use '@cat-of-summer/st-style/scss/main/config' with ($scale: false, $font-size: 16px);
+@layer st-style {
+  @include meta.load-css('@cat-of-summer/st-style/scss/main');
+}
+```
+
+В слое `!important` работает наоборот: `!important` слоя побеждает неслоёный `!important`, поэтому `tx`, `fw`,
+`lc` и `[hidden]` перебивают `!important`-утилиты kit на том же элементе. Если kit сам разложен по слоям,
+слой st-style объявляется первым: `@layer st-style, <слои kit>;`, иначе неслоёный st-style перебьёт весь kit.
+
+### Настройки под rem kit
+
+Kit считает `1rem = 16px`, а st-style по умолчанию ставит `html { font-size: 62.5% }` (`1rem = 10px`) с шкалой в
+`vw` - весь kit мельчает. Шкала st-style подгоняется под kit:
+
+```scss
+@use '@cat-of-summer/st-style/scss/main/config' with (
+  $scale: false,         // html без vw: зум и размер шрифта браузера работают
+  $font-size: 16px,      // html { font-size: 100% } - 1rem kit не меняется
+  $space-step: 0.25rem,  // шаг 4px: mt="4" = 16px
+  $line-height: 1.5,
+  $hyphens: manual,
+  // Primer: title large / medium / small, body medium / small
+  $font-sizes: (h1: 2rem, h2: 1.25rem, h3: 1rem, h4: 1rem, h5: 0.875rem, h6: 0.75rem, p: 0.875rem),
+);
+@use '@cat-of-summer/st-style/scss/main';
+```
+
+- Primer: размеры - из токенов `--text-title-size-large` (2rem), `-medium` (1.25rem), `-small` (1rem),
+  `--text-body-size-medium` (0.875rem), `-small` (0.75rem); line-height тела 1.5; сетка 4px.
+- Bootstrap 5.3: `$font-sizes: (h1: 2.5rem, h2: 2rem, h3: 1.75rem, h4: 1.5rem, h5: 1.25rem, h6: 1rem, p: 1rem)`
+  (`$h1-font-size` … `$h6-font-size`), `$line-height: 1.5`; `$spacers` кратны `0.25rem`, тот же `$space-step`.
+- В `$font-sizes` нужны все ключи `h1`-`h6` и `p`: reset ссылается на них. Свои ключи добавляются к ним
+  (`display: 2.5rem` -> `tx="display"`).
+- С готовым `main.css`, без пересборки: `html { font-size: 100% }` и токены на `:root`
+  (`--fs-p: .875rem; --space-step: .25rem`).
+
+### Что ещё бывает нужно вернуть
+
+| Что | Почему | Что делать |
+|-----|--------|------------|
+| Иконка kit 0x0 в баннере, тосте | `max-width: 100%` у `svg` без атрибута `width` | Octicons, Bootstrap Icons ставят `width` - ничего; иконке без атрибута - `max-width: none` |
+| Поле `textarea` в одну строку | у поля нет `rows`, `field-sizing: content` | `rows` на поле |
+| Список kit без маркеров | `li { list-style: none }` | `list-style: revert` на нужном списке |
+| Ссылки без подчёркивания | `all: unset`, а kit подчёркивание не ставит | `text-decoration: underline` в своём CSS |
+
+---
+
+## Встраивание в чужую страницу (`$scope`)
+
+Страница модуля в админке CMS, виджет на чужом сайте: глобальный reset переделал бы интерфейс хоста. С `$scope`
+всё st-style действует только внутри корня:
+
+```scss
+@use '@cat-of-summer/st-style/scss/main/config' with (
+  $scope: '.st-ui',
+  $scale: false,
+  $font-size: 16px,      // корневой размер шрифта хоста
+  $space-step: 0.25rem,
+  $font-sizes: (h1: 2rem, h2: 1.5rem, h3: 1.25rem, h4: 1rem, h5: 0.875rem, h6: 0.75rem, p: 0.875rem),
+);
+@use '@cat-of-summer/st-style/scss/main';
+
+@use '@cat-of-summer/st-style/scss/effects/config' with ($scope: '.st-ui');
+@use '@cat-of-summer/st-style/scss/effects';
+```
+
+```html
+<div class="st-ui">
+  <div grid="gap-4"><div col="12 md-6" mt="4">…</div></div>
+</div>
+```
+
+| Правила | Без `$scope` | С `$scope: '.st-ui'` |
+|---------|--------------|----------------------|
+| reset, атрибуты, `.editor`, эффекты | вся страница | потомки `.st-ui`: `:where(.st-ui) *[mt~="4"]`, специфичность прежняя |
+| токены `--fs-*`, `--fw-*`, `--space-step`, `--td-*` | `:root` | `.st-ui` |
+| `body`: `font-size`, `font-weight`, `line-height`, `overflow-wrap`, `hyphens`, `user-select` | `body` | `.st-ui` |
+| `html`: сглаживание шрифта, `text-rendering` | `html` | `.st-ui` |
+| `html`: шкала `font-size`, `overflow-x`, `scrollbar-gutter`, `scroll-behavior`, `text-size-adjust`; `body`: `overflow-x`, правка `position: fixed` | выводятся | не выводятся: страница принадлежит хосту |
+| `@property`, `@keyframes` | глобально | глобально |
+
+- `$scope` требует `$scale: false`: `html` остаётся за хостом, `1rem` - его корневой размер. Сборка с
+  `$scale: true` падает с ошибкой. `$font-size` - корневой размер хоста (обычно 16px), `$font-sizes` и
+  `$space-step` - в rem этого размера: умолчания (`p: 1.2rem`) рассчитаны на `1rem = 10px`.
+- `$scope` задаётся в обоих конфигах одинаково: у бандлов нет общих настроек.
+- Корень - обёртка: reset и атрибуты действуют на его потомков, на самом `.st-ui` - только токены и
+  body-правила. Атрибуты ставятся на элементы внутри.
+- Токены переопределяются на корне (`.st-ui { --fs-p: 1rem }`), а не на `:root`: корень объявляет их сам, и
+  значение с `:root` до потомков не дойдёт.
+- Имена анимаций (`pulse`, `spin`, …) глобальные: `@keyframes` хоста с тем же именем перебьёт эффект или наоборот.
+- Стили хоста со специфичностью выше нуля (`.admin div`, `#content a`) по-прежнему достают элементы внутри
+  `.st-ui`. Полная изоляция от CSS хоста - Shadow DOM или `iframe`.
 
 ---
 
@@ -372,10 +513,10 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 - ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
 - место под полосу прокрутки зарезервировано всегда (`scrollbar-gutter: stable`): макет не сдвигается, когда полоса появляется или скролл блокируют через `overflow: hidden` на `html`/`body`. Блокировкам, которые ставят `body` в `position: fixed` inline-стилем, reset задаёт `width: auto !important; right: 0`, чтобы `body` не заходил под зарезервированное место. На оверлейных полосах (macOS, мобильные) правило ничего не меняет. Отключить — `html { scrollbar-gutter: auto }`
 - `vertical-align: middle` — только у медиа (`svg`, `img`, `video`, `canvas`, `iframe`), полей (`input`, `select`, `textarea`, `button`, `meter`, `progress`), `span[checkbox|radio]` и `[icon~="inline"]`. Строчный текст (`mark`, `code`, `a`, `span`) стоит на `baseline`: с `middle` строчный элемент другого размера проседал ниже строки на 1–2px
-- `picture`, `video`, `canvas`, `svg`: `display: block; max-width: 100%; height: auto`. `max-width` не даёт inline-логотипу или иллюстрации вылезти из узкой колонки, но сжимает иконку в боксе без ширины (см. выноску ниже)
+- `picture`, `video`, `canvas`, `svg`: `display: block; height: auto`; `max-width: 100%` - у `picture`, `video`, `canvas` и у `svg` **без** атрибута `width`. `max-width` не даёт иллюстрации вылезти из узкой колонки и ужимает её по ширине. У `svg width="16"` (иконки) ограничения нет: процентный `max-width` обнуляет минимальную ширину заменяемого элемента, и в колонке `min-content` иконка стала бы 0x0 (см. выноску ниже)
 - `input`, `textarea`, `button`: `font-size: var(--fs-p)`; outline фокуса снят `all: unset` и возвращён только для `:focus-visible` (см. "Фокус")
 - `button`, `input[type="button|submit|reset"]`: `text-align: center` - браузерное центрирование подписи, которое `all: unset` заменил бы выравниванием родителя
-- `textarea`: `resize: vertical; field-sizing: content`
+- `textarea`: `resize: vertical`; без `rows` ещё `field-sizing: content` - поле растёт по тексту. С `rows` высота из `rows`: `field-sizing: content` её отменил бы
 - `table`: `border-collapse: collapse; border-spacing: 0`
 - `li`: `list-style: none`
 - `:disabled`: `cursor: not-allowed`
@@ -393,11 +534,11 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 > заполняет бокс (фото карточки или новости, фон блока), нужен атрибут `cover` или
 > `height: 100%` в своём CSS.
 
-> [!warning] `svg` в боксе без ширины
+> [!warning] `svg` без атрибута `width` в боксе без ширины
 > `max-width: 100%` считается от ширины бокса. У `position: absolute` без `width` ширина берётся по
 > содержимому и ограничена местом до края контейнера: иконка на `left: 99.92%` (ракета в конце
-> таймлайна) сжимается до 1px. Боксу нужна ширина (`width: max-content` или явная), либо самому
-> `svg` - `max-width: none`.
+> таймлайна) сжимается до 1px. Иконке нужен атрибут `width` (тогда ограничения нет), боксу - ширина
+> (`width: max-content` или явная), либо самому `svg` - `max-width: none`.
 
 ### Фокус
 
@@ -457,7 +598,7 @@ Reset фреймворка делает «агрессивные» шаги — 
 | Что пропало | Почему | Как вернуть |
 |-------------|---------|-------------|
 | Растягивание `img` на высоту родителя | `height: auto`: процентная высота ломала absolute-картинки и сетки | атрибут `cover` на `img` или `height: 100%` в своём CSS |
-| Размер `svg` в `absolute`-боксе без ширины | `max-width: 100%` от ширины бокса, которая у края почти нулевая | ширина боксу или `max-width: none` на `svg` |
+| Размер `svg` без атрибута `width` в `absolute`-боксе без ширины | `max-width: 100%` от ширины бокса, которая у края почти нулевая | атрибут `width` на `svg`, ширина боксу или `max-width: none` на `svg` |
 | Outline фокуса мышью у ссылок, кнопок, полей | `all: unset`; для клавиатуры возвращён через `:where(:focus-visible)` | цвет и толщина - `--focus-ring`, отступ - `--focus-offset` |
 | `vertical-align: middle` у строчного текста | намеренно: `mark`, `code`, `a` проседали ниже строки | `vertical-align: middle` на нужном элементе |
 | Рамка, фон, `appearance` у `input`, `button`, `select` | `all: unset` | стилизовать с нуля или `appearance: revert`. У `checkbox`, `radio`, `range` нативный вид уже возвращён |
@@ -1292,10 +1433,11 @@ html {
 ```
 
 **Общий порядок подключения стилей:**
-1. Внешние библиотеки (Swiper и т.д.)
-2. `main.min.css` — базовый фреймворк
-3. `effects.min.css` — анимации
-4. `root.css` — проектные переменные
+1. `main.min.css` - базовый фреймворк
+2. `effects.min.css` - анимации
+3. Внешние библиотеки и UI kit (Swiper, Primer, Bootstrap) - после reset, чтобы он не стёр их правила с нулевой
+   специфичностью (см. "Сторонний UI kit")
+4. `root.css` - проектные переменные
 5. `header.css`, `main.css`, `footer.css`, `modals.css` - компоненты
 
 ---

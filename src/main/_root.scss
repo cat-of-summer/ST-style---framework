@@ -2,13 +2,14 @@
 @use 'sass:list';
 @use 'sass:math';
 @use 'config' as cfg;
+@use 'scope';
 
-@property --space-step   { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
+@property --space-step  { syntax: "<length>";          inherits: true;  initial-value: #{cfg.$space-step}; }
 @property --grid-columns { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-span     { syntax: "<integer>";         inherits: false; initial-value: 12; }
 @property --col-start    { syntax: "<integer> | auto";  inherits: false; initial-value: auto; }
 
-:root {
+@include scope.root(':root') {
     font-synthesis: none;
     --font-weight: var(--fw-normal);
     --space-step: #{cfg.$space-step};
@@ -27,7 +28,8 @@
 // Below the first breakpoint the first one's scale applies. Plain `html`
 // (not :where) so the reset's `all: unset` doesn't wipe it.
 // With $scale: false it is a fixed percentage of the browser default (16px),
-// so 1rem = `font` px regardless of the viewport.
+// so 1rem = `font` px regardless of the viewport. With $scope html is the
+// host's: no rule at all.
 @function html-font($data) {
   $font: map.get($data, font) or cfg.$font-size;
   @if not cfg.$scale { @return math.div($font, 16px) * 100%; }
@@ -37,16 +39,18 @@
 
 // Steps whose value equals the previous one are skipped: the first breakpoint
 // (it repeats the base rule) and, with $scale: false, steps with an unchanged `font`.
-$first: list.nth(map.values(cfg.$breakpoints), 1);
-$prev: html-font($first);
-html { font-size: $prev; }
+@if not cfg.$scope {
+  $first: list.nth(map.values(cfg.$breakpoints), 1);
+  $prev: html-font($first);
+  html { font-size: $prev; }
 
-@each $bp, $data in cfg.$breakpoints {
-  $size: html-font($data);
-  @if $size != $prev {
-    @media (min-width: map.get($data, min)) {
-      html { font-size: $size; }
+  @each $bp, $data in cfg.$breakpoints {
+    $size: html-font($data);
+    @if $size != $prev {
+      @media (min-width: map.get($data, min)) {
+        html { font-size: $size; }
+      }
     }
+    $prev: $size;
   }
-  $prev: $size;
 }

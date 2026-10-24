@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes ripple {
     0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
     60%  { transform: translate(-50%,-50%) scale(10); opacity: 0.28; }
@@ -24,4 +26,6 @@
 
 *[ripple~="active"]:active::before, *[ripple~="hover"]:hover::before, *[ripple~="focus"]:focus::before {
     animation: ripple fn.duration(ripple, var(--td-medium)) ease-out
+}
+
 }

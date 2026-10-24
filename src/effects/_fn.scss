@@ -4,9 +4,29 @@
 // never declared by the bundle: they are read as var(--x, default), so a value
 // set anywhere up the tree (:root, .card:hover, inline style) reaches the
 // element by plain inheritance.
+@use 'config' as cfg;
 
 // Duration of an effect: the element's own [td] (--td does not inherit), then
 // --<name>-duration from anywhere up the tree, then the effect's default.
 @function duration($name, $default) {
     @return var(--td, var(--#{$name}-duration, #{$default}));
+}
+
+// Rules of a partial, under :where($scope) when set: specificity stays the
+// same. @keyframes inside are emitted at the top level, unscoped.
+@mixin scoped {
+    @if cfg.$scope {
+        :where(#{cfg.$scope}) { @content; }
+    } @else {
+        @content;
+    }
+}
+
+// :root, or the scope root itself when $scope is set.
+@mixin root {
+    @if cfg.$scope {
+        :where(#{cfg.$scope}) { @content; }
+    } @else {
+        :root { @content; }
+    }
 }

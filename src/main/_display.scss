@@ -1,5 +1,8 @@
 @use 'sass:map';
 @use 'config' as cfg;
+@use 'scope';
+
+@include scope.scoped {
 
 // [ps] — positioning.
 *[ps] { --position: relative; position: var(--position) !important }
@@ -68,4 +71,6 @@ $values: (none, block, flex, grid, inline);
 }
 @for $i from 1 through cfg.$gap-max {
   *:is([ds~="gap-y-#{$i}"], [grid~="gap-y-#{$i}"]) { --gap-y: #{$i}; }
+}
+
 }

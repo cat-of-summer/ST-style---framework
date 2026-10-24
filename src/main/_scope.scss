@@ -1,0 +1,27 @@
+// $scope helpers for the bundle partials. Emits no CSS.
+//
+// With $scope unset both mixins emit their content as is. With $scope: '.st-ui'
+// the rules go under :where(.st-ui), so specificity stays the same, and the
+// page-level rules (:root, body) go on the scope root itself.
+@use 'config' as cfg;
+
+@if cfg.$scope and cfg.$scale {
+  @error '$scope leaves html alone, so there is no vw scale: set $scale: false and $font-size to the host page\'s root font-size (usually 16px).';
+}
+
+@mixin scoped {
+  @if cfg.$scope {
+    :where(#{cfg.$scope}) { @content; }
+  } @else {
+    @content;
+  }
+}
+
+// $selector is the unscoped one: ':root', ':where(body)'.
+@mixin root($selector) {
+  @if cfg.$scope {
+    :where(#{cfg.$scope}) { @content; }
+  } @else {
+    #{$selector} { @content; }
+  }
+}

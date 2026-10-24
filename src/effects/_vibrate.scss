@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $x: var(--vibrate-x, 2px);
 $y: var(--vibrate-y, 1px);
 $r: var(--vibrate-rotate, 0.5deg);
@@ -27,4 +29,6 @@ $r: var(--vibrate-rotate, 0.5deg);
 
 *[vibrate~="reverse"][vibrate~="hover"]:hover, *[vibrate~="reverse"][vibrate~="active"]:active, *[vibrate~="reverse"][vibrate~="focus"]:focus {
     animation-play-state: paused
+}
+
 }

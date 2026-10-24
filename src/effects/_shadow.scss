@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $hover-offset: var(--shadow-hover-offset, 5px);
 $active-offset: var(--shadow-active-offset, 2px);
 
@@ -13,3 +15,5 @@ $active: var(--shadow-active-offsetX, #{$active-offset}) var(--shadow-active-off
 *[shadow~="hover"]:hover { box-shadow: $hover }
 *[shadow~="active"]:active { box-shadow: $active }
 *[shadow~="focus"]:focus { box-shadow: $active }
+
+}

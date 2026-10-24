@@ -1,3 +1,7 @@
+@use 'fn';
+
+@include fn.scoped {
+
 @media (prefers-reduced-motion:reduce) {
     *:is([pulse], [wobble], [float], [heartbeat], [jello], [shimmer-text], [vibrate], [bounce], [spin], [opacity], [blink], [tada], [swing]),
     *:is([sheen], [ripple])::before {
@@ -12,4 +16,6 @@
         width: auto !important;
     }
     *[typing-text]::after { animation: none !important }
+}
+
 }

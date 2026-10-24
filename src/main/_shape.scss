@@ -1,3 +1,7 @@
+@use 'scope';
+
+@include scope.scoped {
+
 // [shape] — shape from a Figma path: corners keep their size, straight edges
 // stretch. st-script Shape draws it: prepends
 // <svg class="shape-layer"><path/></svg> for background and stroke and clips the
@@ -33,4 +37,6 @@
     transition-property: fill, stroke;
     transition-duration: var(--shape-duration, .3s);
     transition-timing-function: var(--shape-ease, ease);
+}
+
 }

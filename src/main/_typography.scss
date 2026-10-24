@@ -1,5 +1,8 @@
 @use 'sass:map';
 @use 'config' as cfg;
+@use 'scope';
+
+@include scope.scoped {
 
 // [tx] — pick a named font-size token (h1..p and any custom keys in $font-sizes).
 // Tokens are rem, so they scale with the html font-size like everything else.
@@ -40,4 +43,6 @@ $lc-guard: ':not([lc~="0"])';
 *[fw] { font-weight: var(--font-weight) !important; }
 @each $name, $val in cfg.$font-weights {
   *[fw="#{$name}"] { --font-weight: var(--fw-#{$name}); }
+}
+
 }

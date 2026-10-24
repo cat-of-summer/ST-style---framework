@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $size: var(--shimmer-size, 100%);
 $animation: shimmer fn.duration(shimmer, 2s) linear infinite;
 
@@ -32,4 +34,6 @@ $animation: shimmer fn.duration(shimmer, 2s) linear infinite;
 *[shimmer-text~="active"]:active, *[shimmer-text~="focus"]:focus {
     color: transparent;
     animation: $animation
+}
+
 }

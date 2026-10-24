@@ -1,5 +1,8 @@
 @use 'sass:map';
 @use 'config' as cfg;
+@use 'scope';
+
+@include scope.scoped {
 
 // [m] / [mt] / [mb] — vertical margin in --space-step units.
 *[m], *[mt], *[mb] {
@@ -41,4 +44,6 @@
       *:is([p~="#{$bp}-#{$i}"], [pb~="#{$bp}-#{$i}"]) { --pb: #{$i}; }
     }
   }
+}
+
 }

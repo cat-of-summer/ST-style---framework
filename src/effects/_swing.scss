@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 @keyframes swing {
     20%  { transform: rotate3d(0, 0, 1, 15deg) }
     40%  { transform: rotate3d(0, 0, 1, -10deg) }
@@ -19,3 +21,5 @@
 *[swing~="infinite"] { --swing-iteration-count: infinite }
 *[swing~="hover"], *[swing~="active"], *[swing~="focus"] { --swing-name: none }
 *[swing~="hover"]:hover, *[swing~="active"]:active, *[swing~="focus"]:focus { --swing-name: swing }
+
+}

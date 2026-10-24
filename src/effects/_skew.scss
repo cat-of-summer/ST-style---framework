@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $hover: 10deg;
 $active: -10deg;
 
@@ -8,3 +10,5 @@ $active: -10deg;
 *[skew~="hover"]:hover { transform: skewX(var(--skew-hover, #{$hover})) }
 *[skew~="active"]:active { transform: skewX(var(--skew-active, #{$active})) }
 *[skew~="focus"]:focus { transform: skewX(var(--skew-active, #{$active})) }
+
+}

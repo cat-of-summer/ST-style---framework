@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $hover: 0.5em;
 $active: 1em;
 
@@ -8,3 +10,5 @@ $active: 1em;
 *[raise~="hover"]:hover { transform: translateY(calc(-1 * var(--raise-hover, #{$hover}))) }
 *[raise~="active"]:active { transform: translateY(calc(-1 * var(--raise-active, #{$active}))) }
 *[raise~="focus"]:focus { transform: translateY(calc(-1 * var(--raise-active, #{$active}))) }
+
+}

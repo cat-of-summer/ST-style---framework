@@ -1,5 +1,8 @@
 @use 'sass:map';
 @use 'config' as cfg;
+@use 'scope';
+
+@include scope.scoped {
 
 *[grid], *[grid~="12"] {
   --grid-columns: 12;
@@ -33,4 +36,6 @@
       *[col~="#{$bp}-start-#{$i}"] { --col-start: #{$i}; }
     }
   }
+}
+
 }

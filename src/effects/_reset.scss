@@ -1,3 +1,7 @@
+@use 'fn';
+
+@include fn.scoped {
+
 *[scale], *[rotate], *[raise], *[pulse], *[wobble], *[heartbeat], *[jello],
 *[bounce], *[spin], *[float], *[vibrate], *[skew], *[tada], *[swing] { will-change: transform }
 *[blink], *[opacity]                                        { will-change: opacity }
@@ -9,3 +13,5 @@
 *[ripple]::before                                           { will-change: transform }
 *[shimmer-text]                                             { will-change: background-position }
 *[underline]::after                                         { will-change: width }
+
+}

@@ -1,3 +1,7 @@
+@use 'scope';
+
+@include scope.scoped {
+
 .editor {
     width: 100%;
     max-width: 100%;
@@ -62,4 +66,6 @@
         vertical-align: baseline;
         font-size: .8em
     }
+}
+
 }

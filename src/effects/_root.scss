@@ -1,9 +1,10 @@
 @use 'config' as cfg;
+@use 'fn';
 
 // No initial value: unset on an element, var(--td, …) takes the fallback.
 @property --td { syntax: "*"; inherits: false; }
 
-:root {
+@include fn.root {
     --iteration-count: 1;
 
     @each $name, $val in cfg.$durations {

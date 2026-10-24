@@ -60,6 +60,13 @@
   .tag--h22   { display: inline-block; border: 1px solid #6366f1; padding-block: .2rem; }
   /* то, что даёт @include st.trim-pad(.2rem) */
   @supports (text-box: trim-both cap alphabetic) { .tag--h22 { padding-block: calc((1lh - 1cap) / 2 + .2rem); } }
+
+  /* 13. Колонка иконки по содержимому, как у баннера UI kit */
+  .banner  { display: grid; grid-template-columns: min-content 1fr; gap: .8rem; align-items: center; }
+  .narrow  { width: 8rem; outline: 1px dashed #5b6275; }
+
+  /* 14. Поле с rows и без */
+  .field   { width: 100%; border: 1px solid #5b6275; border-radius: .4rem; padding: .4rem .8rem; }
 </style>
 </head>
 <body>
@@ -178,6 +185,21 @@
       <div ds="flex gap-2" style="align-items: flex-start">
         <span class="tag tag--h22" trim="" id="tag-h22">новинка</span>
       </div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">13. svg и max-width</h2>
+      <p class="note" mb="2">Ожидание: иконка с width="16" в колонке min-content - 16x16, а не 0x0. Иллюстрация без width ужимается до пунктирной рамки 8rem; логотип с width="200" - нет, выходит за рамку.</p>
+      <div class="banner" mb="2"><svg id="svg-icon" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="8" fill="#6366f1"/></svg><span>Иконка баннера</span></div>
+      <div class="narrow" mb="2"><svg id="svg-fluid" viewBox="0 0 200 40"><rect width="200" height="40" fill="#6366f1"/></svg></div>
+      <div class="narrow"><svg id="svg-logo" width="200" height="40" viewBox="0 0 200 40"><rect width="200" height="40" fill="#ec4899"/></svg></div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">14. textarea и rows</h2>
+      <p class="note" mb="2">Ожидание: поле с rows="4" - четыре строки при одной строке текста; поле без rows растёт по тексту.</p>
+      <textarea class="field" rows="4" id="textarea-rows" mb="2">одна строка</textarea>
+      <textarea class="field" id="textarea-auto">одна строка</textarea>
     </article>
 
   </div>

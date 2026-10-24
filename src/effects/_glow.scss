@@ -1,5 +1,7 @@
 @use 'fn';
 
+@include fn.scoped {
+
 $glow: 0 0 var(--glow-size, 16px) var(--glow-color, rgba(0, 150, 255, 0.7));
 
 *[glow] { transition-duration: fn.duration(glow, var(--td-medium)) }
@@ -7,3 +9,5 @@ $glow: 0 0 var(--glow-size, 16px) var(--glow-color, rgba(0, 150, 255, 0.7));
 *[glow~="hover"]:hover { box-shadow: $glow }
 *[glow~="active"]:active { box-shadow: $glow }
 *[glow~="focus"]:focus { box-shadow: $glow }
+
+}

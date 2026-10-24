@@ -20,3 +20,8 @@ $durations: (
   '10s':  10s,
   '15s':  15s,
 ) !default;
+
+// ── Embedding into a foreign page ───────────────────────────────────────────
+// $scope: '.st-ui' puts the effect attributes under :where(.st-ui) and the
+// tokens on .st-ui itself. Same value as in the main config.
+$scope: null !default;
