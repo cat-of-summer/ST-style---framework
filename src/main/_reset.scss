@@ -210,6 +210,10 @@
     height: 100%
 }
 
+// [cover] on the wrapper sizes the picture only: the img keeps height: auto,
+// overflows the box and is cut at the bottom instead of being cropped by object-fit.
+:where(picture[cover] > img) { height: 100% }
+
 // Balanced line lengths. Opt-in: Figma wraps greedily, so headings stay greedy by default.
 *[balance] { text-wrap: balance }
 

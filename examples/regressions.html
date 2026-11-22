@@ -67,6 +67,18 @@
 
   /* 14. Поле с rows и без */
   .field   { width: 100%; border: 1px solid #5b6275; border-radius: .4rem; padding: .4rem .8rem; }
+
+  /* 15. picture и cover */
+  .frame   { height: 10rem; background: #1d2130; }
+  .frame--ratio { aspect-ratio: 2 / 1; background: #1d2130; }
+  .frame__own { height: auto; }
+
+  /* 16. Кнопка inline-flex: trim на span с подписью */
+  .cta     { display: inline-flex; align-items: center; justify-content: center; padding-inline: 2.4rem; font-size: 2.4rem; line-height: 1; text-transform: uppercase; background: #1d2130; color: #fff; border-radius: .8rem; }
+  .cta--fixed { height: 4.8rem; }
+  /* то, что даёт @include st.trim-pad(.8rem) */
+  .cta--pad { padding-block: .8rem; }
+  @supports (text-box: trim-both cap alphabetic) { .cta--pad { padding-block: calc((1lh - 1cap) / 2 + .8rem); } }
 </style>
 </head>
 <body>
@@ -200,6 +212,23 @@
       <p class="note" mb="2">Ожидание: поле с rows="4" - четыре строки при одной строке текста; поле без rows растёт по тексту.</p>
       <textarea class="field" rows="4" id="textarea-rows" mb="2">одна строка</textarea>
       <textarea class="field" id="textarea-auto">одна строка</textarea>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">15. picture и cover</h2>
+      <p class="note" mb="2">Ожидание: в первой рамке img равен боксу 10rem; во второй (aspect-ratio на picture) img с cover заполняет её без полосы; в третьей свой класс с height: auto перебивает правило, img выше бокса и обрезан.</p>
+      <div class="frame" mb="2"><picture cover id="pic-cover"><img id="pic-cover-img" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%230ea5e9'/%3E%3C/svg%3E"></picture></div>
+      <picture class="frame--ratio" mb="2" id="pic-ratio"><img cover id="pic-ratio-img" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%2322c55e'/%3E%3C/svg%3E"></picture>
+      <div class="frame"><picture cover id="pic-own"><img class="frame__own" id="pic-own-img" alt="" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500'%3E%3Crect width='800' height='500' fill='%23f59e0b'/%3E%3C/svg%3E"></picture></div>
+    </article>
+
+    <article col="12 md-6" class="case" p="4">
+      <h2 tx="h4" mb="2">16. Кнопка inline-flex и trim</h2>
+      <p class="note" mb="2">Ожидание: подпись (span trim) высотой в капс и ровно по центру кнопки; первая кнопка 4.8rem, вторая 4rem (строка 2.4 + поля 0.8 × 2).</p>
+      <div ds="flex gap-2" style="align-items: flex-start">
+        <button class="cta cta--fixed" type="button" id="cta-fixed"><span trim="" id="cta-fixed-label">записаться</span></button>
+        <button class="cta cta--pad" type="button" id="cta-pad"><span trim="" id="cta-pad-label">записаться</span></button>
+      </div>
     </article>
 
   </div>

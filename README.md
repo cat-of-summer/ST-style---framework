@@ -52,6 +52,8 @@ Markup uses attributes instead of classes:
 | 1024px (lp) | 10px | 32px |
 
 Размеры из макета переводятся делением на `font`: 16px → `1.6rem`, 320px → `32rem`.
+Карту `$font-sizes` задают из макета при подключении: значения по умолчанию - заготовка с основным
+текстом 12px (раздел "Размеры шрифтов" в `docs/src/main/index.scss.md`).
 
 ```scss
 @use '@cat-of-summer/st-style/scss/main/config' with (
@@ -66,7 +68,8 @@ Markup uses attributes instead of classes:
 ```
 
 Без пересборки токены переопределяются в CSS (`:root { --fs-h1: 4rem }`), шкала — правилом
-на `html`. `[tx="h1"]` ставит размер токена на любой элемент, свой размер —
+на `html`, только значениями в `vw` по ступеням: `min()` и `clamp()` поверх шкалы ломают
+масштабирование. `[tx="h1"]` ставит размер токена на любой элемент, свой размер —
 `tx style="--tx: 1.8rem"` или просто `font-size: 1.8rem`.
 
 > [!warning]

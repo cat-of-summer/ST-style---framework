@@ -169,7 +169,8 @@ overridable в рантайме и расширяемы (добавь ключ �
 ```
 
 ```html
-<picture scale="hover">    <!-- картинка увеличивается при наведении -->
+<picture scale="hover">    <!-- увеличивается весь кадр вместе с рамкой -->
+<picture><img scale="hover"></picture>  <!-- зум внутри неподвижной рамки -->
 <button scale="active">    <!-- кнопка «нажимается» при клике -->
 <div scale="hover active"> <!-- оба состояния -->
 ```
@@ -705,10 +706,10 @@ overridable в рантайме и расширяемы (добавь ключ �
     <h3>Название услуги</h3>
 </article>
 
-<!-- Фотогалерея: масштаб при наведении -->
-<picture scale="hover">
+<!-- Фотогалерея: зум внутри рамки при наведении -->
+<picture>
     <source srcset="photo.webp" type="image/webp">
-    <img src="photo.jpg" alt="Фото">
+    <img scale="hover" src="photo.jpg" alt="Фото">
 </picture>
 
 <!-- Кнопка с ripple-эффектом и тенью -->
