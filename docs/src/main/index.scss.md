@@ -94,6 +94,7 @@
 | Капс в плашке или кнопке сидит выше центра | над прописными остаётся место под выносные элементы шрифта | атрибут `trim`, высоту макета - `@include st.trim-pad()` ("Атрибут `trim`") |
 | `trim` ничего не меняет | плашка `flex`/`inline-flex` (`[icon]`, `ds="flex"`) или на ней `lc` | плашке `display: inline-block`; во flex-элементе `trim` ставится на `span` с текстом |
 | Тексты сдвинулись на 2–8px после обновления на 1.2 | строчные элементы стоят на `baseline`, а не на `middle` | ожидаемо: так ближе к макету, править не нужно |
+| GSAP ScrollTrigger: съезжают пины и точки `start`/`end`, особенно после перезагрузки или ресайза | `scroll-behavior: smooth` на `html` превращает сброс прокрутки при замерах в анимацию | `$scroll-behavior: auto` ("CSS Reset") |
 | Пропали отступы, маркеры, подчёркивания | `all: unset` | "CSS Reset → Что снимает reset и как вернуть" |
 
 ### Почему у элемента такой размер
@@ -548,7 +549,7 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 
 - **`img`: `width: 100%; height: auto; object-fit: cover; object-position: center`** - картинка во всю ширину родителя, высота по пропорциям файла. Заполнить бокс заданной высоты (фото карточки, фон блока) - атрибут `cover` на `img`: `width/height: 100%`, `object-fit: cover` обрежет лишнее. С `aspect-ratio` бокс задан и без `cover`: картинка обрежется, а не растянется. `height: 100%` по умолчанию не ставится: процентная высота работает только при родителе с заданной высотой, иначе у `position: absolute` картинка получает высоту containing block и режется в полоску, а в grid и с `aspect-ratio` высота ссылается сама на себя и строка сетки едет
 - `iframe`: `width: 100%; height: 100%` - встраиванию (видео, карта) нужна обёртка с размером или `aspect-ratio`
-- `html`: `font-size` в `vw` по брейкпоинтам (см. "Масштабирование"), `overflow-x: hidden`, `scrollbar-gutter: stable`, `scroll-behavior: smooth`, `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
+- `html`: `font-size` в `vw` по брейкпоинтам (см. "Масштабирование"), `overflow-x: hidden`, `scrollbar-gutter: stable`, `scroll-behavior` из `$scroll-behavior` (по умолчанию `smooth`, см. выноску про GSAP ниже), `text-size-adjust: none`, `-webkit-font-smoothing: antialiased`, `-moz-osx-font-smoothing: grayscale`, `text-rendering: optimizeLegibility`
 - `body`: `overflow-x: hidden`, `font-size: var(--fs-p)`, `line-height` из `$line-height` (по умолчанию `1`), `overflow-wrap: break-word`, `hyphens` из `$hyphens` (по умолчанию `auto`); `user-select` — только при `$user-select: none`
 - ширина `html` и `body` не задаётся: при классической полосе прокрутки `100vw` сделал бы их шире окна на ширину полосы
 - место под полосу прокрутки зарезервировано всегда (`scrollbar-gutter: stable`): макет не сдвигается, когда полоса появляется или скролл блокируют через `overflow: hidden` на `html`/`body`. Блокировкам, которые ставят `body` в `position: fixed` inline-стилем, reset задаёт `width: auto !important; right: 0`, чтобы `body` не заходил под зарезервированное место. На оверлейных полосах (macOS, мобильные) правило ничего не меняет. Отключить — `html { scrollbar-gutter: auto }`
@@ -579,6 +580,20 @@ html { font-size: 2.7777777778vw }                                  /* <360: ш�
 > содержимому и ограничена местом до края контейнера: иконка на `left: 99.92%` (ракета в конце
 > таймлайна) сжимается до 1px. Иконке нужен атрибут `width` (тогда ограничения нет), боксу - ширина
 > (`width: max-content` или явная), либо самому `svg` - `max-width: none`.
+
+> [!warning] `scroll-behavior: smooth` конфликтует с GSAP ScrollTrigger
+> При пересчёте ScrollTrigger сбрасывает прокрутку в 0, чтобы измерить позиции. С `smooth` сброс
+> становится анимацией, замеры идут при ненулевой прокрутке, и пины и точки `start`/`end` съезжают.
+> На проекте с ScrollTrigger плавность из CSS отключается:
+>
+> ```scss
+> @use '@cat-of-summer/st-style/scss/main/config' with ($scroll-behavior: auto);
+> @use '@cat-of-summer/st-style/scss/main';
+> ```
+>
+> При подключении готового CSS - `html { scroll-behavior: auto }` в своих стилях. Плавный переход
+> по якорям тогда делает ScrollToPlugin, плавную прокрутку страницы - ScrollSmoother. При `$scope`
+> фреймворк `scroll-behavior` не выводит, настройка не действует.
 
 ### `img` и `picture`
 

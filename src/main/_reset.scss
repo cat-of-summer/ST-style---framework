@@ -4,6 +4,10 @@
 @use 'config' as cfg;
 @use 'scope';
 
+@if cfg.$scroll-behavior != smooth and cfg.$scroll-behavior != auto {
+    @error '$scroll-behavior is smooth or auto, got `#{cfg.$scroll-behavior}`.';
+}
+
 // With $scope every rule below goes under :where($scope); html and body rules
 // go on the scope root or are left out (see scope.root).
 @include scope.scoped {
@@ -47,7 +51,7 @@
     @if not cfg.$scope {
         overflow-x: hidden;
         scrollbar-gutter: stable;
-        scroll-behavior: smooth;
+        @if cfg.$scroll-behavior != auto { scroll-behavior: cfg.$scroll-behavior; }
         -webkit-text-size-adjust: none;
         text-size-adjust: none;
     }

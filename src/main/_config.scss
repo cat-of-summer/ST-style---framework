@@ -95,6 +95,12 @@ $user-select: auto !default;
 // height per text style; apps set the body rhythm here (1.5, manual).
 $line-height: 1 !default;
 $hyphens: auto !default;
+// html scroll-behavior: `smooth` (default) or `auto` (emits nothing). Ignored
+// under $scope: the page belongs to the host.
+// WARNING: `smooth` conflicts with GSAP ScrollTrigger. On refresh it resets the
+// scroll to 0 to measure, smooth turns that reset into an animation, and start /
+// end points and pins end up misplaced. Set `auto` on projects with ScrollTrigger.
+$scroll-behavior: smooth !default;
 // true — under prefers-reduced-motion: reduce, every animation and transition
 // is cut to 1ms site-wide (not only the effects bundle). Opt-in: the rule is
 // !important and overrides project motion as well.

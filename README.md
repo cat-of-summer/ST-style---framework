@@ -146,7 +146,9 @@ the typography tokens `$font-sizes`/`$font-weights`, `$scale` (`true` — vw sca
 `false` — fixed rem, see «Без масштабирования»), `$user-select` (`auto` by
 default; `none` forbids text selection on `body`, inputs and contenteditable stay
 selectable), `$line-height` and `$hyphens` for `body` (`1` and `auto` by default;
-apps usually set `1.5` and `manual`), `$reduced-motion` (`false` by default;
+apps usually set `1.5` and `manual`), `$scroll-behavior` for `html` (`smooth` by
+default; **conflicts with GSAP ScrollTrigger, set `auto` on projects that use it**),
+`$reduced-motion` (`false` by default;
 `true` cuts every animation and transition to 1ms under
 `prefers-reduced-motion: reduce`) and `$scope` (`null` by default; a selector such as
 `'.st-ui'` keeps the reset, attributes and tokens inside that root and leaves `html`
